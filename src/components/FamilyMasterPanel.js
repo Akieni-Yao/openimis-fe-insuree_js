@@ -13,9 +13,16 @@ import {
   FormattedMessage,
   FormPanel,
   Contributions,
+  ConstantBasedPicker,
 } from "@openimis/fe-core";
 
 const FAMILY_MASTER_PANEL_CONTRIBUTION_KEY = "insuree.Family.master";
+
+const CAMU_ENROLMENT_TYPE = [
+    "government",
+    "private",
+    "selfEmployed",
+  ];
 
 const styles = (theme) => ({
   tableTitle: theme.table.title,
@@ -26,6 +33,17 @@ const styles = (theme) => ({
 });
 
 class FamilyMasterPanel extends FormPanel {
+  // The one from FormPanel does not allow jsonExt patching
+  updateExts = (updates) => {
+    let data = { ...this.state.data };
+    if (data["jsonExt"] === undefined) {
+      data["jsonExt"] = updates;
+    } else {
+      data["jsonExt"] = { ...data["jsonExt"], ...updates };
+    }
+    this.props.onEditedChanged(data);
+  };
+
   headSummary = () => {
     const { classes, edited } = this.props;
     return (
@@ -131,32 +149,17 @@ class FamilyMasterPanel extends FormPanel {
           </Grid>
           {!!overview && this.headSummary()}
           <Grid item xs={2} className={classes.item}>
-            <PublishedComponent
-              pubRef="insuree.FamilyTypePicker"
-              withNull={true}
-              readOnly={readOnly}
-              nullLabel={formatMessage(intl, "insuree", "Family.FamilyType.null")}
-              value={!!edited && !!edited.familyType ? edited.familyType.code : null}
-              onChange={(v) => this.updateAttribute("familyType", { code: v })}
-            />
-          </Grid>
-          <Grid item xs={2} className={classes.item}>
-            <PublishedComponent
-              pubRef="insuree.ConfirmationTypePicker"
-              withNull={true}
-              readOnly={readOnly}
-              nullLabel={formatMessage(intl, "insuree", "Family.ConfirmationType.null")}
-              value={!!edited && !!edited.confirmationType ? edited.confirmationType.code : null}
-              onChange={(v) => this.updateAttribute("confirmationType", { code: v })}
-            />
-          </Grid>
-          <Grid item xs={3} className={classes.item}>
-            <TextInput
+            <ConstantBasedPicker
               module="insuree"
-              label="Family.confirmationNo"
+              label="Family.enrolmentType"
+              required
               readOnly={readOnly}
-              value={!edited ? "" : edited.confirmationNo}
-              onChange={(v) => this.updateAttribute("confirmationNo", v)}
+              //value={!!edited && !!edited.enrolmentType ? edited.enrolmentType.code : null}
+              onChange={(value) =>
+                this.updateExts({enrolmentType: value})
+              }
+              constants={CAMU_ENROLMENT_TYPE}
+              withNull
             />
           </Grid>
           <Grid item xs={4} className={classes.item}>
@@ -168,19 +171,6 @@ class FamilyMasterPanel extends FormPanel {
               readOnly={readOnly}
               value={!edited ? "" : edited.address}
               onChange={(v) => this.updateAttribute("address", v)}
-            />
-          </Grid>
-          <Grid item xs={1} className={classes.item}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  color="primary"
-                  checked={!!edited && !!edited.poverty}
-                  disabled={readOnly}
-                  onChange={(e) => this.updateAttribute("poverty", !edited.poverty)}
-                />
-              }
-              label={formatMessage(intl, "insuree", "Family.poverty")}
             />
           </Grid>
           <Divider />

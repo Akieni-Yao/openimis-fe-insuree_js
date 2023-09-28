@@ -22,9 +22,9 @@
   "insuree.FSP.title": "First Service Point",
   "insuree.Insuree.label": "Insuree",
   "insuree.Insuree.picker.dialog.title": "Search Insuree",
-  "insuree.Insuree.chfId": "Insurance No.",
-  "insuree.Insuree.lastName": "Last Name",
-  "insuree.Insuree.otherNames": "Given Names",
+  "insuree.Insuree.chfId": "CAMU No.",
+  "insuree.Insuree.lastName": "Last/Post Names",
+  "insuree.Insuree.otherNames": "First Names",
   "insuree.Insuree.names": "Name",
   "insuree.Insuree.gender": "Gender",
   "insuree.Insuree.dob": "Birth Date",
@@ -226,5 +226,12 @@
   "insuree.EnrolledFamiliesReport.dateTo": "To Date",
   "insuree.InsureeFamilyOverviewReport.dateFrom": "From Date",
   "insuree.InsureeFamilyOverviewReport.dateTo": "To Date",
-  "insuree.InsureeMissingPhotoReport.officer": "Officer"
+  "insuree.InsureeMissingPhotoReport.officer": "Officer",
+  "insuree.Family.enrolmentType": "Enrolment Type",
+  "insuree.Family.enrolmentType.null": "None",
+  "insuree.Family.enrolmentType.government": "Government",
+  "insuree.Family.enrolmentType.private": "Private",
+  "insuree.Family.enrolmentType.selfEmployed": "Self Employed",
+  "insuree.Insuree.nbKids": "Number of Kids",
+  "insuree.approx": "Approx."
 }

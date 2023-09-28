@@ -25,6 +25,17 @@ const INSUREE_INSUREE_CONTRIBUTION_KEY = "insuree.Insuree";
 const INSUREE_INSUREE_PANELS_CONTRIBUTION_KEY = "insuree.Insuree.panels";
 
 class InsureeMasterPanel extends FormPanel {
+  // The one from FormPanel does not allow jsonExt patching
+  updateExts = (updates) => {
+    let data = { ...this.state.data };
+    if (data["jsonExt"] === undefined) {
+      data["jsonExt"] = updates;
+    } else {
+      data["jsonExt"] = { ...data["jsonExt"], ...updates };
+    }
+    this.props.onEditedChanged(data);
+  };
+
   render() {
     const {
       intl,
@@ -122,6 +133,23 @@ class InsureeMasterPanel extends FormPanel {
                       onChange={(v) => this.updateAttribute("dob", v)}
                     />
                   </Grid>
+                  <Grid item xs={1} className={classes.item}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          color="primary"
+                          checked={!!edited && !!edited.jsonExt && edited.jsonExt.approx}
+                          disabled={readOnly}
+                          onChange={(e) => {
+                            console.log("e", e, e.target.checked);
+                            this.updateExts({approx: e.target.checked})}
+                          }
+                        />
+                      }
+                      label={formatMessage(intl, "insuree", "approx")}
+                    />
+                  </Grid>
+
                   <Grid item xs={3} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.InsureeGenderPicker"
@@ -144,6 +172,16 @@ class InsureeMasterPanel extends FormPanel {
                       onChange={(v) => this.updateAttribute("marital", v)}
                     />
                   </Grid>
+                  <Grid item xs={2} className={classes.item}>
+                    <TextInput
+                      module="insuree"
+                      label="Insuree.nbKids"
+                      readOnly={readOnly}
+                      numeric={true}
+                      value={!!edited && !!edited.jsonExt ? edited.jsonExt.nbKids : ""}
+                      onChange={(v) => this.updateExts({nbKids:v})}
+                    />
+                  </Grid>
                   <Grid item xs={3} className={classes.item}>
                     <FormControlLabel
                       control={
@@ -157,17 +195,7 @@ class InsureeMasterPanel extends FormPanel {
                       label={formatMessage(intl, "insuree", "Insuree.cardIssued")}
                     />
                   </Grid>
-                  <Grid item xs={12}>
-                    <PublishedComponent
-                      pubRef="insuree.InsureeAddress"
-                      value={edited}
-                      module="insuree"
-                      readOnly={readOnly}
-                      onChangeLocation={(v) => this.updateAttribute("currentVillage", v)}
-                      onChangeAddress={(v) => this.updateAttribute("currentAddress", v)}
-                    />
-                  </Grid>
-                  <Grid item xs={6} className={classes.item}>
+                  <Grid item xs={3} className={classes.item}>
                     <TextInput
                       module="insuree"
                       label="Insuree.phone"

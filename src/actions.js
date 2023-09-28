@@ -55,6 +55,7 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   "email",
   "phone",
   "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
+  "jsonExt"
 ];
 
 export const INSUREE_PICKER_PROJECTION = ["id", "uuid", "chfId", "lastName", "otherNames"];
@@ -83,6 +84,7 @@ export function fetchInsuree(mm, chfid) {
       "photo{folder,filename,photo}",
       "gender{code, gender, altLanguage}",
       "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
+      "jsonExt",
     ],
   );
   return graphql(payload, "INSUREE_INSUREE");
