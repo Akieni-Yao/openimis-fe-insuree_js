@@ -1,5 +1,6 @@
 import {
   graphql,
+  graphqlMutationLegacy,
   formatQuery,
   formatPageQuery,
   formatPageQueryWithCount,
@@ -297,25 +298,26 @@ export function formatFamilyGQL(mm, family) {
   `;
 }
 
-export function createFamily(mm, family, clientMutationLabel) {
+export function createFamily(mm, family, clientMutationLabel, additionalRequest='') {
   let mutation = formatMutation("createFamily", formatFamilyGQL(mm, family), clientMutationLabel);
   var requestedDateTime = new Date();
-  return graphql(mutation.payload, ["INSUREE_MUTATION_REQ", "INSUREE_CREATE_FAMILY_RESP", "INSUREE_MUTATION_ERR"], {
-    clientMutationId: mutation.clientMutationId,
-    clientMutationLabel,
-    requestedDateTime,
-  });
+  return graphqlMutationLegacy(mutation.payload, ["INSUREE_MUTATION_REQ", "INSUREE_CREATE_FAMILY_RESP", "INSUREE_MUTATION_ERR"], {
+      clientMutationId: mutation.clientMutationId,
+      clientMutationLabel,
+      requestedDateTime,
+    }, true, additionalRequest);
 }
-
-export function updateFamily(mm, family, clientMutationLabel) {
+export function updateFamily(mm, family, clientMutationLabel, additionalRequest='') {
   let mutation = formatMutation("updateFamily", formatFamilyGQL(mm, family), clientMutationLabel);
   var requestedDateTime = new Date();
-  return graphql(mutation.payload, ["INSUREE_MUTATION_REQ", "INSUREE_UPDATE_FAMILY_RESP", "INSUREE_MUTATION_ERR"], {
+  return graphqlMutationLegacy(mutation.payload, ["INSUREE_MUTATION_REQ", "INSUREE_UPDATE_FAMILY_RESP", "INSUREE_MUTATION_ERR"], {
     clientMutationId: mutation.clientMutationId,
     clientMutationLabel,
     requestedDateTime,
     familyUuid: family.uuid,
-  });
+  },
+  true,
+  additionalRequest);
 }
 
 export function deleteFamily(mm, family, deleteMembers, clientMutationLabel) {

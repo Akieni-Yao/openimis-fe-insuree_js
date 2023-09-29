@@ -18,15 +18,22 @@ class FamilyPage extends Component {
     historyPush(this.props.modulesManager, this.props.history, "insuree.route.family");
   };
 
-  save = (family) => {
+  save = async (family) => {
     if (!family.uuid) {
-      this.props.createFamily(
+      const createFamilyResult = await this.props.createFamily(
         this.props.modulesManager,
         family,
         formatMessageWithValues(this.props.intl, "insuree", "CreateFamily.mutationLabel", {
           label: familyLabel(family),
         }),
+        'families {family{id uuid headInsuree { id }}}'
       );
+      if (createFamilyResult
+          && createFamilyResult.status === 2
+          && createFamilyResult.families[0]?.family?.headInsuree?.id
+      ) {
+        console.log("Family created with head insuree id", createFamilyResult.families[0]?.family?.headInsuree?.id);
+      }
     } else {
       this.props.updateFamily(
         this.props.modulesManager,
