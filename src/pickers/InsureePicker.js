@@ -10,7 +10,9 @@ import _ from "lodash";
 
 const styles = (theme) => ({
   label: {
-    color: theme.palette.primary.main,
+    // color: theme.palette.primary.main,
+    color: theme.palette.text.primary,
+
   },
   item: {
     padding: theme.spacing(1),

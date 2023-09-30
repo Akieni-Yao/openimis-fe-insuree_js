@@ -14,10 +14,14 @@ const styles = (theme) => ({
 });
 
 class FamilyPage extends Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = { temporary_number: "" };
+// }
   add = () => {
     historyPush(this.props.modulesManager, this.props.history, "insuree.route.family");
   };
-
+  
   save = async (family) => {
     if (!family.uuid) {
       const createFamilyResult = await this.props.createFamily(
@@ -32,6 +36,7 @@ class FamilyPage extends Component {
           && createFamilyResult.status === 2
           && createFamilyResult.families[0]?.family?.headInsuree?.id
       ) {
+        // this.setState({ temporary_number: createFamilyResult.families[0]?.family?.headInsuree?.id });
         console.log("Family created with head insuree id", createFamilyResult.families[0]?.family?.headInsuree?.id);
       }
     } else {

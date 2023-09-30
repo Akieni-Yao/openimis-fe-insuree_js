@@ -233,5 +233,6 @@
   "insuree.Family.enrolmentType.private": "Private",
   "insuree.Family.enrolmentType.selfEmployed": "Self Employed",
   "insuree.Insuree.nbKids": "Number of Kids",
-  "insuree.approx": "Approx."
+  "insuree.approx": "Approx.",
+  "insuree.createdAt": "Created At"
 }

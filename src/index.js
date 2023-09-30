@@ -118,6 +118,8 @@ const DEFAULT_CONFIG = {
     { key: "insuree.PhotoStatusPicker", ref: PhotoStatusPicker },
     { key: "insuree.RelationPicker", ref: RelationPicker },
     { key: "insuree.InsureeNumberInput", ref: InsureeNumberInput },
+    { key: "insuree.TempInsueranceNUmber", ref: "insuree_Temp_Number" },
+    // { key: "insuree.BirthPlace", ref: "birth_place" },
 
     { key: "insuree.route.families", ref: ROUTE_INSUREE_FAMILIES },
     { key: "insuree.route.familyOverview", ref: ROUTE_INSUREE_FAMILY_OVERVIEW },

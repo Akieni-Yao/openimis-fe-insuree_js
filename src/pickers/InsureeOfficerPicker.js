@@ -8,7 +8,9 @@ import { formatMessage, AutoSuggestion, ProgressOrError, withModulesManager, dec
 
 const styles = (theme) => ({
   label: {
-    color: theme.palette.primary.main,
+    // color: theme.palette.primary.main,
+    color: theme.palette.text.primary,
+
   },
 });
 

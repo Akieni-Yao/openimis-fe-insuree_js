@@ -11,7 +11,7 @@ import {
   graphqlWithVariables,
 } from "@openimis/fe-core";
 
-const FAMILY_HEAD_PROJECTION = "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code}}";
+const FAMILY_HEAD_PROJECTION = "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code},temporaryNumber}";
 
 const FAMILY_FULL_PROJECTION = (mm) => [
   "id",
@@ -56,7 +56,8 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   "email",
   "phone",
   "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
-  "jsonExt"
+  "jsonExt",
+  "temporaryNumber"
 ];
 
 export const INSUREE_PICKER_PROJECTION = ["id", "uuid", "chfId", "lastName", "otherNames"];
@@ -84,6 +85,7 @@ export function fetchInsuree(mm, chfid) {
       `family{id}`,
       "photo{folder,filename,photo}",
       "gender{code, gender, altLanguage}",
+      "temporaryNumber",
       "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
       "jsonExt",
     ],
@@ -115,7 +117,7 @@ export function fetchFamilySummaries(mm, filters) {
     "confirmationNo",
     "validityFrom",
     "validityTo",
-    "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone, dob}",
+    "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone, dob,temporaryNumber}",
     "location" + mm.getProjection("location.Location.FlatProjection"),
   ];
   const payload = formatPageQueryWithCount("families", filters, projections);
@@ -223,6 +225,7 @@ export function fetchInsureeSummaries(mm, filters) {
     "gender{code}",
     "dob",
     "marital",
+    "temporaryNumber",
     "family{uuid,location" + mm.getProjection("location.Location.FlatProjection") + "}",
     "currentVillage" + mm.getProjection("location.Location.FlatProjection"),
   ];
@@ -301,6 +304,8 @@ export function formatFamilyGQL(mm, family) {
 export function createFamily(mm, family, clientMutationLabel, additionalRequest='') {
   let mutation = formatMutation("createFamily", formatFamilyGQL(mm, family), clientMutationLabel);
   var requestedDateTime = new Date();
+  // console.log(mutation.payload,"familymutation.payload")
+
   return graphqlMutationLegacy(mutation.payload, ["INSUREE_MUTATION_REQ", "INSUREE_CREATE_FAMILY_RESP", "INSUREE_MUTATION_ERR"], {
       clientMutationId: mutation.clientMutationId,
       clientMutationLabel,
@@ -339,6 +344,7 @@ export function deleteFamily(mm, family, deleteMembers, clientMutationLabel) {
 export function createInsuree(mm, insuree, clientMutationLabel) {
   let mutation = formatMutation("createInsuree", formatInsureeGQL(mm, insuree), clientMutationLabel);
   var requestedDateTime = new Date();
+  // console.log(mutation.payload,"mutation.payload")
   return graphql(mutation.payload, ["INSUREE_MUTATION_REQ", "INSUREE_CREATE_INSUREE_RESP", "INSUREE_MUTATION_ERR"], {
     clientMutationId: mutation.clientMutationId,
     clientMutationLabel,
