@@ -312,7 +312,7 @@ class InsureeMasterPanel extends FormPanel {
                       module="insuree"
                       label="Insuree.nbKids"
                       readOnly={readOnly}
-                      numeric={true}
+                      type="number"
                       value={!!edited && !!edited.jsonExt ? edited.jsonExt.nbKids : ""}
                       onChange={(v) => this.updateExts({ nbKids: v })}
                     />
