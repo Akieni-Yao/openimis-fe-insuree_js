@@ -30,6 +30,11 @@ const CAMU_ENROLMENT_TYPE = [
   "private",
   "selfEmployed",
 ];
+const CAMU_CIVIL_QUALITY = [
+    "rightOpener",
+    "spouse",
+    "child",
+];
 
 class InsureeMasterPanel extends FormPanel {
   // The one from FormPanel does not allow jsonExt patching
@@ -158,9 +163,9 @@ class InsureeMasterPanel extends FormPanel {
                   label="Family.enrolmentType"
                   required={false}
                   readOnly={readOnly}
-                  //value={!!edited && !!edited.enrolmentType ? edited.enrolmentType.code : null}
+                  value={!!edited && !!edited.jsonExt ? edited.jsonExt.enrolmentType : null}
                   onChange={(value) =>
-                    this.updateExts({ enrolmentTypes: value })
+                    this.updateExts({ enrolmentType: value })
                   }
                   constants={CAMU_ENROLMENT_TYPE}
                   withNull
@@ -330,6 +335,21 @@ class InsureeMasterPanel extends FormPanel {
                       label={formatMessage(intl, "insuree", "Insuree.cardIssued")}
                     />
                   </Grid>
+                  <Grid item xs={3} className={classes.item}>
+                    <ConstantBasedPicker
+                      module="insuree"
+                      label="Family.civilQuality"
+                      required={false}
+                      readOnly={readOnly}
+                      value={!!edited && !!edited.jsonExt ? edited.jsonExt.civilQuality : null}
+                      onChange={(value) =>
+                        this.updateExts({ civilQuality: value })
+                      }
+                      constants={CAMU_CIVIL_QUALITY}
+                      withNull
+                    />
+                  </Grid>
+
                   <Grid item xs={3} className={classes.item}>
                     <TextInput
                       module="insuree"

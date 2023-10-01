@@ -417,5 +417,10 @@
   "insuree.Country.UZ": "Uzbekistan",
   "insuree.Country.VU": "Vanuatu",
   "insuree.Country.VE": "Venezuela",
-  "insuree.Country.VN": "Vietnam"
+  "insuree.Country.VN": "Vietnam",
+  "insuree.Family.civilQuality": "Civil Quality",
+  "insuree.Family.civilQuality.null": "None",
+  "insuree.Family.civilQuality.rightOpener": "Right opener",
+  "insuree.Family.civilQuality.spouse": "Right opening (spouse)",
+  "insuree.Family.civilQuality.child": "Right opening (child)"
 }

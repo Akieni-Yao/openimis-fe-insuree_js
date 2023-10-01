@@ -11,7 +11,7 @@ import {
   graphqlWithVariables,
 } from "@openimis/fe-core";
 
-const FAMILY_HEAD_PROJECTION = "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code},temporaryNumber}";
+const FAMILY_HEAD_PROJECTION = "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code},temporaryNumber, jsonExt}";
 
 const FAMILY_FULL_PROJECTION = (mm) => [
   "id",
@@ -26,6 +26,7 @@ const FAMILY_FULL_PROJECTION = (mm) => [
   FAMILY_HEAD_PROJECTION,
   "location" + mm.getProjection("location.Location.FlatProjection"),
   "clientMutationId",
+  "jsonExt",
 ];
 
 export const FAMILY_PICKER_PROJECTION = ["id", "uuid", "headInsuree{id chfId uuid lastName otherNames}"];
