@@ -202,6 +202,11 @@ export function fetchProfessions(mm) {
   return graphql(payload, "INSUREE_PROFESSIONS");
 }
 
+export function fetchCountries(mm) {
+  const payload = formatQuery("country", null, ["code"]);
+  return graphql(payload, "INSUREE_COUNTRIES");
+}
+
 export function fetchIdentificationTypes(mm) {
   const payload = formatQuery("identificationTypes", null, ["code"]);
   return graphql(payload, "INSUREE_IDENTIFICATION_TYPES");

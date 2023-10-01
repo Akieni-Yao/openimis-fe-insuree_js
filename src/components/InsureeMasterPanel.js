@@ -297,6 +297,17 @@ class InsureeMasterPanel extends FormPanel {
                     />
                   </Grid>
                   <Grid item xs={2} className={classes.item}>
+                    <PublishedComponent
+                      pubRef="insuree.CountryPicker"
+                      value={!!edited && !!edited.jsonExt ? edited.jsonExt.nationality : ""}
+                      module="insuree"
+                      readOnly={readOnly}
+                      withNull={true}
+                      label={"insuree.NationalityPicker.label"}
+                      onChange={(v) => this.updateExts({nationality: v})}
+                    />
+                  </Grid>
+                  <Grid item xs={2} className={classes.item}>
                     <TextInput
                       module="insuree"
                       label="Insuree.nbKids"

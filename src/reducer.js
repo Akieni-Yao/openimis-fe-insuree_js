@@ -51,6 +51,10 @@ function reducer(
     fetchedRelations: false,
     relations: null,
     errorRelations: null,
+    fetchingCountries: false,
+    fetchedCountries: false,
+    countries: null,
+    errorCountries: null,
     fetchingIdentificationTypes: false,
     fetchedIdentificationTypes: false,
     identificationTypes: null,
@@ -424,6 +428,28 @@ function reducer(
         ...state,
         fetchingIdentificationTypes: false,
         errorIdentificationTypes: formatServerError(action.payload),
+      };
+    case "INSUREE_COUNTRIES_REQ":
+      return {
+        ...state,
+        fetchingCountries: true,
+        fetchedCountries: false,
+        countries: null,
+        errorCountries: null,
+      };
+    case "INSUREE_COUNTRIES_RESP":
+      return {
+        ...state,
+        fetchingCountries: false,
+        fetchedCountries: true,
+        countries: action.payload.data.country.map((t) => t.code),
+        errorCountries: formatGraphQLError(action.payload),
+      };
+    case "INSUREE_COUNTRIES_ERR":
+      return {
+        ...state,
+        fetchingCountries: false,
+        errorCountries: formatServerError(action.payload),
       };
     case "INSUREE_NUMBER_VALIDATION_FIELDS_REQ":
       return {
