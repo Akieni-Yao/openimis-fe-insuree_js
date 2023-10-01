@@ -72,7 +72,7 @@ class IdentificationTypePicker extends Component {
 const mapStateToProps = (state) => ({
   identificationTypes: state.insuree.identificationTypes,
   fetching: state.insuree.fetchingIdentificationTypes,
-  fetched: state.medical.fetchedIdentificationTypes,
+  fetched: state.insuree.fetchedIdentificationTypes,
 });
 
 const mapDispatchToProps = (dispatch) => {
