@@ -256,7 +256,7 @@ class InsureeMasterPanel extends FormPanel {
                       onChange={(v) => this.updateAttribute("dob", v)}
                     />
                   </Grid>
-                  <Grid item xs={1} className={classes.item}>
+                  <Grid item xs={2} className={classes.item}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -274,7 +274,7 @@ class InsureeMasterPanel extends FormPanel {
                     />
                   </Grid>
 
-                  <Grid item xs={3} className={classes.item}>
+                  <Grid item xs={2} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.InsureeGenderPicker"
                       value={!!edited && !!edited.gender ? edited.gender.code : ""}
@@ -285,7 +285,7 @@ class InsureeMasterPanel extends FormPanel {
                       onChange={(v) => this.updateAttribute("gender", { code: v })}
                     />
                   </Grid>
-                  <Grid item xs={3} className={classes.item}>
+                  <Grid item xs={2} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.InsureeMaritalStatusPicker"
                       value={!!edited && !!edited.marital ? edited.marital : ""}
