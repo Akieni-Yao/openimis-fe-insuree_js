@@ -67,7 +67,7 @@ class InsureeChfIdPicker extends Component {
     const { readOnly = false, required = false } = this.props;
     return (
       <Grid container>
-        <Grid item xs={4}>
+        <Grid item xs={12}>
           <TextInput
             readOnly={readOnly}
             autoFocus={true}
@@ -81,7 +81,7 @@ class InsureeChfIdPicker extends Component {
             required={required}
           />
         </Grid>
-        <Grid item xs={8}>
+        <Grid item xs={12}>
           <ProgressOrError progress={this.props.fetching} error={this.props.error} />
           {!this.props.fetching && (
             <TextInput
