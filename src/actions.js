@@ -11,7 +11,7 @@ import {
   graphqlWithVariables,
 } from "@openimis/fe-core";
 
-const FAMILY_HEAD_PROJECTION = "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code},temporaryNumber, jsonExt}";
+const FAMILY_HEAD_PROJECTION = "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code},camuNumber}";
 
 const FAMILY_FULL_PROJECTION = (mm) => [
   "id",
@@ -58,7 +58,7 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   "phone",
   "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
   "jsonExt",
-  "temporaryNumber"
+  "camuNumber"
 ];
 
 export const INSUREE_PICKER_PROJECTION = ["id", "uuid", "chfId", "lastName", "otherNames"];
@@ -86,7 +86,7 @@ export function fetchInsuree(mm, chfid) {
       `family{id}`,
       "photo{folder,filename,photo}",
       "gender{code, gender, altLanguage}",
-      "temporaryNumber",
+      "camuNumber",
       "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
       "jsonExt",
     ],
@@ -118,7 +118,7 @@ export function fetchFamilySummaries(mm, filters) {
     "confirmationNo",
     "validityFrom",
     "validityTo",
-    "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone, dob,temporaryNumber}",
+    "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone, dob,camuNumber}",
     "location" + mm.getProjection("location.Location.FlatProjection"),
   ];
   const payload = formatPageQueryWithCount("families", filters, projections);
@@ -231,7 +231,7 @@ export function fetchInsureeSummaries(mm, filters) {
     "gender{code}",
     "dob",
     "marital",
-    "temporaryNumber",
+    "camuNumber",
     "family{uuid,location" + mm.getProjection("location.Location.FlatProjection") + "}",
     "currentVillage" + mm.getProjection("location.Location.FlatProjection"),
   ];
