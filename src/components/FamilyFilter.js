@@ -77,7 +77,7 @@ class FamilyFilter extends Component {
           module="insuree"
           id={`FamilyFilter.${anchor}.chfId`}
           field={
-            <Grid item xs={1} className={classes.item}>
+            <Grid item xs={2} className={classes.item}>
               <TextInput
                 module="insuree"
                 label={`Family.${anchor}.chfId`}
@@ -215,7 +215,7 @@ class FamilyFilter extends Component {
           module="insuree"
           id={`FamilyFilter.${anchor}.dob`}
           field={
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <Grid container>
                 <Grid item xs={6} className={classes.item}>
                   <PublishedComponent

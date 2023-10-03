@@ -75,9 +75,9 @@ class InsureeChfIdPicker extends Component {
             label="Insuree.chfId"
             value={this.state.search}
             onChange={(v) => this.debouncedSearch(v)}
-            inputProps={{
-              "maxLength": this.chfIdMaxLength,
-            }}
+            // inputProps={{
+            //   "maxLength": this.chfIdMaxLength,
+            // }}
             required={required}
           />
         </Grid>
