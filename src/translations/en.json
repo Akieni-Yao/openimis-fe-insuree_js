@@ -422,5 +422,10 @@
   "insuree.Family.civilQuality.null": "None",
   "insuree.Family.civilQuality.rightOpener": "Right opener",
   "insuree.Family.civilQuality.spouse": "Right opening (spouse)",
-  "insuree.Family.civilQuality.child": "Right opening (child)"
+  "insuree.Family.civilQuality.child": "Right opening (child)",
+ "insuree.Insuree.documentsName":"Document's Name",
+ "insuree.Insuree.documentTitle":"Documents",
+ "insuree.Insuree.viewDocuments":"View Documents",
+ "insuree.Insuree.status":"Status",
+ "insuree.Insuree.BiometricHeading":"Biometric"
 }

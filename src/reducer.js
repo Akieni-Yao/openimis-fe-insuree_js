@@ -66,6 +66,10 @@ function reducer(
     submittingMutation: false,
     headSelected: false,
     mutation: {},
+    fetchingDocuments: false,
+    fetchedDocuments: false,
+    documentsData: null,
+    errorDocument: null,
   },
   action,
 ) {
@@ -451,6 +455,28 @@ function reducer(
         fetchingCountries: false,
         errorCountries: formatServerError(action.payload),
       };
+    case "INSUREE_DOCUMENTS_REQ":
+      return {
+        ...state,
+        fetchingDocuments: true,
+        fetchedDocuments: false,
+        documentsData: null,
+        errorDocument: null,
+      };
+    case "INSUREE_DOCUMENTS_RESP":
+      return {
+        ...state,
+        fetchingDocuments: false,
+        fetchedDocuments: true,
+        documentsData: action.payload.data.insureeDocuments,
+        errorDocument: formatGraphQLError(action.payload),
+      };
+    case "INSUREE_DOCUMENTS_ERR":
+      return {
+        ...state,
+        fetchingDocuments: false,
+        errorDocument: formatServerError(action.payload),
+      };
     case "INSUREE_NUMBER_VALIDATION_FIELDS_REQ":
       return {
         ...state,
@@ -534,6 +560,8 @@ function reducer(
       return dispatchMutationResp(state, "createInsuree", action);
     case "INSUREE_UPDATE_INSUREE_RESP":
       return dispatchMutationResp(state, "updateInsuree", action);
+      case "INSUREE_UPDATE_DOCUMENT_RESP":
+        return dispatchMutationResp(state, "updateDocumentInsuree", action);
     case "INSUREE_DELETE_INSUREES_RESP":
       return dispatchMutationResp(state, "deleteInsurees", action);
     case "INSUREE_REMOVE_INSUREES_RESP":

@@ -10,8 +10,7 @@ import {
   TextInput,
   Contributions,
   withModulesManager,
-  ConstantBasedPicker
-
+  ConstantBasedPicker,
 } from "@openimis/fe-core";
 import _ from "lodash";
 const styles = (theme) => ({
@@ -22,19 +21,12 @@ const styles = (theme) => ({
     height: "100%",
   },
 });
-const MAX_MAIN_ACTIVITY_LENGTH = 255
+const MAX_MAIN_ACTIVITY_LENGTH = 255;
 const INSUREE_INSUREE_CONTRIBUTION_KEY = "insuree.Insuree";
+const INSUREE_INSUREE_DOCUMENTS_KEY = "insuree.Insuree.documents";
 const INSUREE_INSUREE_PANELS_CONTRIBUTION_KEY = "insuree.Insuree.panels";
-const CAMU_ENROLMENT_TYPE = [
-  "government",
-  "private",
-  "selfEmployed",
-];
-const CAMU_CIVIL_QUALITY = [
-    "rightOpener",
-    "spouse",
-    "child",
-];
+const CAMU_ENROLMENT_TYPE = ["government", "private", "selfEmployed"];
+const CAMU_CIVIL_QUALITY = ["rightOpener", "spouse", "child"];
 
 class InsureeMasterPanel extends FormPanel {
   // The one from FormPanel does not allow jsonExt patching
@@ -119,7 +111,6 @@ class InsureeMasterPanel extends FormPanel {
 
               {/* New Added Fields */}
 
-
               <Grid item xs={4} className={classes.item}>
                 <TextInput
                   pubRef="insuree"
@@ -128,7 +119,6 @@ class InsureeMasterPanel extends FormPanel {
                   required={false}
                   readOnly={true}
                   value={!!edited && !!edited?.camuNumber ? edited?.camuNumber : ""}
-
                   // value={!!edited && !!edited.temporary_number ? edited.temporary_number : ""}
                   // edited_id={edited_id}
                   onChange={(v) => this.updateAttribute("temporary_number", v)}
@@ -142,7 +132,7 @@ class InsureeMasterPanel extends FormPanel {
                   inputProps={{ maxLength: MAX_MAIN_ACTIVITY_LENGTH }}
                   value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeniu : ""}
                   onChange={(v) => this.updateExts({ insureeniu: v })}
-                // readOnly={isPolicyHolderPortalUser}
+                  // readOnly={isPolicyHolderPortalUser}
                 />
               </Grid>
               <Grid item xs={3} className={classes.item}>
@@ -164,9 +154,7 @@ class InsureeMasterPanel extends FormPanel {
                   required={false}
                   readOnly={readOnly}
                   value={!!edited && !!edited.jsonExt ? edited.jsonExt.enrolmentType : null}
-                  onChange={(value) =>
-                    this.updateExts({ enrolmentType: value })
-                  }
+                  onChange={(value) => this.updateExts({ enrolmentType: value })}
                   constants={CAMU_ENROLMENT_TYPE}
                   withNull
                 />
@@ -191,7 +179,7 @@ class InsureeMasterPanel extends FormPanel {
                 <PublishedComponent
                   pubRef="location.RegionPicker"
                   withNull
-                  label={(formatMessage(intl, "insuree", "insuree.createdAt"))}
+                  label={formatMessage(intl, "insuree", "insuree.createdAt")}
                   filterLabels={false}
                   value={!!edited && !!edited ? edited.createdAt : null}
                   onChange={(v) => this.updateExts({ createdAt: v })}
@@ -211,7 +199,6 @@ class InsureeMasterPanel extends FormPanel {
                 />
               </Grid>
 
-
               <Grid item xs={4} className={classes.item}>
                 <TextInput
                   module="insuree"
@@ -225,7 +212,6 @@ class InsureeMasterPanel extends FormPanel {
                   onChange={(v) => this.updateExts({ insureeaddress: v })}
                 />
               </Grid>
-
 
               <Grid item xs={4} className={classes.item}>
                 <TextInput
@@ -270,9 +256,8 @@ class InsureeMasterPanel extends FormPanel {
                           disabled={readOnly}
                           onChange={(e) => {
                             console.log("e", e, e.target.checked);
-                            this.updateExts({ approx: e.target.checked })
-                          }
-                          }
+                            this.updateExts({ approx: e.target.checked });
+                          }}
                         />
                       }
                       label={formatMessage(intl, "insuree", "approx")}
@@ -309,7 +294,7 @@ class InsureeMasterPanel extends FormPanel {
                       readOnly={readOnly}
                       withNull={true}
                       label={"insuree.NationalityPicker.label"}
-                      onChange={(v) => this.updateExts({nationality: v})}
+                      onChange={(v) => this.updateExts({ nationality: v })}
                     />
                   </Grid>
                   <Grid item xs={2} className={classes.item}>
@@ -342,9 +327,7 @@ class InsureeMasterPanel extends FormPanel {
                       required={false}
                       readOnly={readOnly}
                       value={!!edited && !!edited.jsonExt ? edited.jsonExt.civilQuality : null}
-                      onChange={(value) =>
-                        this.updateExts({ civilQuality: value })
-                      }
+                      onChange={(value) => this.updateExts({ civilQuality: value })}
                       constants={CAMU_CIVIL_QUALITY}
                       withNull
                     />
@@ -427,8 +410,14 @@ class InsureeMasterPanel extends FormPanel {
                 contributionKey={INSUREE_INSUREE_CONTRIBUTION_KEY}
               />
             </Grid>
+            <Contributions
+              {...this.props}
+              updateAttribute={this.updateAttribute}
+              contributionKey={INSUREE_INSUREE_DOCUMENTS_KEY}
+            />
           </Paper>
           <Contributions
+          edited={edited}
             {...this.props}
             updateAttribute={this.updateAttribute}
             contributionKey={INSUREE_INSUREE_PANELS_CONTRIBUTION_KEY}

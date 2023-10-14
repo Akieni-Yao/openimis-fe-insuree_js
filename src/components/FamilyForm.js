@@ -22,11 +22,29 @@ import FamilyMasterPanel from "./FamilyMasterPanel";
 import { fetchFamily, newFamily, createFamily, fetchFamilyMutation } from "../actions";
 import FamilyInsureesOverview from "./FamilyInsureesOverview";
 import HeadInsureeMasterPanel from "./HeadInsureeMasterPanel";
-
+import { Button } from "@material-ui/core";
 import { insureeLabel } from "../utils/utils";
 
 const styles = (theme) => ({
   lockedPage: theme.page.locked,
+  approvedBtn: {
+    borderColor: "#00913E",
+    color: "#00913E",
+    borderRadius: "2rem",
+  },
+  rejectBtn: {
+    borderColor: "##FF0000",
+    color: "##FF0000",
+    borderRadius: "2rem",
+  },
+  commonBtn: {
+    borderColor: "#FF841C",
+    color: "#FF841C",
+    borderRadius: "2rem",
+  },
+  noBtnClasses: {
+    visibility: "hidden",
+  },
 });
 
 const INSUREE_FAMILY_PANELS_CONTRIBUTION_KEY = "insuree.Family.panels";
@@ -153,6 +171,21 @@ class FamilyForm extends Component {
     this.setState({ confirmedAction }, this.props.coreConfirm(title, message));
   };
 
+  getStatusClass = (status) => {
+    switch (status) {
+      case "PRE_REGISTERED":
+      case "APPROVED":
+        return this.props.classes.approvedBtn;
+      case "REJECT":
+        return this.props.classes.rejectBtn;
+      case "REWORK":
+      case "PENDING_FOR_REVIEW":
+      case "AWAIT FOR DOCUMENTS":
+        return this.props.classes.commonBtn;
+      default:
+        return this.props.classes.noBtnClasses;
+    }
+  };
   render() {
     const {
       modulesManager,
@@ -181,12 +214,22 @@ class FamilyForm extends Component {
     }
     let actions = [];
     if (family_uuid || !!family.clientMutationId) {
-      actions.push({
-        doIt: this.reload,
-        icon: <ReplayIcon />,
-        onlyIfDirty: !readOnly && !runningMutation,
-      });
+      actions.push(
+        {
+          icon: family.status !== null && (
+            <Button variant="outlined" className={this.getStatusClass(family.status)}>
+              {family.status}
+            </Button>
+          ),
+        },
+        {
+          doIt: this.reload,
+          icon: <ReplayIcon />,
+          onlyIfDirty: !readOnly && !runningMutation,
+        },
+      );
     }
+    console.log("family", family);
     return (
       <div className={!!runningMutation ? classes.lockedPage : null}>
         <Helmet

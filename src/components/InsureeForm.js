@@ -5,7 +5,7 @@ import _ from "lodash";
 
 import { withTheme, withStyles } from "@material-ui/core/styles";
 import ReplayIcon from "@material-ui/icons/Replay";
-
+import { Typography, Button } from "@material-ui/core";
 import {
   formatMessageWithValues,
   withModulesManager,
@@ -163,7 +163,7 @@ class InsureeForm extends Component {
   _save = (insuree) => {
     this.setState(
       { lockNew: true }, // avoid duplicates
-      (e) => this.props.save(insuree),
+      (e) => this.props.save({ ...insuree, status: "REWORK", statusComment: "Not clear" }),
     );
   };
 
@@ -171,7 +171,30 @@ class InsureeForm extends Component {
     // console.log("insuree",insuree);
     this.setState({ insuree, newInsuree: false });
   };
-
+  getStatusClass = (status) => {
+    switch (status) {
+      case "PRE_REGISTERED":
+      case "APPROVED":
+        return this.props.classes.approvedBtn;
+      case "REJECT":
+        return this.props.classes.rejectBtn;
+      case "REWORK":
+      case "PENDING_FOR_REVIEW":
+      case "AWAIT FOR DOCUMENTS":
+        return this.props.classes.commonBtn;
+      default:
+        return this.props.classes.noBtnClasses;
+    }
+  };
+  statusButton = (data) => {
+    console.log("DATA", data);
+    return (
+      <Typography>
+        STATUS
+        <Button className={this.getStatusClass(data.status)}> {data.status}</Button>
+      </Typography>
+    );
+  };
   render() {
     const {
       rights,
@@ -197,6 +220,10 @@ class InsureeForm extends Component {
         doIt: this.reload,
         icon: <ReplayIcon />,
         onlyIfDirty: !readOnly && !runningMutation,
+      },
+      {
+        // icon: <Button variant="outlined">APPROVED</Button>,
+        icon: this.statusButton(insuree),
       },
     ];
     return (

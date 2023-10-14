@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { injectIntl } from "react-intl";
 import _ from "lodash";
-import { Checkbox, Paper, IconButton, Grid, Divider, Typography, Tooltip } from "@material-ui/core";
+import { Checkbox, Paper, IconButton, Grid, Divider, Typography, Tooltip, Button } from "@material-ui/core";
 import {
   Search as SearchIcon,
   Add as AddIcon,
@@ -49,6 +49,24 @@ const styles = (theme) => ({
   paperHeader: theme.paper.header,
   paperHeaderAction: theme.paper.action,
   tableTitle: theme.table.title,
+  approvedBtn: {
+    borderColor: "#00913E",
+    color: "#00913E",
+    borderRadius: "2rem",
+  },
+  rejectBtn: {
+    borderColor: "##FF0000",
+    color: "##FF0000",
+    borderRadius: "2rem",
+  },
+  commonBtn: {
+    borderColor: "#FF841C",
+    color: "#FF841C",
+    borderRadius: "2rem",
+  },
+  noBtnClasses: {
+   visibility:"hidden"
+  },
 });
 
 class FamilyInsureesOverview extends PagedDataHandler {
@@ -132,6 +150,7 @@ class FamilyInsureesOverview extends PagedDataHandler {
     "Insuree.gender",
     "Insuree.dob",
     "Insuree.cardIssued",
+    "Insuree.status",
     "",
     "",
     "",
@@ -248,6 +267,21 @@ class FamilyInsureesOverview extends PagedDataHandler {
       </IconButton>
     </Tooltip>
   );
+  getStatusClass = (status) => {
+    switch (status) {
+      case "PRE_REGISTERED":
+      case "APPROVED":
+        return this.props.classes.approvedBtn;
+      case "REJECT":
+        return this.props.classes.rejectBtn;
+        case "REWORK":
+      case "PENDING_FOR_REVIEW":
+      case "AWAIT FOR DOCUMENTS":
+        return this.props.classes.commonBtn;
+      default:
+        return this.props.classes.noBtnClasses;
+    }
+  };
 
   isHead = (f, i) => i.chfId === (!!f.headInsuree && f.headInsuree.chfId);
 
@@ -259,6 +293,12 @@ class FamilyInsureesOverview extends PagedDataHandler {
       i.gender && i.gender.code ? formatMessage(this.props.intl, "insuree", `InsureeGender.${i.gender.code}`) : "",
     (i) => formatDateFromISO(this.props.modulesManager, this.props.intl, i.dob),
     (i) => <Checkbox color="primary" readOnly={true} disabled={true} checked={i.cardIssued} />,
+    (i) =>
+      i.status !== null && (
+        <Button variant="outlined" className={this.getStatusClass(i.status)}>
+          {i.status}
+        </Button>
+      ),
     (i) =>
       !!this.props.readOnly ||
       !this.props.rights.includes(RIGHT_INSUREE_DELETE) ||

@@ -29,6 +29,7 @@ import InsureeProfileLink from "./components/InsureeProfileLink";
 import InsureeSummary from "./components/InsureeSummary";
 import InsureeFirstServicePointDisplay from "./components/InsureeFirstServicePointDisplay";
 import InsureeFirstServicePointPanel from "./components/InsureeFirstServicePointPanel";
+import InsureeDocuments from "./components/InsureeDocuments";
 import InsureeAddress from "./components/InsureeAddress";
 import FamilyDisplayPanel from "./components/FamilyDisplayPanel";
 import { familyLabel } from "./utils/utils";
@@ -40,6 +41,7 @@ import EnrolledFamiliesReport from "./reports/EnrolledFamiliesReport";
 import InsureeFamilyOverviewReport from "./reports/InsureeFamilyOverviewReport";
 import InsureeMissingPhotoReport from "./reports/InsureeMissingPhotoReport";
 import InsureePendingEnrollmentReport from "./reports/InsureePendingEnrollmentReport";
+import RejectCommentPicker from "./pickers/RejectCommentPicker";
 
 const ROUTE_INSUREE_FAMILIES = "insuree/families";
 const ROUTE_INSUREE_FAMILY_OVERVIEW = "insuree/families/familyOverview";
@@ -56,7 +58,7 @@ const DEFAULT_CONFIG = {
       component: InsureeMissingPhotoReport,
       isValid: (values) => true,
       getParams: (values) => {
-        const params = {}
+        const params = {};
         if (values.officer) {
           params.officerId = decodeId(values.officer.id);
         }
@@ -74,7 +76,7 @@ const DEFAULT_CONFIG = {
         dateFrom: values.dateFrom,
         dateTo: values.dateTo,
         officerId: decodeId(values.officer.id),
-        locationId: decodeId(values.location.id)
+        locationId: decodeId(values.location.id),
       }),
     },
     {
@@ -119,6 +121,7 @@ const DEFAULT_CONFIG = {
     { key: "insuree.FamilyTypePicker", ref: FamilyTypePicker },
     { key: "insuree.PhotoStatusPicker", ref: PhotoStatusPicker },
     { key: "insuree.RelationPicker", ref: RelationPicker },
+    { key: "insuree.RejectCommentPicker", ref: RejectCommentPicker },
     { key: "insuree.InsureeNumberInput", ref: InsureeNumberInput },
     { key: "insuree.TempInsueranceNUmber", ref: "insuree_Temp_Number" },
     // { key: "insuree.BirthPlace", ref: "birth_place" },
@@ -151,6 +154,7 @@ const DEFAULT_CONFIG = {
   "insuree.InsureeSummaryAvatar": [InsureeAvatar],
   "insuree.InsureeSummaryExt": [InsureeFirstServicePointDisplay],
   "insuree.Insuree.panels": [InsureeFirstServicePointPanel],
+  "insuree.Insuree.documents": [InsureeDocuments],
   "policy.Policy.headPanel": [FamilyDisplayPanel],
   "invoice.SubjectAndThirdpartyPicker": [
     {
