@@ -427,5 +427,6 @@
  "insuree.Insuree.documentTitle":"Documents",
  "insuree.Insuree.viewDocuments":"View Documents",
  "insuree.Insuree.status":"Status",
- "insuree.Insuree.BiometricHeading":"Biometric"
+ "insuree.Insuree.BiometricHeading":"Biometric",
+ "insuree.Insuree.rejectComment":"Reason for Rejection"
 }

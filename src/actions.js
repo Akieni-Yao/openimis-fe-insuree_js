@@ -43,6 +43,7 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   "age",
   "validityFrom",
   "validityTo",
+  "status",
   `family{${FAMILY_FULL_PROJECTION(mm).join(",")}}`,
   `photo{id,uuid,date,folder,filename,officerId,photo}`,
   "gender{code}",
@@ -271,6 +272,18 @@ function formatInsureeDocument(docs) {
     ${!!docs.comments ? `comments: "${docs.comments}"` : ""}
     ${!!docs.newStatus ? `newStatus: "${docs.newStatus}"` : ""}
     ${!!docs.documentId ? `documentId: "${docs.documentId}"` : ""}
+  `;
+}
+function formatExternalDocument(docs, tempCamu) {
+  const newarray = docs.map((doc) => ({
+    documentId: doc.documentId,
+    status: doc.documentStatus,
+    comments: doc.comments || "",
+  }));
+  const formattedDocumentUpdates = JSON.stringify(newarray);
+  return `
+  ${!!tempCamu ? `tempCamuNumber: "${tempCamu}"` : ""}
+  ${!!docs ? `documentUpdates: ${JSON.stringify(newarray).replace(/"/g, '\\"')}}` : ""}
   `;
 }
 
@@ -507,28 +520,28 @@ export function checkIfHeadSelected(insuree) {
   };
 }
 
-export function selectTaskGroupUser(center, variables) {
-  graphqlWithVariables(
-    `
-  query TaskGroupByCenter {
-  taskGroupByCenter(center: ${center}) {
-  createdBy
-  modifiedBy
-  createdTime
-  modifiedTime
-  status
-  id
-  uuid
-  name
-  center
-  locationId
-  }
-  }
-  `,
-    {},
-    "TASKGROUP_USER_FILTER_CENTER_SELECTED",
-  );
-}
+// export function selectTaskGroupUser(center, variables) {
+//   graphqlWithVariables(
+//     `
+//   query TaskGroupByCenter {
+//   taskGroupByCenter(center: ${center}) {
+//   createdBy
+//   modifiedBy
+//   createdTime
+//   modifiedTime
+//   status
+//   id
+//   uuid
+//   name
+//   center
+//   locationId
+//   }
+//   }
+//   `,
+//     {},
+//     "TASKGROUP_USER_FILTER_CENTER_SELECTED",
+//   );
+// }
 
 export const fetchInsureeDocuments = (tempCamu) => {
   const payload = formatQuery(
@@ -550,5 +563,20 @@ export function updateInsureeDocument(mm, insuree) {
     mutation,
     ["INSUREE_MUTATION_REQ", "INSUREE_UPDATE_DOCUMENT_RESP", "INSUREE_MUTATION_ERR"],
     "success message",
+  );
+}
+
+export function updateExternalDocuments(mm, docs, tempCamu) {
+  console.log("docs", docs);
+  let mutation = `mutation 
+    updateStatusInExternalEndpoint(${formatExternalDocument(docs, tempCamu)}) {
+        success
+        message
+        responses
+    }`;
+  return graphql(
+    mutation,
+    ["INSUREE_MUTATION_REQ", "INSUREE_UPDATE_EXTERNAL_DOCUMENT_RESP", "INSUREE_MUTATION_ERR"],
+    "success message responses",
   );
 }

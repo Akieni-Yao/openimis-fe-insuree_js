@@ -560,8 +560,10 @@ function reducer(
       return dispatchMutationResp(state, "createInsuree", action);
     case "INSUREE_UPDATE_INSUREE_RESP":
       return dispatchMutationResp(state, "updateInsuree", action);
-      case "INSUREE_UPDATE_DOCUMENT_RESP":
-        return dispatchMutationResp(state, "updateDocumentInsuree", action);
+    case "INSUREE_UPDATE_DOCUMENT_RESP":
+      return dispatchMutationResp(state, "updateDocumentInsuree", action);
+    case "INSUREE_UPDATE_EXTERNAL_DOCUMENT_RESP":
+      return dispatchMutationResp(state, "updateExternalDocuments", action);
     case "INSUREE_DELETE_INSUREES_RESP":
       return dispatchMutationResp(state, "deleteInsurees", action);
     case "INSUREE_REMOVE_INSUREES_RESP":

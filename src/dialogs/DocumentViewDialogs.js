@@ -10,8 +10,12 @@ import {
   Slide,
   makeStyles,
   Grid,
+  IconButton,
+  Divider,
+  Typography,
 } from "@material-ui/core";
 import { PublishedComponent } from "@openimis/fe-core";
+import CloseIcon from "@material-ui/icons/Close";
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -20,17 +24,28 @@ const useStyles = makeStyles((theme) => ({
     margin: 0,
     position: "absolute",
     width: "50%",
-    height: "100%", // Set dialog height to 100% to cover the entire screen height
-    top: 0, // Set top to 0 to align with the top of the screen
-    right: 0, // Set right to 0 to align with the right of the screen
-    borderRadius: 0, // Remove border-radius
-    borderTopLeftRadius: 0, // Remove border-radius on the top left corner
+    height: "100vh",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 0,
+    borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
     overflow: "auto",
   },
   header: {
-    backgroundColor: "green", // Customize the header background color
-    color: "white", // Text color for the header
+    backgroundColor: "#00913E",
+    color: "white",
+    height: "4rem",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  rejectBtn: {
+    backgroundColor: "#FF0000",
+  },
+  closeButton: {
+    marginLeft: "auto",
   },
 }));
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -107,7 +122,7 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
       param2: "value2",
     };
 
-    const accessToken = "qtlmFWDYGfTv7y7H6aWge2hPROA";
+    const accessToken = "WM5qI67nNMBdm7dS-2u6USspT7A";
     const headers = {
       "Authorization": `Bearer ${accessToken}`,
       "Content-Type": "application/json",
@@ -136,7 +151,7 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
 
   useEffect(() => {
     console.log("hi");
-    const buttonElements = document.querySelectorAll(' [class^="Form-fab-"]');
+    const buttonElements = document.querySelectorAll(' [class^="Form-fab-"], [class^="Form-fabAbove-"]');
     console.log("buttonElements:", buttonElements);
 
     if (open) {
@@ -153,7 +168,7 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
       if (buttonElements.length > 0) {
         buttonElements.forEach((element) => {
           if (element.style) {
-            element.style.zIndex = "2000"; // Set the default zIndex when documentImage is not available
+            element.style.zIndex = "2000";
           }
         });
       }
@@ -169,31 +184,36 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
       onClose={onClose}
       TransitionComponent={Transition}
       fullWidth
-      maxWidth="xl"
+      maxWidth="md"
+      maxHeight="100vh"
+      scroll="paper"
       PaperProps={{
         className: classes.dialog,
       }}
     >
-      <DialogTitle className={classes.header}>Custom Header</DialogTitle>
+      <DialogTitle className={classes.header}>
+        Documents
+        <IconButton color="inherit" onClick={onClose} edge="end">
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
       <DialogContent>
-        {/* <img
-          src={blobURL} // Create a URL from the Blob
-          alt="Document"
-          width="100%"
-        // /> */}
-        <iframe title="PDF Viewer" src={blobURL} width="100%" height="600"></iframe>
-        <DialogContentText>Please review the document and choose an action.</DialogContentText>
+        <iframe title="PDF Viewer" src={blobURL} width="100%" height="100%"></iframe>
+        {/* <DialogContentText>Please review the document and choose an action.</DialogContentText> */}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleApprove} variant="contained" color="primary">
-          Approve
-        </Button>
-        <Button onClick={handleReject} color="primary">
-          Reject
-        </Button>
-      </DialogActions>
+      <Divider />
+      {!showRejectComment && (
+        <DialogActions style={{ marginTop: "40px " }}>
+          <Button onClick={handleApprove} variant="contained" color="primary">
+            Verify
+          </Button>
+          <Button onClick={handleReject} variant="contained" className={classes.rejectBtn}>
+            Reject
+          </Button>
+        </DialogActions>
+      )}
       {showRejectComment && (
-        <Grid>
+        <Grid style={{ margin: "10px 40px" }}>
           <PublishedComponent
             pubRef="insuree.RejectCommentPicker"
             withNull
@@ -208,7 +228,7 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
             <Button onClick={() => setShowRejectComment(false)} variant="contained" color="primary">
               Cancel
             </Button>
-            <Button onClick={submitReject} color="primary">
+            <Button onClick={submitReject} color="primary" variant="outlined">
               Submit
             </Button>
           </DialogActions>

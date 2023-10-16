@@ -42,6 +42,7 @@ import InsureeFamilyOverviewReport from "./reports/InsureeFamilyOverviewReport";
 import InsureeMissingPhotoReport from "./reports/InsureeMissingPhotoReport";
 import InsureePendingEnrollmentReport from "./reports/InsureePendingEnrollmentReport";
 import RejectCommentPicker from "./pickers/RejectCommentPicker";
+import ReviewerPicker from "./pickers/ReviwerPicker";
 
 const ROUTE_INSUREE_FAMILIES = "insuree/families";
 const ROUTE_INSUREE_FAMILY_OVERVIEW = "insuree/families/familyOverview";
@@ -122,6 +123,7 @@ const DEFAULT_CONFIG = {
     { key: "insuree.PhotoStatusPicker", ref: PhotoStatusPicker },
     { key: "insuree.RelationPicker", ref: RelationPicker },
     { key: "insuree.RejectCommentPicker", ref: RejectCommentPicker },
+    { key: "insuree.ReviewerPicker", ref: ReviewerPicker },
     { key: "insuree.InsureeNumberInput", ref: InsureeNumberInput },
     { key: "insuree.TempInsueranceNUmber", ref: "insuree_Temp_Number" },
     // { key: "insuree.BirthPlace", ref: "birth_place" },

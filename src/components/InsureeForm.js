@@ -17,15 +17,44 @@ import {
   ProgressOrError,
   Helmet,
 } from "@openimis/fe-core";
-import { fetchInsureeFull, fetchFamily, clearInsuree, fetchInsureeMutation } from "../actions";
+import {
+  fetchInsureeFull,
+  fetchFamily,
+  clearInsuree,
+  fetchInsureeMutation,
+  fetchInsureeDocuments,
+  updateExternalDocuments,
+} from "../actions";
 import { RIGHT_INSUREE } from "../constants";
 import { insureeLabel } from "../utils/utils";
 import FamilyDisplayPanel from "./FamilyDisplayPanel";
 import InsureeMasterPanel from "../components/InsureeMasterPanel";
+import RejectDialog from "../dialogs/RejectDialog";
 
 const styles = (theme) => ({
   page: theme.page,
   lockedPage: theme.page.locked,
+  approvedBtn: {
+    marginRight: "5px",
+    borderColor: "#00913E",
+    color: "#00913E",
+    borderRadius: "2rem",
+  },
+  rejectBtn: {
+    marginRight: "5px",
+    borderColor: "##FF0000",
+    color: "##FF0000",
+    borderRadius: "2rem",
+  },
+  commonBtn: {
+    marginRight: "5px",
+    borderColor: "#FF841C",
+    color: "#FF841C",
+    borderRadius: "2rem",
+  },
+  noBtnClasses: {
+    visibility: "hidden",
+  },
 });
 
 const INSUREE_INSUREE_FORM_CONTRIBUTION_KEY = "insuree.InsureeForm";
@@ -36,6 +65,9 @@ class InsureeForm extends Component {
     reset: 0,
     insuree: this._newInsuree(),
     newInsuree: true,
+    confirmDialog: false,
+    statusCheck: null,
+    payload: null,
   };
 
   _newInsuree() {
@@ -163,8 +195,24 @@ class InsureeForm extends Component {
   _save = (insuree) => {
     this.setState(
       { lockNew: true }, // avoid duplicates
-      (e) => this.props.save({ ...insuree, status: "REWORK", statusComment: "Not clear" }),
+      (e) => this.props.save(insuree),
     );
+  };
+  _approveorreject = (insuree) => {
+    console.log("CHECKPAYL", insuree);
+    // this.props.updateExternalDocuments(this.props.modulesManager, this.props.documentsData, insuree.chfId);
+    this.setState(
+      { lockNew: true }, // avoid duplicates
+      (e) => this.props.save(insuree),
+    );
+  };
+  handleDialogOpen = (status, data) => {
+    this.setState({ confirmDialog: true });
+    this.setState({ statusCheck: status });
+    this.setState({ payload: data });
+  };
+  handleDialogClose = () => {
+    this.setState({ confirmDialog: false });
   };
 
   onEditedChanged = (insuree) => {
@@ -187,12 +235,13 @@ class InsureeForm extends Component {
     }
   };
   statusButton = (data) => {
-    console.log("DATA", data);
     return (
-      <Typography>
-        STATUS
-        <Button className={this.getStatusClass(data.status)}> {data.status}</Button>
-      </Typography>
+      <>
+        <Typography>STATUS :</Typography>
+        <Button className={this.getStatusClass(data.status)} variant="outlined">
+          {data.status}
+        </Button>
+      </>
     );
   };
   render() {
@@ -211,8 +260,42 @@ class InsureeForm extends Component {
       classes,
       add,
       save,
+      documentsData,
     } = this.props;
-    const { insuree, clientMutationId } = this.state;
+    const { insuree, clientMutationId, payload, statusCheck } = this.state;
+
+    // const documentsData = [
+    //   {
+    //     "id": "34",
+    //     "documentId": "ad303dbf-f6f2-4da3-9d47-cadc55c5e05c",
+    //     "documentName": "Declaration of employment",
+    //     "documentPath": "Declaration of employment.pdf",
+    //     "documentStatus": "APPROVED",
+    //     "comments": null,
+    //     "tempCamu": "T1915102023003719",
+    //     "isVerified": false,
+    //   },
+    //   {
+    //     "id": "35",
+    //     "documentId": "71ac4acf-bc58-46a9-a437-25a282386c5f",
+    //     "documentName": "Salary slips",
+    //     "documentPath": "Salary slips.pdf",
+    //     "documentStatus": "APPROVED",
+    //     "comments": null,
+    //     "tempCamu": "T1915102023003719",
+    //     "isVerified": false,
+    //   },
+    //   {
+    //     "id": "36",
+    //     "documentId": "208dc2e3-e132-400a-bc26-d9799110acbe",
+    //     "documentName": "Copy of passport",
+    //     "documentPath": "Copy of passport.pdf",
+    //     "documentStatus": "APPROVED",
+    //     "comments": null,
+    //     "tempCamu": "T1915102023003719",
+    //     "isVerified": false,
+    //   },
+    // ];
     if (!rights.includes(RIGHT_INSUREE)) return null;
     let runningMutation = !!insuree && !!clientMutationId;
     let actions = [
@@ -226,6 +309,17 @@ class InsureeForm extends Component {
         icon: this.statusButton(insuree),
       },
     ];
+    const allApprovedOrRejected =
+      documentsData &&
+      documentsData.every(
+        (document) => document.documentStatus === "APPROVED" || document.documentStatus === "REJECTED",
+      );
+    const hasReject = allApprovedOrRejected && documentsData.some((document) => document.documentStatus === "REJECTED");
+    // Check if all documents have a status of "APPROVED"
+    const allApproved =
+      documentsData && documentsData.length > 0
+        ? documentsData.every((document) => document.documentStatus === "APPROVED")
+        : false;
     return (
       <div className={runningMutation ? classes.lockedPage : null}>
         <Helmet
@@ -256,8 +350,20 @@ class InsureeForm extends Component {
               canSave={this.canSave}
               save={!!save ? this._save : null}
               openDirty={save}
+              hasReject={hasReject}
+              allApproved={allApproved}
+              approveorreject={this._approveorreject}
+              handleDialogOpen={this.handleDialogOpen}
             />
           )}
+        <RejectDialog
+          isOpen={this.state.confirmDialog}
+          onClose={this.handleDialogClose}
+          payload={payload}
+          approveorreject={this._approveorreject}
+          statusCheck={statusCheck}
+          classes={classes}
+        />
       </div>
     );
   }
@@ -276,12 +382,19 @@ const mapStateToProps = (state, props) => ({
   submittingMutation: state.insuree.submittingMutation,
   mutation: state.insuree.mutation,
   isInsureeNumberValid: state.insuree?.validationFields?.insureeNumber?.isValid,
+  documentsData: state.insuree.documentsData,
 });
 
 export default withHistory(
   withModulesManager(
-    connect(mapStateToProps, { fetchInsureeFull, fetchFamily, clearInsuree, fetchInsureeMutation, journalize })(
-      injectIntl(withTheme(withStyles(styles)(InsureeForm))),
-    ),
+    connect(mapStateToProps, {
+      fetchInsureeFull,
+      fetchFamily,
+      clearInsuree,
+      fetchInsureeMutation,
+      journalize,
+      fetchInsureeDocuments,
+      updateExternalDocuments,
+    })(injectIntl(withTheme(withStyles(styles)(InsureeForm)))),
   ),
 );

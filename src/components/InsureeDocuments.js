@@ -52,10 +52,33 @@ const styles = (theme) => ({
   paperHeaderAction: theme.paper.action,
   tableTitle: theme.table.title,
   tableHeader: theme.table.header,
+  biometricPaper: {
+    background: "#fff",
+  },
   btnPrimary: theme.formTable.actions,
+  approvedIcon: {
+    "&.Mui-checked": {
+      color: "#00913E", // Custom color for the approved checkbox when checked
+    },
+  },
+  rejectIcon: {
+    "&.Mui-checked": {
+      color: "#FF0000", // Custom color for the rejected checkbox when checked
+    },
+  },
+  commonBtn: {
+    color: "grey",
+  },
+  noBtnClasses: {
+    visibility: "hidden",
+  },
+  customWidth: {
+    maxWidth: 500,
+    color: "white",
+  },
 });
 
-class FamilyInsureesOverview extends PagedDataHandler {
+class InsureeDocuments extends PagedDataHandler {
   state = {
     documentViewOpen: false,
     chfid: null,
@@ -79,7 +102,7 @@ class FamilyInsureesOverview extends PagedDataHandler {
 
   componentDidMount() {
     this.setState({ orderBy: null }, (e) => this.onChangeRowsPerPage(this.defaultPageSize));
-    this.props.fetchInsureeDocuments(this.props.edited.chfId);
+    this.props.fetchInsureeDocuments(this.props?.edited?.chfId);
   }
 
   queryPrms = () => {
@@ -130,8 +153,19 @@ class FamilyInsureesOverview extends PagedDataHandler {
   onDocumentViewClose = () => {
     this.setState({ documentViewOpen: false });
   };
+  rejectedCommentsTooltip = (rejectComment) => {
+    console.log("tooltip", rejectComment);
+    return (
+      <PublishedComponent
+        pubRef="insuree.RejectCommentPicker"
+        withNull
+        filterLabels={false}
+        value={!!rejectComment.comments && rejectComment.comments}
+        readOnly={true}
+      />
+    );
+  };
   viewDocumentAction = (uuid) => {
-    console.log("uuid", uuid);
     return (
       <Tooltip title={formatMessage(this.props.intl, "insuree", "Insuree.viewDocuments")}>
         <IconButton onClick={(e) => this.setState({ documentId: uuid, documentViewOpen: true })}>
@@ -140,35 +174,68 @@ class FamilyInsureesOverview extends PagedDataHandler {
       </Tooltip>
     );
   };
-  //   getCheckBoxClass = (status) => {
-  //     let selectedClass = null;
-  //     let rejectedTooltip = null;
-  //     switch (status) {
-  //       case "APPROVED":
-  //         selectedClass = this.props.classes.approvedBtn;
-  //       case "REJECT":
-  //         selectedClass = this.props.classes.rejectBtn;
-  //         rejectedTooltip = () => {
-  //           return (
-  //             <Tooltip title={formatMessage(this.props.intl, "insuree", "insureeSummaries.openFamilyButton.tooltip")}>
-  //             <IconButton>
-  //               <HelpIcon />
-  //             </IconButton>
-  //             </Tooltip>
-  //           );
-  //         };
-  //       case "PENDING_FOR_REVIEW":
-  //         selectedClass = this.props.classes.commonBtn;
-  //       default:
-  //         selectedClass = this.props.classes.noBtnClasses;
-  //     }
-  //   };
+  getCheckBoxClass = (status) => {
+    console.log("sgtaa", status);
+    const checkStatus = status.documentStatus;
+    let selectedClass = null;
+    let rejectedTooltip = null;
+    let docsStatus = null;
+
+    switch (checkStatus) {
+      case "APPROVED":
+        selectedClass = this.props.classes.approvedBtn;
+        // selectedClass = "00913E";
+        docsStatus = "Approved";
+        break;
+      case "REJECTED": // I assume this is "REJECTED"
+        selectedClass = this.props.classes.rejectBtn;
+        rejectedTooltip = (
+          <Tooltip
+            placement="right-start"
+            arrow
+            classes={{ tooltip: this.props.classes.customWidth }}
+            title={this.rejectedCommentsTooltip(status)}
+          >
+            <IconButton>
+              <HelpIcon />
+            </IconButton>
+          </Tooltip>
+        );
+        docsStatus = "Rejected";
+        break;
+      case "PENDING_FOR_REVIEW":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "NOT REVIEWED";
+        break;
+      default:
+        selectedClass = this.props.classes.noBtnClasses;
+        break;
+    }
+
+    return { selectedClass, rejectedTooltip, docsStatus };
+  };
 
   formatters = [
     (i) => i.documentName || "",
     (i) => !!i.documentId && this.viewDocumentAction(i.documentId),
 
-    (i) => <Checkbox color="primary" readOnly={true} disabled={true} checked={i.documentStatus} />,
+    (i) => {
+      const { selectedClass, rejectedTooltip, docsStatus } = this.getCheckBoxClass(i);
+      return (
+        <>
+          <Checkbox
+            // icon={<span className={selectedClass} />}
+            // checkedIcon={<span className={selectedClass} />}
+            className={selectedClass}
+            readOnly={true}
+            disabled={true}
+            checked={i.documentStatus == "APPROVED" || i.documentStatus == "REJECTED"} // Example checked condition
+          />
+          {docsStatus}
+          {rejectedTooltip}
+        </>
+      );
+    },
   ];
 
   addNewInsuree = () =>
@@ -197,32 +264,16 @@ class FamilyInsureesOverview extends PagedDataHandler {
       !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
         ? []
         : [
-            // {
-            //   button: (
-            //     <div>
-            //       <PublishedComponent //div needed for the tooltip style!!
-            //         pubRef="insuree.InsureePicker"
-            //         IconRender={AddExistingIcon}
-            //         forcedFilter={["head: false"]}
-            //         onChange={(changeInsureeFamily) => this.setState({ changeInsureeFamily })}
-            //         check={() => this.checkCanAddInsuree(() => this.setState({ checkedCanAdd: true }))}
-            //         checked={this.state.checkedCanAdd}
-            //       />
-            //     </div>
-            //   ),
-            //   tooltip: formatMessage(intl, "insuree", "familyAddExsistingInsuree.tooltip"),
-            // },
             {
               button: (
                 <Button
                   onClick={(e) => this.checkCanAddInsuree(this.addNewInsuree)}
-                  variant="filled"
-                  className={classes.btnPrimary}
+                  variant="contained"
+                  color="primary"
                 >
                   Collect Documents
                 </Button>
               ),
-              tooltip: formatMessage(intl, "insuree", "familyAddNewInsuree.tooltip"),
             },
           ];
     if (!!checkingCanAddInsuree || !!errorCanAddInsuree) {
@@ -235,7 +286,6 @@ class FamilyInsureesOverview extends PagedDataHandler {
         tooltip: formatMessage(intl, "insuree", "familyCheckCanAdd"),
       });
     }
-    console.log("editedval", documentDetails);
     return (
       <Grid container>
         <Grid item xs={7}>
@@ -267,6 +317,38 @@ class FamilyInsureesOverview extends PagedDataHandler {
               headerActions={this.headerActions}
               itemFormatters={this.formatters}
               items={documentDetails}
+              // items={[
+              //   {
+              //     "id": "34",
+              //     "documentId": "ad303dbf-f6f2-4da3-9d47-cadc55c5e05c",
+              //     "documentName": "Declaration of employment",
+              //     "documentPath": "Declaration of employment.pdf",
+              //     "documentStatus": "PENDING_FOR_REVIEW",
+              //     "comments": null,
+              //     "tempCamu": "T1915102023003719",
+              //     "isVerified": false,
+              //   },
+              //   {
+              //     "id": "35",
+              //     "documentId": "71ac4acf-bc58-46a9-a437-25a282386c5f",
+              //     "documentName": "Salary slips",
+              //     "documentPath": "Salary slips.pdf",
+              //     "documentStatus": "APPROVED",
+              //     "comments": null,
+              //     "tempCamu": "T1915102023003719",
+              //     "isVerified": false,
+              //   },
+              //   {
+              //     "id": "36",
+              //     "documentId": "208dc2e3-e132-400a-bc26-d9799110acbe",
+              //     "documentName": "Copy of passport",
+              //     "documentPath": "Copy of passport.pdf",
+              //     "documentStatus": "REJECTED",
+              //     "comments": 1,
+              //     "tempCamu": "T1915102023003719",
+              //     "isVerified": false,
+              //   },
+              // ]}
               fetching={fetchingDocuments}
               error={errorDocuments}
               onDoubleClick={this.onDoubleClick}
@@ -303,13 +385,15 @@ class FamilyInsureesOverview extends PagedDataHandler {
                   })}
                 </Grid>
               </Grid>
-              <Grid item xs={12} className={classes.tableHeader}>
+              <Grid item xs={12} className={classes.biometricPaper}>
                 <Divider />
-                <Grid container justify="center" alignItems="center">
+                <Grid container justify="center" alignItems="center" className={classes.biometricPaper}>
                   <Typography style={{ padding: "50px 0" }}>
-                    <DisabledBiometric />
+                    <Box style={{ marginLeft: "2.2rem" }}>
+                      <DisabledBiometric fontSize="large" />
+                    </Box>
+                    <Box> Biometric Details are not provided</Box>
                   </Typography>
-                  <Box display="block"> Biometric Details are not provided</Box>
                 </Grid>
               </Grid>
             </Grid>
@@ -364,5 +448,5 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default withModulesManager(
-  injectIntl(withTheme(withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(FamilyInsureesOverview)))),
+  injectIntl(withTheme(withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(InsureeDocuments)))),
 );

@@ -179,7 +179,7 @@ class FamilyForm extends Component {
       case "REJECT":
         return this.props.classes.rejectBtn;
       case "REWORK":
-      case "PENDING_FOR_REVIEW":
+      case "PENDING":
       case "AWAIT FOR DOCUMENTS":
         return this.props.classes.commonBtn;
       default:
