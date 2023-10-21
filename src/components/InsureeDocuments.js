@@ -37,7 +37,6 @@ import {
 import { DisabledBiometric } from "../SvgIndex";
 import DocumentViewDialog from "../dialogs/DocumentViewDialogs";
 import HelpIcon from "@material-ui/icons/Help";
-import { Link, BrowserRouter } from "react-router-dom";
 
 const styles = (theme) => ({
   paper: theme.paper.paper,
@@ -169,9 +168,7 @@ class InsureeDocuments extends PagedDataHandler {
         value={!!rejectComment.comments && Number(rejectComment.comments)}
         readOnly={true}
       >
-        <div style={{ color: "white" }}>
-          {rejectComment.comments}
-        </div>
+        <div style={{ color: "white" }}>{rejectComment.comments}</div>
       </PublishedComponent>
     );
   };
