@@ -19,10 +19,13 @@ import {
 const FAMILY_MASTER_PANEL_CONTRIBUTION_KEY = "insuree.Family.master";
 
 const CAMU_ENROLMENT_TYPE = [
-    "government",
-    "private",
-    "selfEmployed",
-  ];
+  "public_Employees",
+  "private_sector_employees",
+  "Selfemployed_and_liberal_professions",
+  "CRF_and_CNSS_pensioners",
+  "student",
+  "vulnerable_Persons",
+];
 
 const styles = (theme) => ({
   tableTitle: theme.table.title,
@@ -155,9 +158,7 @@ class FamilyMasterPanel extends FormPanel {
               required
               readOnly={readOnly}
               //value={!!edited && !!edited.enrolmentType ? edited.enrolmentType.code : null}
-              onChange={(value) =>
-                this.updateExts({enrolmentType: value})
-              }
+              onChange={(value) => this.updateExts({ enrolmentType: value })}
               constants={CAMU_ENROLMENT_TYPE}
               withNull
             />

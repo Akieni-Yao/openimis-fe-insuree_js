@@ -22,8 +22,9 @@ import FamilyMasterPanel from "./FamilyMasterPanel";
 import { fetchFamily, newFamily, createFamily, fetchFamilyMutation } from "../actions";
 import FamilyInsureesOverview from "./FamilyInsureesOverview";
 import HeadInsureeMasterPanel from "./HeadInsureeMasterPanel";
-import { Button } from "@material-ui/core";
+import { Button, Tooltip, IconButton, Typography, Grid } from "@material-ui/core";
 import { insureeLabel } from "../utils/utils";
+import HelpIcon from "@material-ui/icons/Help";
 
 const styles = (theme) => ({
   lockedPage: theme.page.locked,
@@ -44,6 +45,17 @@ const styles = (theme) => ({
   },
   noBtnClasses: {
     visibility: "hidden",
+  },
+  customWidth: {
+    maxWidth: 500,
+  },
+  margin2: {
+    display: "flex",
+    paddingTop: theme.spacing(2),
+    paddingRight: theme.spacing(1),
+  },
+  spanPadding: {
+    paddingTop: theme.spacing(1),
   },
 });
 
@@ -144,9 +156,11 @@ class FamilyForm extends Component {
     if (!this.state.family.headInsuree) return false;
     // if (!this.state.family.headInsuree.chfId) return false;
     // if (!this.props.isChfIdValid) return false;
+    if (!this.state.family?.jsonExt?.enrolmentType) return false;
     if (!this.state.family.headInsuree.lastName) return false;
     if (!this.state.family.headInsuree.otherNames) return false;
     if (!this.state.family.headInsuree.dob) return false;
+    if (!this.state.family.headInsuree.gender || !this.state.family?.headInsuree.gender?.code) return false;
     if (
       !!this.state.family.headInsuree.photo &&
       (!this.state.family.headInsuree.photo.date || !this.state.family.headInsuree.photo.officerId)
@@ -163,7 +177,6 @@ class FamilyForm extends Component {
   };
 
   onEditedChanged = (family) => {
-    // console.log("family",family)
     this.setState({ family, newFamily: false });
   };
 
@@ -172,19 +185,43 @@ class FamilyForm extends Component {
   };
 
   getStatusClass = (status) => {
+    let selectedClass = null;
+    let docsStatus = null;
+
     switch (status) {
       case "PRE_REGISTERED":
+        selectedClass = this.props.classes.approvedBtn;
+        docsStatus = "Pre Registered";
+        break;
       case "APPROVED":
-        return this.props.classes.approvedBtn;
-      case "REJECT":
-        return this.props.classes.rejectBtn;
+        selectedClass = this.props.classes.approvedBtn;
+        docsStatus = "Active";
+        break;
+      case "REJECTED":
+        selectedClass = this.props.classes.rejectBtn;
+        docsStatus = "Inactive";
+        break;
       case "REWORK":
-      case "PENDING":
-      case "AWAIT FOR DOCUMENTS":
-        return this.props.classes.commonBtn;
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Rework";
+        break;
+      case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Waiting for document and biometric";
+        break;
+      case "WAITING_FOR_APPROVAL":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Waiting For Approval";
+        break;
+      case "WAITING_FOR_QUEUE":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Waiting For Queue";
+        break;
       default:
-        return this.props.classes.noBtnClasses;
+        selectedClass = this.props.classes.noBtnClasses;
+        break;
     }
+    return { selectedClass, docsStatus };
   };
   render() {
     const {
@@ -214,14 +251,60 @@ class FamilyForm extends Component {
     }
     let actions = [];
     if (family_uuid || !!family.clientMutationId) {
-      actions.push(
-        {
-          icon: family.status !== null && (
-            <Button variant="outlined" className={this.getStatusClass(family.status)}>
-              {family.status}
+      let button = null;
+      if (family.status !== null) {
+        const { selectedClass, docsStatus } = this.getStatusClass(family.status);
+        button = (
+          <Grid className={classes.margin2}>
+            <Typography component="span" className={classes.spanPadding}>
+              STATUS :
+            </Typography>
+            <Button variant="outlined" className={selectedClass}>
+              {docsStatus}
             </Button>
-          ),
-        },
+            {family.status === "REWORK" || family.status === "REJECTED" ? (
+              <Tooltip
+                placement="right"
+                arrow
+                classes={{ tooltip: this.props.classes.customWidth }}
+                title={family.statusComment}
+              >
+                <IconButton>
+                  <HelpIcon />
+                </IconButton>
+              </Tooltip>
+            ) : null}
+          </Grid>
+        );
+      }
+
+      actions.push({ button });
+
+      actions.push(
+        // {
+        //   icon: family.status !== null && (
+        //     // const { selectedClass, docsStatus } = this.getStatusClass(i);
+        //     // return(
+        //       <>
+        //       <Button variant="outlined" className={selectedClass}>
+        //         {docsStatus}
+        //       </Button>
+        //       {(family.status == "REWORK" || family.status == "REJECTED" || family.status == "WAITING_FOR_APPROVAL") &&
+        //       !!family.statusComment ? (
+        //         <Tooltip
+        //           placement="bottom"
+        //           arrow
+        //           classes={{ tooltip: this.props.classes.customWidth }}
+        //           title={family.statusComment}
+        //         >
+        //           <IconButton>
+        //             <HelpIcon />
+        //           </IconButton>
+        //         </Tooltip>
+        //       ) : null}
+        //     </>
+        //   ),
+        // },
         {
           doIt: this.reload,
           icon: <ReplayIcon />,
@@ -229,7 +312,6 @@ class FamilyForm extends Component {
         },
       );
     }
-    console.log("family", family);
     return (
       <div className={!!runningMutation ? classes.lockedPage : null}>
         <Helmet

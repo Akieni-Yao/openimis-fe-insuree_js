@@ -44,6 +44,8 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   "validityFrom",
   "validityTo",
   "status",
+  "statusComment",
+  // "biometrics_status",
   `family{${FAMILY_FULL_PROJECTION(mm).join(",")}}`,
   `photo{id,uuid,date,folder,filename,officerId,photo}`,
   "gender{code}",
@@ -91,6 +93,8 @@ export function fetchInsuree(mm, chfid) {
       "gender{code, gender, altLanguage}",
       "camuNumber",
       "status",
+      "statusComment",
+      // "biometrics_status",
       "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
       "jsonExt",
     ],
@@ -123,6 +127,7 @@ export function fetchFamilySummaries(mm, filters) {
     "validityFrom",
     "validityTo",
     "status",
+
     "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone, dob,camuNumber}",
     "location" + mm.getProjection("location.Location.FlatProjection"),
   ];
@@ -142,6 +147,8 @@ export function fetchFamilyMembers(mm, filters) {
     "dob",
     "cardIssued",
     "status",
+    "statusComment",
+    // "biometrics_status"
   ];
   const payload = formatPageQueryWithCount("familyMembers", filters, projections);
   return graphql(payload, "INSUREE_FAMILY_MEMBERS");
@@ -280,12 +287,38 @@ function formatExternalDocument(docs, tempCamu) {
     status: doc.documentStatus,
     comments: doc.comments || "",
   }));
-  const formattedDocumentUpdates = JSON.stringify(newarray);
-  return `
-  ${!!tempCamu ? `tempCamuNumber: "${tempCamu}"` : ""}
-  ${!!docs ? `documentUpdates: ${JSON.stringify(newarray).replace(/"/g, '\\"')}}` : ""}
+
+  const result = {
+    tempCamuNumber: tempCamu || "",
+    documentUpdates: newarray,
+  };
+
+  const formattedResult = `
+    tempCamuNumber: "${result.tempCamuNumber}",
+    documentUpdates: [
+    ${result.documentUpdates
+      .map(
+        (update) =>
+          `{ documentId: "${update.documentId}", status: "${update.status}", comments: "${update.comments}" }`,
+      )
+      .join("\n")}
+    ]
   `;
+
+  return formattedResult;
 }
+// function formatExternalDocument(docs, tempCamu) {
+//   const newarray = docs.map((doc) => ({
+//     documentId: doc.documentId,
+//     status: doc.documentStatus,
+//     comments: doc.comments || "",
+//   }));
+
+//   return `
+//   ${!!tempCamu ? `tempCamuNumber: "${tempCamu}"` : ""}
+//   ${!!docs ? `documentUpdates: ${JSON.stringify(newarray)}` : ""}
+//   `;
+// }
 
 export function formatInsureeGQL(mm, insuree) {
   return `
@@ -348,8 +381,6 @@ export function formatFamilyGQL(mm, family) {
 export function createFamily(mm, family, clientMutationLabel, additionalRequest = "") {
   let mutation = formatMutation("createFamily", formatFamilyGQL(mm, family), clientMutationLabel);
   var requestedDateTime = new Date();
-  // console.log(mutation.payload,"familymutation.payload")
-
   return graphqlMutationLegacy(
     mutation.payload,
     ["INSUREE_MUTATION_REQ", "INSUREE_CREATE_FAMILY_RESP", "INSUREE_MUTATION_ERR"],
@@ -398,23 +429,33 @@ export function deleteFamily(mm, family, deleteMembers, clientMutationLabel) {
 export function createInsuree(mm, insuree, clientMutationLabel) {
   let mutation = formatMutation("createInsuree", formatInsureeGQL(mm, insuree), clientMutationLabel);
   var requestedDateTime = new Date();
-  // console.log(mutation.payload,"mutation.payload")
-  return graphql(mutation.payload, ["INSUREE_MUTATION_REQ", "INSUREE_CREATE_INSUREE_RESP", "INSUREE_MUTATION_ERR"], {
-    clientMutationId: mutation.clientMutationId,
-    clientMutationLabel,
-    requestedDateTime,
-  });
+  return graphqlMutationLegacy(
+    mutation.payload,
+    ["INSUREE_MUTATION_REQ", "INSUREE_CREATE_INSUREE_RESP", "INSUREE_MUTATION_ERR"],
+    {
+      clientMutationId: mutation.clientMutationId,
+      clientMutationLabel,
+      requestedDateTime,
+    },
+    true,
+    "insurees { id insuree {chfId camuNumber}}",
+  );
 }
 
 export function updateInsuree(mm, insuree, clientMutationLabel) {
   let mutation = formatMutation("updateInsuree", formatInsureeGQL(mm, insuree), clientMutationLabel);
-  console.log("MUTATION", mutation.payload);
   var requestedDateTime = new Date();
-  return graphql(mutation.payload, ["INSUREE_MUTATION_REQ", "INSUREE_UPDATE_INSUREE_RESP", "INSUREE_MUTATION_ERR"], {
-    clientMutationId: mutation.clientMutationId,
-    clientMutationLabel,
-    requestedDateTime,
-  });
+  return graphqlMutationLegacy(
+    mutation.payload,
+    ["INSUREE_MUTATION_REQ", "INSUREE_UPDATE_INSUREE_RESP", "INSUREE_MUTATION_ERR"],
+    {
+      clientMutationId: mutation.clientMutationId,
+      clientMutationLabel,
+      requestedDateTime,
+    },
+    true,
+    "insurees { id insuree {camuNumber chfId}}",
+  );
 }
 
 export function removeInsuree(mm, family_uuid, insuree, cancelPolicies, clientMutationLabel) {
@@ -562,18 +603,17 @@ export function updateInsureeDocument(mm, insuree) {
   return graphql(
     mutation,
     ["INSUREE_MUTATION_REQ", "INSUREE_UPDATE_DOCUMENT_RESP", "INSUREE_MUTATION_ERR"],
-    "success message",
+    "success message internalId",
   );
 }
 
 export function updateExternalDocuments(mm, docs, tempCamu) {
-  console.log("docs", docs);
   let mutation = `mutation 
-    updateStatusInExternalEndpoint(${formatExternalDocument(docs, tempCamu)}) {
-        success
-        message
-        responses
-    }`;
+  updateStatusInExternalEndpoint(${formatExternalDocument(docs, tempCamu)}) {
+    success
+    message
+    responses
+  }`;
   return graphql(
     mutation,
     ["INSUREE_MUTATION_REQ", "INSUREE_UPDATE_EXTERNAL_DOCUMENT_RESP", "INSUREE_MUTATION_ERR"],

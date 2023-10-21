@@ -25,7 +25,14 @@ const MAX_MAIN_ACTIVITY_LENGTH = 255;
 const INSUREE_INSUREE_CONTRIBUTION_KEY = "insuree.Insuree";
 const INSUREE_INSUREE_DOCUMENTS_KEY = "insuree.Insuree.documents";
 const INSUREE_INSUREE_PANELS_CONTRIBUTION_KEY = "insuree.Insuree.panels";
-const CAMU_ENROLMENT_TYPE = ["government", "private", "selfEmployed"];
+const CAMU_ENROLMENT_TYPE = [
+  "public_Employees",
+  "private_sector_employees",
+  "Selfemployed_and_liberal_professions",
+  "CRF_and_CNSS_pensioners",
+  "student",
+  "vulnerable_Persons",
+];
 const CAMU_CIVIL_QUALITY = ["rightOpener", "spouse", "child"];
 
 class InsureeMasterPanel extends FormPanel {
@@ -40,7 +47,14 @@ class InsureeMasterPanel extends FormPanel {
     if (!data["jsonExt"].dateValidFrom) {
       data["jsonExt"].dateValidFrom = new Date().toISOString().slice(0, 10);
     }
-    // console.log("fgjhk",data);
+    if (updates?.insureelocations) {
+      data["jsonExt"].insureelocations = updates.insureelocations;
+    } else if (this.props.family?.location) {
+      data["jsonExt"].insureelocations = this.props.family?.location;
+    } else if (this.props.edited?.family?.location && !updates?.insureelocations) {
+      data["jsonExt"].insureelocations = this.props.edited?.family?.location;
+    }
+
     this.props.onEditedChanged(data);
   };
 
@@ -55,7 +69,6 @@ class InsureeMasterPanel extends FormPanel {
       actions,
       edited_id,
     } = this.props;
-    // console.log(edited, "edited")
     return (
       <Grid container>
         <Grid item xs={12}>
@@ -142,7 +155,7 @@ class InsureeMasterPanel extends FormPanel {
                   label="Place of birth"
                   required={false}
                   // readOnly={readOnly}
-                  value={!edited ? "" : edited.jsonExt.BirthPlace}
+                  value={!edited?.jsonExt?.BirthPlace ? "" : edited?.jsonExt?.BirthPlace}
                   // edited_id={edited_id}
                   onChange={(v) => this.updateExts({ BirthPlace: v })}
                 />
@@ -151,10 +164,10 @@ class InsureeMasterPanel extends FormPanel {
                 <ConstantBasedPicker
                   module="insuree"
                   label="Family.enrolmentType"
-                  required={false}
+                  required={true}
                   readOnly={readOnly}
-                  value={!!edited && !!edited.jsonExt ? edited.jsonExt.enrolmentType : null}
-                  onChange={(value) => this.updateExts({ enrolmentType: value })}
+                  value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeEnrolmentType : null}
+                  onChange={(value) => this.updateExts({ insureeEnrolmentType: value })}
                   constants={CAMU_ENROLMENT_TYPE}
                   withNull
                 />
@@ -167,7 +180,7 @@ class InsureeMasterPanel extends FormPanel {
                   required={false}
                   maxDate={!!edited && !!edited.dateValidTo && edited.dateValidTo}
                   value={
-                    !!edited && !!edited.jsonExt.dateValidFrom
+                    !!edited && !!edited?.jsonExt?.dateValidFrom
                       ? edited.jsonExt.dateValidFrom
                       : new Date().toISOString().slice(0, 10) // Set the default value to today's date
                   }
@@ -181,9 +194,8 @@ class InsureeMasterPanel extends FormPanel {
                   withNull
                   label={formatMessage(intl, "insuree", "insuree.createdAt")}
                   filterLabels={false}
-                  value={!!edited && !!edited ? edited.createdAt : null}
+                  value={!!edited && !!edited?.createdAt ? edited.createdAt : null}
                   onChange={(v) => this.updateExts({ createdAt: v })}
-                  // onChange={(v) => this.updateAttribute("createdAt", v)}
                   readOnly={readOnly}
                 />
               </Grid>
@@ -191,9 +203,23 @@ class InsureeMasterPanel extends FormPanel {
                 <PublishedComponent
                   pubRef="location.DetailedLocation"
                   withNull={true}
-                  readOnly={readOnly}
+                  readOnly={
+                    !!edited &&
+                    !!edited.family &&
+                    !!edited.family.headInsuree &&
+                    edited.family.headInsuree.id !== edited.id
+                      ? readOnly
+                      : true
+                  }
                   required={true}
-                  value={!edited ? null : edited.jsonExt.insureelocations}
+                  value={
+                    edited_id
+                      ? edited?.jsonExt?.insureelocations
+                      : edited?.family?.location
+                      ? edited?.family?.location
+                      : this.props?.family?.location
+                  }
+                  // value={!edited?.jsonExt?.insureelocations ? "" : edited?.jsonExt?.insureelocations}
                   onChange={(v) => this.updateExts({ insureelocations: v })}
                   filterLabels={false}
                 />
@@ -208,7 +234,7 @@ class InsureeMasterPanel extends FormPanel {
                   required={false}
                   // readOnly={readOnly}
                   // value={!!edited && !!edited.jsonExt.address ? edited.jsonExt.address : ""}
-                  value={!edited ? "" : edited.jsonExt.insureeaddress}
+                  value={!edited && !edited?.jsonExt?.insureeaddress ? "" : edited?.jsonExt?.insureeaddress}
                   onChange={(v) => this.updateExts({ insureeaddress: v })}
                 />
               </Grid>
@@ -410,14 +436,16 @@ class InsureeMasterPanel extends FormPanel {
                 contributionKey={INSUREE_INSUREE_CONTRIBUTION_KEY}
               />
             </Grid>
-            <Contributions
-              {...this.props}
-              updateAttribute={this.updateAttribute}
-              contributionKey={INSUREE_INSUREE_DOCUMENTS_KEY}
-            />
+            {!!edited && !!edited?.chfId ? (
+              <Contributions
+                {...this.props}
+                updateAttribute={this.updateAttribute}
+                contributionKey={INSUREE_INSUREE_DOCUMENTS_KEY}
+              />
+            ) : null}
           </Paper>
           <Contributions
-          edited={edited}
+            edited={edited}
             {...this.props}
             updateAttribute={this.updateAttribute}
             contributionKey={INSUREE_INSUREE_PANELS_CONTRIBUTION_KEY}

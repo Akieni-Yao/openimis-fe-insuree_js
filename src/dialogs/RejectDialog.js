@@ -10,13 +10,30 @@ import {
   Slide,
   makeStyles,
   Grid,
+  IconButton,
 } from "@material-ui/core";
 import { PublishedComponent, TextInput } from "@openimis/fe-core";
+import { Close as CloseIcon } from "@material-ui/icons";
 
+const useStyles = makeStyles(() => ({
+  rejectBtn: {
+    backgroundColor: "#FF0000",
+    color: "#fff",
+  },
+  reworkBtn: {
+    backgroundColor: "#FF841C",
+    color: "#fff",
+  },
+  closeIcon: {
+    position: "absolute",
+    top: 0,
+    right: 15,
+  },
+}));
 const RejectDialog = (props) => {
   const { classes, approveorreject, onClose, isOpen, payload, statusCheck } = props;
   const [comment, setComment] = useState({ statusComment: "", status: "", reviewer: null });
-
+  const newClasses = useStyles();
   const handleChange = (name, value) => {
     setComment((prevComment) => ({
       ...prevComment,
@@ -31,19 +48,23 @@ const RejectDialog = (props) => {
     }
   }, [statusCheck]);
 
-  console.log("insureeevent", comment);
   const updatedPayload = { ...payload, ...comment };
 
   return (
     <div>
       <Dialog open={isOpen} onClose={() => onClose()} maxWidth="xs" fullWidth>
-        <DialogTitle>{statusCheck == "rework" ? "Rework" : "Reject"}</DialogTitle>
-
+        <DialogTitle style={{ fontWeight: 600 }}>
+          {statusCheck == "rework" ? "Rework" : "Reason for rejection"}
+          <IconButton edge="end" className={newClasses.closeIcon} color="inherit" onClick={() => onClose()}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
         <DialogContent>
           {statusCheck == "rework" && (
             <Grid item xs={12} className={classes.item}>
               <PublishedComponent
                 pubRef="insuree.ReviewerPicker"
+                label="Reviewer"
                 withNull={true}
                 readOnly={false}
                 required
@@ -73,7 +94,7 @@ const RejectDialog = (props) => {
           <Button
             onClick={() => approveorreject(updatedPayload)}
             variant="contained"
-            className={classes.secondaryButton}
+            className={statusCheck == "rework" ? newClasses.reworkBtn : newClasses.rejectBtn}
           >
             {statusCheck == "rework" ? "Send for rework" : "Reject"}
           </Button>

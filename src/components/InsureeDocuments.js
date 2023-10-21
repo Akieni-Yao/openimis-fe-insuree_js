@@ -5,14 +5,6 @@ import { bindActionCreators } from "redux";
 import { injectIntl } from "react-intl";
 import _ from "lodash";
 import { Checkbox, Paper, IconButton, Grid, Divider, Typography, Tooltip, Button, Box } from "@material-ui/core";
-import {
-  Search as SearchIcon,
-  Add as AddIcon,
-  PersonAdd as AddExistingIcon,
-  PersonPin as SetHeadIcon,
-  Delete as DeleteIcon,
-  Clear as RemoveIcon,
-} from "@material-ui/icons";
 import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
 import {
   formatMessage,
@@ -45,6 +37,7 @@ import {
 import { DisabledBiometric } from "../SvgIndex";
 import DocumentViewDialog from "../dialogs/DocumentViewDialogs";
 import HelpIcon from "@material-ui/icons/Help";
+import { Link, BrowserRouter } from "react-router-dom";
 
 const styles = (theme) => ({
   paper: theme.paper.paper,
@@ -72,9 +65,14 @@ const styles = (theme) => ({
   noBtnClasses: {
     visibility: "hidden",
   },
+  customArrow: {
+    color: "#eeeaea",
+  },
   customWidth: {
     maxWidth: 500,
+    width: "fit-content",
     color: "white",
+    backgroundColor: "#eeeaea",
   },
 });
 
@@ -88,6 +86,7 @@ class InsureeDocuments extends PagedDataHandler {
     reset: 0,
     canAddAction: null,
     checkedCanAdd: false,
+    dataFromAPI: null,
   };
 
   constructor(props) {
@@ -126,12 +125,20 @@ class InsureeDocuments extends PagedDataHandler {
       newTab,
     );
   };
-
-  approved = (docData) => {
-    this.props.updateInsureeDocument(docData);
+  handleExternalNavigation = () => {
+    window.open("https://cnss.walkingtree.tech", "_blank"); // Opens in a new tab or window
   };
-  rejectDoc = (docData) => {
-    this.props.updateInsureeDocument(docData);
+  approved = async (docData) => {
+    const response = await this.props.updateInsureeDocument(docData);
+    setTimeout(() => {
+      this.props.fetchInsureeDocuments(this.props?.edited?.chfId);
+    }, 2000);
+  };
+  rejectDoc = async (docData) => {
+    const response = await this.props.updateInsureeDocument(docData);
+    setTimeout(() => {
+      this.props.fetchInsureeDocuments(this.props?.edited?.chfId);
+    }, 1000);
   };
   onChangeSelection = (i) => {
     this.props.selectFamilyMember(i[0] || null);
@@ -154,15 +161,18 @@ class InsureeDocuments extends PagedDataHandler {
     this.setState({ documentViewOpen: false });
   };
   rejectedCommentsTooltip = (rejectComment) => {
-    console.log("tooltip", rejectComment);
     return (
       <PublishedComponent
         pubRef="insuree.RejectCommentPicker"
         withNull
         filterLabels={false}
-        value={!!rejectComment.comments && rejectComment.comments}
+        value={!!rejectComment.comments && Number(rejectComment.comments)}
         readOnly={true}
-      />
+      >
+        <div style={{ color: "white" }}>
+          {rejectComment.comments}
+        </div>
+      </PublishedComponent>
     );
   };
   viewDocumentAction = (uuid) => {
@@ -175,25 +185,22 @@ class InsureeDocuments extends PagedDataHandler {
     );
   };
   getCheckBoxClass = (status) => {
-    console.log("sgtaa", status);
     const checkStatus = status.documentStatus;
     let selectedClass = null;
     let rejectedTooltip = null;
     let docsStatus = null;
-
     switch (checkStatus) {
       case "APPROVED":
-        selectedClass = this.props.classes.approvedBtn;
-        // selectedClass = "00913E";
+        selectedClass = this.props.classes.approvedIcon;
         docsStatus = "Approved";
         break;
-      case "REJECTED": // I assume this is "REJECTED"
-        selectedClass = this.props.classes.rejectBtn;
+      case "REJECTED":
+        selectedClass = this.props.classes.rejectIcon;
         rejectedTooltip = (
           <Tooltip
-            placement="right-start"
+            placement="right"
             arrow
-            classes={{ tooltip: this.props.classes.customWidth }}
+            classes={{ tooltip: this.props.classes.customWidth, arrow: this.props.classes.customArrow }}
             title={this.rejectedCommentsTooltip(status)}
           >
             <IconButton>
@@ -224,12 +231,10 @@ class InsureeDocuments extends PagedDataHandler {
       return (
         <>
           <Checkbox
-            // icon={<span className={selectedClass} />}
-            // checkedIcon={<span className={selectedClass} />}
             className={selectedClass}
             readOnly={true}
             disabled={true}
-            checked={i.documentStatus == "APPROVED" || i.documentStatus == "REJECTED"} // Example checked condition
+            checked={i.documentStatus == "APPROVED" || i.documentStatus == "REJECTED"}
           />
           {docsStatus}
           {rejectedTooltip}
@@ -259,23 +264,46 @@ class InsureeDocuments extends PagedDataHandler {
       errorCanAddInsuree,
       edited,
       documentDetails,
+      dataFromAPI,
     } = this.props;
     let actions =
       !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
         ? []
         : [
-            {
-              button: (
-                <Button
-                  onClick={(e) => this.checkCanAddInsuree(this.addNewInsuree)}
-                  variant="contained"
-                  color="primary"
-                >
-                  Collect Documents
-                </Button>
-              ),
-            },
+            // {
+            //   button: (
+            //     <Button onClick={this.handleExternalNavigation} variant="contained" color="primary">
+            //       Collect Documents
+            //     </Button>
+            //   ),
+            // },
           ];
+    if (!!checkingCanAddInsuree || !!errorCanAddInsuree) {
+      actions.push({
+        button: (
+          <div>
+            <ProgressOrError progress={checkingCanAddInsuree} error={errorCanAddInsuree} />
+          </div>
+        ),
+        tooltip: formatMessage(intl, "insuree", "familyCheckCanAdd"),
+      });
+    }
+    // let bioActions =
+    //   !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
+    //     ? []
+    //     : [
+    //         {
+    //           button: (
+    //             <Button
+    //               onClick={(e) => this.checkCanAddInsuree(this.addNewInsuree)}
+    //               variant="contained"
+    //               color="primary"
+    //             >
+    //               Collect Biometric
+    //             </Button>
+    //           ),
+    //         },
+    //       ];
     if (!!checkingCanAddInsuree || !!errorCanAddInsuree) {
       actions.push({
         button: (
@@ -311,59 +339,48 @@ class InsureeDocuments extends PagedDataHandler {
                 <Divider />
               </Grid>
             </Grid>
-            <Table
-              module="insuree"
-              headers={this.headers}
-              headerActions={this.headerActions}
-              itemFormatters={this.formatters}
-              items={documentDetails}
-              // items={[
-              //   {
-              //     "id": "34",
-              //     "documentId": "ad303dbf-f6f2-4da3-9d47-cadc55c5e05c",
-              //     "documentName": "Declaration of employment",
-              //     "documentPath": "Declaration of employment.pdf",
-              //     "documentStatus": "PENDING_FOR_REVIEW",
-              //     "comments": null,
-              //     "tempCamu": "T1915102023003719",
-              //     "isVerified": false,
-              //   },
-              //   {
-              //     "id": "35",
-              //     "documentId": "71ac4acf-bc58-46a9-a437-25a282386c5f",
-              //     "documentName": "Salary slips",
-              //     "documentPath": "Salary slips.pdf",
-              //     "documentStatus": "APPROVED",
-              //     "comments": null,
-              //     "tempCamu": "T1915102023003719",
-              //     "isVerified": false,
-              //   },
-              //   {
-              //     "id": "36",
-              //     "documentId": "208dc2e3-e132-400a-bc26-d9799110acbe",
-              //     "documentName": "Copy of passport",
-              //     "documentPath": "Copy of passport.pdf",
-              //     "documentStatus": "REJECTED",
-              //     "comments": 1,
-              //     "tempCamu": "T1915102023003719",
-              //     "isVerified": false,
-              //   },
-              // ]}
-              fetching={fetchingDocuments}
-              error={errorDocuments}
-              onDoubleClick={this.onDoubleClick}
-              withSelection={"single"}
-              onChangeSelection={this.onChangeSelection}
-              withPagination={false}
-              rowsPerPageOptions={this.rowsPerPageOptions}
-              defaultPageSize={this.defaultPageSize}
-              page={this.currentPage()}
-              pageSize={this.currentPageSize()}
-              count={pageInfo.totalCount}
-              onChangePage={this.onChangePage}
-              onChangeRowsPerPage={this.onChangeRowsPerPage}
-              rowLocked={this.rowLocked}
-            />
+            {documentDetails?.length > 0 && !fetchingDocuments ? (
+              <Table
+                module="insuree"
+                headers={this.headers}
+                headerActions={this.headerActions}
+                itemFormatters={this.formatters}
+                items={documentDetails}
+                fetching={fetchingDocuments}
+                error={errorDocuments}
+                onDoubleClick={this.onDoubleClick}
+                withSelection={"single"}
+                onChangeSelection={this.onChangeSelection}
+                withPagination={false}
+                rowsPerPageOptions={this.rowsPerPageOptions}
+                defaultPageSize={this.defaultPageSize}
+                page={this.currentPage()}
+                pageSize={this.currentPageSize()}
+                count={pageInfo.totalCount}
+                onChangePage={this.onChangePage}
+                onChangeRowsPerPage={this.onChangeRowsPerPage}
+                rowLocked={this.rowLocked}
+              />
+            ) : !fetchingDocuments && documentDetails?.length == 0 ? (
+              <Grid
+                style={{
+                  dispaly: "flex",
+                  height: "15rem",
+                }}
+              >
+                <Typography
+                  style={{
+                    color: "red",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    alignItems: "center",
+                    padding: "6rem 0",
+                  }}
+                >
+                  No Documents Found
+                </Typography>
+              </Grid>
+            ) : null}
           </Paper>
         </Grid>
         <Grid item xs={5}>
@@ -374,9 +391,9 @@ class InsureeDocuments extends PagedDataHandler {
                   <FormattedMessage module="insuree" id="Insuree.BiometricHeading" />
                 </Typography>
               </Grid>
-              <Grid item xs={4}>
+              {/* <Grid item xs={4}>
                 <Grid container justify="flex-end">
-                  {actions.map((a, idx) => {
+                  {bioActions.map((a, idx) => {
                     return (
                       <Grid item key={`form-action-${idx}`} className={classes.paperHeaderAction}>
                         {withTooltip(a.button, a.tooltip)}
@@ -384,28 +401,30 @@ class InsureeDocuments extends PagedDataHandler {
                     );
                   })}
                 </Grid>
-              </Grid>
+              </Grid> */}
               <Grid item xs={12} className={classes.biometricPaper}>
                 <Divider />
-                <Grid container justify="center" alignItems="center" className={classes.biometricPaper}>
-                  <Typography style={{ padding: "50px 0" }}>
-                    <Box style={{ marginLeft: "2.2rem" }}>
-                      <DisabledBiometric fontSize="large" />
-                    </Box>
-                    <Box> Biometric Details are not provided</Box>
+                <Grid container justify="center" alignItems="center" style={{ backgroundColor: "#00913E0D" }}>
+                  <Typography style={{ padding: "30px 0" }} alignItems="center">
+                    {/* <Box style={{ marginLeft: "2.2rem" }}> */}
+                    <DisabledBiometric fontSize="large" />
+                    {/* </Box> */}
                   </Typography>
+                  Biometric Details are not provided
                 </Grid>
               </Grid>
             </Grid>
           </Paper>
         </Grid>
-        <DocumentViewDialog
-          open={this.state.documentViewOpen}
-          onClose={this.onDocumentViewClose}
-          documentImage={this.state.documentId}
-          approved={this.approved}
-          rejectDoc={this.rejectDoc}
-        />
+        {!!this.state.documentViewOpen && (
+          <DocumentViewDialog
+            open={this.state.documentViewOpen}
+            onClose={this.onDocumentViewClose}
+            documentImage={this.state.documentId}
+            approved={this.approved}
+            rejectDoc={this.rejectDoc}
+          />
+        )}
       </Grid>
     );
   }

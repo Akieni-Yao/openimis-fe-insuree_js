@@ -43,6 +43,7 @@ import { RIGHT_INSUREE_DELETE } from "../constants";
 import { insureeLabel, familyLabel } from "../utils/utils";
 import ChangeInsureeFamilyDialog from "./ChangeInsureeFamilyDialog";
 import RemoveInsureeFromFamilyDialog from "./RemoveInsureeFromFamilyDialog";
+import HelpIcon from "@material-ui/icons/Help";
 
 const styles = (theme) => ({
   paper: theme.paper.paper,
@@ -65,7 +66,10 @@ const styles = (theme) => ({
     borderRadius: "2rem",
   },
   noBtnClasses: {
-   visibility:"hidden"
+    visibility: "hidden",
+  },
+  customWidth: {
+    maxWidth: 500,
   },
 });
 
@@ -106,14 +110,14 @@ class FamilyInsureesOverview extends PagedDataHandler {
       this.query();
     } else if (!prevProps.checkedCanAddInsuree && !!this.props.checkedCanAddInsuree) {
       if (_.isEmpty(this.props.canAddInsureeWarnings)) {
-        this.setState({ checkedCanAdd: true }, (e) => this.state.canAddAction());
+        this.setState({ checkedCanAdd: true }, (e) => this.state?.canAddAction());
       } else {
         let messages = this.props.canAddInsureeWarnings;
         messages.push(formatMessage(this.props.intl, "insuree", "addInsuree.alert.message"));
         this.props.coreAlert(formatMessage(this.props.intl, "insuree", "addInsuree.alert.title"), messages);
       }
     } else if (!!prevProps.alert && !this.props.alert) {
-      this.setState({ checkedCanAdd: true }, (e) => this.state.canAddAction());
+      this.setState({ checkedCanAdd: true }, (e) => this.state?.canAddAction());
     }
   }
 
@@ -267,22 +271,46 @@ class FamilyInsureesOverview extends PagedDataHandler {
       </IconButton>
     </Tooltip>
   );
+
   getStatusClass = (status) => {
+    let selectedClass = null;
+    let docsStatus = null;
+
     switch (status) {
       case "PRE_REGISTERED":
+        selectedClass = this.props.classes.approvedBtn;
+        docsStatus = "Pre Registered";
+        break;
       case "APPROVED":
-        return this.props.classes.approvedBtn;
-      case "REJECT":
-        return this.props.classes.rejectBtn;
-        case "REWORK":
-      case "PENDING_FOR_REVIEW":
-      case "AWAIT FOR DOCUMENTS":
-        return this.props.classes.commonBtn;
+        selectedClass = this.props.classes.approvedBtn;
+        docsStatus = "Active";
+        break;
+      case "REJECTED":
+        selectedClass = this.props.classes.rejectBtn;
+        docsStatus = "Inactive";
+        break;
+      case "REWORK":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Rework";
+        break;
+      case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Waiting for document and biometric";
+        break;
+      case "WAITING_FOR_APPROVAL":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Waiting For Approval";
+        break;
+      case "WAITING_FOR_QUEUE":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Waiting For Queue";
+        break;
       default:
-        return this.props.classes.noBtnClasses;
+        selectedClass = this.props.classes.noBtnClasses;
+        break;
     }
+    return { selectedClass, docsStatus };
   };
-
   isHead = (f, i) => i.chfId === (!!f.headInsuree && f.headInsuree.chfId);
 
   formatters = [
@@ -293,12 +321,33 @@ class FamilyInsureesOverview extends PagedDataHandler {
       i.gender && i.gender.code ? formatMessage(this.props.intl, "insuree", `InsureeGender.${i.gender.code}`) : "",
     (i) => formatDateFromISO(this.props.modulesManager, this.props.intl, i.dob),
     (i) => <Checkbox color="primary" readOnly={true} disabled={true} checked={i.cardIssued} />,
-    (i) =>
-      i.status !== null && (
-        <Button variant="outlined" className={this.getStatusClass(i.status)}>
-          {i.status}
-        </Button>
-      ),
+    (i) => {
+      if (i.status !== null) {
+        const { selectedClass, docsStatus } = this.getStatusClass(i.status);
+        return (
+          <>
+            <Button variant="outlined" className={selectedClass}>
+              {docsStatus}
+            </Button>
+            {i.status === "REWORK" || i.status === "REJECTED" ? (
+              <Tooltip
+                placement="right"
+                arrow
+                classes={{ tooltip: this.props.classes.customWidth }}
+                title={i.statusComment}
+              >
+                <IconButton>
+                  <HelpIcon />
+                </IconButton>
+              </Tooltip>
+            ) : null}
+          </>
+        );
+      } else {
+        return null;
+      }
+    },
+
     (i) =>
       !!this.props.readOnly ||
       !this.props.rights.includes(RIGHT_INSUREE_DELETE) ||

@@ -32,7 +32,7 @@ const ReviewerPicker = (props) => {
   const { isLoading, data, error } = useGraphqlQuery(
     `
     {
-    taskGroup(center:"01")
+    taskGroup(center:"CG10-19")
     {
     totalCount 
     pageInfo { hasNextPage, hasPreviousPage, startCursor, endCursor}
@@ -42,8 +42,8 @@ const ReviewerPicker = (props) => {
     {
     name,
     center,
-    locationId,
-    department{id, uuid, code, name, type, parent{id,uuid,code,name,type,parent{id,uuid,code,name,type,parent{id,uuid,code,name,type}}}},
+    
+    location{id, uuid, code, name, type, parent{id,uuid,code,name,type,parent{id,uuid,code,name,type,parent{id,uuid,code,name,type}}}},
     uuid,
     }
     }
@@ -52,8 +52,11 @@ const ReviewerPicker = (props) => {
     `,
     { str: searchString },
   );
-  let taskGroup = !!data?.taskGroupByCenter
-    ? data?.taskGroupByCenter.map((v) => ({ value: v.name, label: v.name }))
+  let taskGroup = !!data?.taskGroup
+    ? data?.taskGroup.edges.map((v) => {
+        const { name, uuid } = v.node;
+        return { value: uuid, label: name };
+      })
     : [];
   return (
     <SelectInput
@@ -62,7 +65,7 @@ const ReviewerPicker = (props) => {
       options={taskGroup}
       value={!!value ? value : null}
       readOnly={readOnly}
-      required={required}
+      // required={required}
       onChange={onChange}
     />
   );

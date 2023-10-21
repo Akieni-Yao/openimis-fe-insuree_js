@@ -5,7 +5,7 @@ import _ from "lodash";
 
 import { withTheme, withStyles } from "@material-ui/core/styles";
 import ReplayIcon from "@material-ui/icons/Replay";
-import { Typography, Button } from "@material-ui/core";
+import { Typography, Button, Tooltip, IconButton, Grid } from "@material-ui/core";
 import {
   formatMessageWithValues,
   withModulesManager,
@@ -30,6 +30,7 @@ import { insureeLabel } from "../utils/utils";
 import FamilyDisplayPanel from "./FamilyDisplayPanel";
 import InsureeMasterPanel from "../components/InsureeMasterPanel";
 import RejectDialog from "../dialogs/RejectDialog";
+import HelpIcon from "@material-ui/icons/Help";
 
 const styles = (theme) => ({
   page: theme.page,
@@ -54,6 +55,17 @@ const styles = (theme) => ({
   },
   noBtnClasses: {
     visibility: "hidden",
+  },
+  customWidth: {
+    maxWidth: 500,
+  },
+  margin2: {
+    display: "flex",
+    paddingTop: theme.spacing(2),
+    paddingRight: theme.spacing(1),
+  },
+  spanPadding: {
+    paddingTop: theme.spacing(1),
   },
 });
 
@@ -182,6 +194,7 @@ class InsureeForm extends Component {
     if (!doesInsureeChange) return false;
     // if (!this.props.isInsureeNumberValid) return false;
     // if (!this.state.insuree.chfId) return false;
+    if (!this.state.insuree?.jsonExt?.insureeEnrolmentType) return false;
     if (!this.state.insuree.lastName) return false;
     if (!this.state.insuree.otherNames) return false;
     if (!this.state.insuree.dob) return false;
@@ -199,12 +212,12 @@ class InsureeForm extends Component {
     );
   };
   _approveorreject = (insuree) => {
-    console.log("CHECKPAYL", insuree);
     // this.props.updateExternalDocuments(this.props.modulesManager, this.props.documentsData, insuree.chfId);
     this.setState(
       { lockNew: true }, // avoid duplicates
       (e) => this.props.save(insuree),
     );
+    this.handleDialogClose();
   };
   handleDialogOpen = (status, data) => {
     this.setState({ confirmDialog: true });
@@ -216,32 +229,80 @@ class InsureeForm extends Component {
   };
 
   onEditedChanged = (insuree) => {
-    // console.log("insuree",insuree);
     this.setState({ insuree, newInsuree: false });
   };
   getStatusClass = (status) => {
+    let selectedClass = null;
+    let docsStatus = null;
+
     switch (status) {
       case "PRE_REGISTERED":
+        selectedClass = this.props.classes.approvedBtn;
+        docsStatus = "Pre Registered";
+        break;
       case "APPROVED":
-        return this.props.classes.approvedBtn;
-      case "REJECT":
-        return this.props.classes.rejectBtn;
+        selectedClass = this.props.classes.approvedBtn;
+        docsStatus = "Active";
+        break;
+      case "REJECTED":
+        selectedClass = this.props.classes.rejectBtn;
+        docsStatus = "Inactive";
+        break;
       case "REWORK":
-      case "PENDING_FOR_REVIEW":
-      case "AWAIT FOR DOCUMENTS":
-        return this.props.classes.commonBtn;
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Rework";
+        break;
+      case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Waiting for document and biometric";
+        break;
+      case "WAITING_FOR_APPROVAL":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Waiting For Approval";
+        break;
+      case "WAITING_FOR_QUEUE":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "Waiting For Queue";
+        break;
       default:
-        return this.props.classes.noBtnClasses;
+        selectedClass = this.props.classes.noBtnClasses;
+        break;
     }
+    return { selectedClass, docsStatus };
   };
   statusButton = (data) => {
+    const { selectedClass, docsStatus } = this.getStatusClass(data.status);
     return (
-      <>
-        <Typography>STATUS :</Typography>
-        <Button className={this.getStatusClass(data.status)} variant="outlined">
-          {data.status}
+      <Grid className={this.props.classes.margin2}>
+        <Typography component="span" className={this.props.classes.spanPadding}>
+          STATUS :
+        </Typography>
+        <Button className={selectedClass} variant="outlined">
+          {docsStatus}
         </Button>
-      </>
+        {data.status == "REWORK" || data.status == "REJECTED" ? (
+          <Tooltip
+            placement="bottom"
+            arrow
+            classes={{ tooltip: this.props.classes.customWidth }}
+            title={data.statusComment}
+            // componentsProps={{
+            //   tooltip: {
+            //     sx: {
+            //       bgcolor: "common.white",
+            //       "& .MuiTooltip-arrow": {
+            //         color: "common.white",
+            //       },
+            //     },
+            //   },
+            // }}
+          >
+            <IconButton>
+              <HelpIcon />
+            </IconButton>
+          </Tooltip>
+        ) : null}
+      </Grid>
     );
   };
   render() {
@@ -305,8 +366,7 @@ class InsureeForm extends Component {
         onlyIfDirty: !readOnly && !runningMutation,
       },
       {
-        // icon: <Button variant="outlined">APPROVED</Button>,
-        icon: this.statusButton(insuree),
+        button: this.statusButton(insuree),
       },
     ];
     const allApprovedOrRejected =
@@ -315,7 +375,6 @@ class InsureeForm extends Component {
         (document) => document.documentStatus === "APPROVED" || document.documentStatus === "REJECTED",
       );
     const hasReject = allApprovedOrRejected && documentsData.some((document) => document.documentStatus === "REJECTED");
-    // Check if all documents have a status of "APPROVED"
     const allApproved =
       documentsData && documentsData.length > 0
         ? documentsData.every((document) => document.documentStatus === "APPROVED")
