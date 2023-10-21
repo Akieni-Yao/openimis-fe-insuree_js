@@ -33,11 +33,11 @@ class InsureeMainMenu extends Component {
         route: "/" + modulesManager.getRef("insuree.route.insurees"),
       });
     }
-    entries.push(
-      ...this.props.modulesManager
-        .getContribs(INSUREE_MAIN_MENU_CONTRIBUTION_KEY)
-        .filter((c) => !c.filter || c.filter(rights)),
-    );
+    // entries.push(
+    //   ...this.props.modulesManager
+    //     .getContribs(INSUREE_MAIN_MENU_CONTRIBUTION_KEY)
+    //     .filter((c) => !c.filter || c.filter(rights)),
+    // );
 
     if (!entries.length) return null;
     return (
