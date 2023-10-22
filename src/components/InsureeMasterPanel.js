@@ -176,7 +176,7 @@ class InsureeMasterPanel extends FormPanel {
                 <PublishedComponent
                   pubRef="core.DatePicker"
                   module="insuree"
-                  label="Created on"
+                  label="CREATED on"
                   required={false}
                   maxDate={!!edited && !!edited.dateValidTo && edited.dateValidTo}
                   value={
