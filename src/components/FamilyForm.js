@@ -70,6 +70,8 @@ class FamilyForm extends Component {
     family: this._newFamily(),
     newFamily: true,
     confirmedAction: null,
+    // isFormValid: true,
+
   };
 
   _newFamily() {
@@ -150,7 +152,11 @@ class FamilyForm extends Component {
       );
     }
   };
-
+  // onValidation = (isFormValid) => {
+  //   if (this.state.isFormValid !== isFormValid) {
+  //     this.setState({ isFormValid });
+  //   }
+  // };
   canSave = () => {
     // if (!this.state.family.location) return false;
     if (!this.state.family.headInsuree) return false;
@@ -349,6 +355,8 @@ class FamilyForm extends Component {
             save={!!save ? this._save : null}
             onActionToConfirm={this.onActionToConfirm}
             openDirty={save}
+            // onValidation={this.onValidation}
+
           />
         )}
       </div>

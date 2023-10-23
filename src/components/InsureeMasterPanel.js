@@ -433,6 +433,7 @@ class InsureeMasterPanel extends FormPanel {
                       readOnly={readOnly}
                       value={!!edited && !!edited.email ? edited?.email : ""}
                       onChange={(v) => this.updateAttribute("email", v)}
+                      
                     />
                   </Grid>
                   <Grid item xs={3} className={classes.item}>
