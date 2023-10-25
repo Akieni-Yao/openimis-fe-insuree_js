@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogActions,
@@ -18,15 +18,8 @@ import {
 } from "@material-ui/core";
 import { PublishedComponent } from "@openimis/fe-core";
 import CloseIcon from "@material-ui/icons/Close";
-// import Draggable from "react-draggable";
+import Draggable from "react-draggable";
 
-// function PaperComponent(props) {
-//   return (
-//     <Draggable handle="#draggable-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
-//       <Paper {...props} />
-//     </Draggable>
-//   );
-// }
 const useStyles = makeStyles((theme) => ({
   dialog: {
     display: "flex",
@@ -43,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
     borderTopLeftRadius: 0,
     borderBottomLeftRadius: 0,
     overflow: "auto",
+    cursor: "move",
   },
   header: {
     backgroundColor: "#00913E",
@@ -65,6 +59,7 @@ const useStyles = makeStyles((theme) => ({
     pointerEvents: "none",
   },
 }));
+
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
@@ -77,7 +72,6 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
   const [showRejectComment, setShowRejectComment] = useState(false);
   const [blobURL, setBlobURL] = useState(null);
   const classes = useStyles();
-
   const handleApprove = () => {
     approved({ documentId: documentImage, newStatus: "APPROVED", comments: null });
     onClose();
@@ -124,7 +118,6 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
       })
       .then((data) => {
         const accessToken = data.access_token;
-        // Now that you have the access token, you can use it to call other APIs.
         documentViewAPI(accessToken);
       })
       .catch((error) => {
@@ -187,65 +180,72 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
 
   return (
     open && (
-      <Dialog
-        open={open}
-        // onClose={onClose}
-        TransitionComponent={Transition}
-        fullWidth
-        maxWidth="md"
-        maxHeight="50vh"
-        PaperProps={{
-          className: classes.dialog,
-        }}
-        // PaperComponent={PaperComponent}
-        BackdropComponent={Backdrop} // Use Backdrop as the background component
-        BackdropProps={{
-          invisible: true, // Make the backdrop invisible
-          classes: { root: classes.backdrop },
-        }}
-      >
-        <DialogTitle style={{ cursor: "move" }} className={classes.header}>
-          Documents
-          <IconButton color="inherit" onClick={onClose} edge="end" className={classes.closeButton}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <iframe title="PDF Viewer" src={blobURL} width="100%" height="100%"></iframe>
-        </DialogContent>
-        <Divider />
-        {!showRejectComment && (
-          <DialogActions style={{ margin: "20px 20px" }}>
-            <Button onClick={handleApprove} variant="contained" color="primary">
-              Verify
-            </Button>
-            <Button onClick={handleReject} variant="contained" className={classes.rejectBtn}>
-              Reject
-            </Button>
-          </DialogActions>
-        )}
-        {showRejectComment && (
-          <Grid style={{ margin: "10px 40px" }}>
-            <PublishedComponent
-              pubRef="insuree.RejectCommentPicker"
-              withNull
-              label="Please Select the reason"
-              filterLabels={false}
-              value={rejectComment}
-              onChange={(v) => setRejectComment(v)}
-              readOnly={false}
-            />
-            <DialogActions>
-              <Button onClick={() => setShowRejectComment(false)} variant="outlined" color="primary">
-                Cancel
+      <Draggable handle="#draggable-dialog-title">
+        <Dialog
+          open={open}
+          // onClose={onClose}
+          TransitionComponent={Transition}
+          fullWidth
+          maxWidth="md"
+          // maxHeight="50vh"
+          id="draggable-dialog-title"
+          PaperProps={{
+            className: classes.dialog,
+          }}
+          // BackdropComponent={Backdrop}
+          // BackdropProps={{
+          //   invisible: true,
+          //   classes: { root: classes.backdrop },
+          // }}
+          disableScrollLock={true}
+          hideBackdrop
+          disabledEnforceFocus
+          disableBackdropClick
+          aria-labelledby="draggable-dialog-title"
+        >
+          <DialogTitle className={classes.header}>
+            Documents
+            <IconButton color="inherit" onClick={onClose} edge="end" className={classes.closeButton}>
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <iframe title="PDF Viewer" src={blobURL} width="100%" height="100%"></iframe>
+          </DialogContent>
+          <Divider />
+          {!showRejectComment && (
+            <DialogActions style={{ margin: "20px 20px" }}>
+              <Button onClick={handleApprove} variant="contained" color="primary">
+                Verify
               </Button>
-              <Button onClick={submitReject} variant="contained" color="primary">
-                Submit
+              <Button onClick={handleReject} variant="contained" className={classes.rejectBtn}>
+                Reject
               </Button>
             </DialogActions>
-          </Grid>
-        )}
-      </Dialog>
+          )}
+          {showRejectComment && (
+            <Grid style={{ margin: "10px 40px" }}>
+              <PublishedComponent
+                pubRef="insuree.RejectCommentPicker"
+                withNull
+                label="Please Select the reason"
+                filterLabels={false}
+                value={rejectComment}
+                onChange={(v) => setRejectComment(v)}
+                readOnly={false}
+              />
+              <DialogActions>
+                <Button onClick={() => setShowRejectComment(false)} variant="outlined" color="primary">
+                  Cancel
+                </Button>
+                <Button onClick={submitReject} variant="contained" color="primary">
+                  Submit
+                </Button>
+              </DialogActions>
+            </Grid>
+          )}
+        </Dialog>
+      </Draggable>
     )
   );
 }
