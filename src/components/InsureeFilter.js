@@ -154,7 +154,7 @@ class InsureeFilter extends Component {
         />
         <Grid item xs={3}>
           <Grid container>
-            <ControlledField
+            {/* <ControlledField
               module="insuree"
               id="InsureeFilter.gender"
               field={
@@ -175,7 +175,7 @@ class InsureeFilter extends Component {
                   />
                 </Grid>
               }
-            />
+            /> */}
             <ControlledField
               module="insuree"
               id="InsureeFilter.maritalStatus"

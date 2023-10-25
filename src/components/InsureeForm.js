@@ -80,6 +80,8 @@ class InsureeForm extends Component {
     confirmDialog: false,
     statusCheck: null,
     payload: null,
+    isFormValid: true,
+
   };
 
   _newInsuree() {
@@ -188,7 +190,11 @@ class InsureeForm extends Component {
     }
     return true;
   };
-
+  onValidation = (isFormValid) => {
+    if (this.state.isFormValid !== isFormValid) {
+      this.setState({ isFormValid });
+    }
+  };
   canSave = () => {
     const doesInsureeChange = this.doesInsureeChange();
     if (!doesInsureeChange) return false;
@@ -199,6 +205,7 @@ class InsureeForm extends Component {
     if (!this.state.insuree.otherNames) return false;
     if (!this.state.insuree.dob) return false;
     if (!this.state.insuree.gender || !this.state.insuree.gender?.code) return false;
+    // if (!this.state.isFormValid == true) return false;
     // if (this.state.lockNew) return false;
     // if (!!this.state.insuree.photo && (!this.state.insuree.photo.date || !this.state.insuree.photo.officerId))
     //   return false;
@@ -231,6 +238,7 @@ class InsureeForm extends Component {
   onEditedChanged = (insuree) => {
     this.setState({ insuree, newInsuree: false });
   };
+
   getStatusClass = (status) => {
     let selectedClass = null;
     let docsStatus = null;
@@ -286,16 +294,16 @@ class InsureeForm extends Component {
             arrow
             classes={{ tooltip: this.props.classes.customWidth }}
             title={data.statusComment}
-            // componentsProps={{
-            //   tooltip: {
-            //     sx: {
-            //       bgcolor: "common.white",
-            //       "& .MuiTooltip-arrow": {
-            //         color: "common.white",
-            //       },
-            //     },
-            //   },
-            // }}
+          // componentsProps={{
+          //   tooltip: {
+          //     sx: {
+          //       bgcolor: "common.white",
+          //       "& .MuiTooltip-arrow": {
+          //         color: "common.white",
+          //       },
+          //     },
+          //   },
+          // }}
           >
             <IconButton>
               <HelpIcon />
@@ -413,6 +421,8 @@ class InsureeForm extends Component {
               allApproved={allApproved}
               approveorreject={this._approveorreject}
               handleDialogOpen={this.handleDialogOpen}
+              onValidation={this.onValidation}
+
             />
           )}
         <RejectDialog

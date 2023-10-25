@@ -13,6 +13,7 @@ import {
   ConstantBasedPicker,
 } from "@openimis/fe-core";
 import _ from "lodash";
+import { MAX_BIRTHPLACE_LENGTH, MAX_PHONE_LENGTH } from "../constants";
 const styles = (theme) => ({
   paper: theme.paper.paper,
   tableTitle: theme.table.title,
@@ -21,7 +22,7 @@ const styles = (theme) => ({
     height: "100%",
   },
 });
-const MAX_MAIN_ACTIVITY_LENGTH = 255;
+const MAX_MAIN_ACTIVITY_LENGTH = 30;
 const INSUREE_INSUREE_CONTRIBUTION_KEY = "insuree.Insuree";
 const INSUREE_INSUREE_DOCUMENTS_KEY = "insuree.Insuree.documents";
 const INSUREE_INSUREE_PANELS_CONTRIBUTION_KEY = "insuree.Insuree.panels";
@@ -33,9 +34,30 @@ const CAMU_ENROLMENT_TYPE = [
   "student",
   "vulnerable_Persons",
 ];
-const CAMU_CIVIL_QUALITY = ["rightOpener", "spouse", "child"];
-
+const CAMU_CIVIL_QUALITY = ["Main Beneficiary", "Depedent Beneficiary spouse", "Depedent Beneficiary child"];
 class InsureeMasterPanel extends FormPanel {
+  constructor(props) {
+    super(props);
+    this.phoneValidation = props.modulesManager.getConf(
+      "policyHolder",
+      "policyHolderForm.phoneValidation",
+      {
+        regex: /^[0-9]*$/,
+        regexMsg: {
+          en: formatMessage(
+            props.intl,
+            "policyHolder",
+            "phoneValidation.regexMsg.en"
+          ),
+          fr: formatMessage(
+            props.intl,
+            "policyHolder",
+            "phoneValidation.regexMsg.fr"
+          ),
+        },
+      }
+    );
+  }
   // The one from FormPanel does not allow jsonExt patching
   updateExts = (updates) => {
     let data = { ...this.state.data };
@@ -57,7 +79,29 @@ class InsureeMasterPanel extends FormPanel {
 
     this.props.onEditedChanged(data);
   };
-
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    this._componentDidUpdate(prevProps, prevState, snapshot);
+    const { edited } = this.props;
+    if (prevProps.edited !== edited) {
+      let isFormValid = true;
+      if (
+        !!this.regexError("phone", edited.phone) ||
+        !!this.regexError("email", edited.email)
+      ) {
+        isFormValid = false;
+      }
+      // this.props.onValidation(isFormValid);
+    }
+  }
+  regexError = (field, value) => {
+    if (!!value) {
+      let validation = this[`${field}Validation`];
+      return !!validation && !validation["regex"].test(value)
+        ? validation["regexMsg"][this.props.intl.locale]
+        : false;
+    }
+    return false;
+  };
   render() {
     const {
       intl,
@@ -140,20 +184,24 @@ class InsureeMasterPanel extends FormPanel {
               <Grid item xs={2} className={classes.item}>
                 <TextInput
                   module="insuree"
-                  label="niu"
+                  label="NIU"
                   required={false}
                   inputProps={{ maxLength: MAX_MAIN_ACTIVITY_LENGTH }}
                   value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeniu : ""}
                   onChange={(v) => this.updateExts({ insureeniu: v })}
-                  // readOnly={isPolicyHolderPortalUser}
+                // readOnly={isPolicyHolderPortalUser}
                 />
               </Grid>
               <Grid item xs={3} className={classes.item}>
                 <TextInput
                   // pubRef="insuree"
                   module="insuree"
-                  label="Place of birth"
+                  label="Insuree.placeofbirth"
                   required={false}
+                  inputProps={{ maxLength: MAX_BIRTHPLACE_LENGTH }}
+                  // error={this.regexError("email", edited.email)}
+
+
                   // readOnly={readOnly}
                   value={!edited?.jsonExt?.BirthPlace ? "" : edited?.jsonExt?.BirthPlace}
                   // edited_id={edited_id}
@@ -176,7 +224,7 @@ class InsureeMasterPanel extends FormPanel {
                 <PublishedComponent
                   pubRef="core.DatePicker"
                   module="insuree"
-                  label="Created on"
+                  label="Insuree.Created on"
                   required={false}
                   maxDate={!!edited && !!edited.dateValidTo && edited.dateValidTo}
                   value={
@@ -205,9 +253,9 @@ class InsureeMasterPanel extends FormPanel {
                   withNull={true}
                   readOnly={
                     !!edited &&
-                    !!edited.family &&
-                    !!edited.family.headInsuree &&
-                    edited.family.headInsuree.id !== edited.id
+                      !!edited.family &&
+                      !!edited.family.headInsuree &&
+                      edited.family.headInsuree.id !== edited.id
                       ? readOnly
                       : true
                   }
@@ -216,8 +264,8 @@ class InsureeMasterPanel extends FormPanel {
                     edited_id
                       ? edited?.jsonExt?.insureelocations
                       : edited?.family?.location
-                      ? edited?.family?.location
-                      : this.props?.family?.location
+                        ? edited?.family?.location
+                        : this.props?.family?.location
                   }
                   // value={!edited?.jsonExt?.insureelocations ? "" : edited?.jsonExt?.insureelocations}
                   onChange={(v) => this.updateExts({ insureelocations: v })}
@@ -281,7 +329,7 @@ class InsureeMasterPanel extends FormPanel {
                           checked={!!edited && !!edited.jsonExt && edited.jsonExt.approx}
                           disabled={readOnly}
                           onChange={(e) => {
-                            console.log("e", e, e.target.checked);
+                            // console.log("e", e, e.target.checked);
                             this.updateExts({ approx: e.target.checked });
                           }}
                         />
@@ -293,10 +341,10 @@ class InsureeMasterPanel extends FormPanel {
                   <Grid item xs={2} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.InsureeGenderPicker"
-                      value={!!edited && !!edited.gender ? edited.gender.code : ""}
+                      value={!!edited && !!edited.gender ? edited?.gender?.code : ""}
                       module="insuree"
                       readOnly={readOnly}
-                      withNull={true}
+                      // withNull={true}
                       required={true}
                       onChange={(v) => this.updateAttribute("gender", { code: v })}
                     />
@@ -304,18 +352,18 @@ class InsureeMasterPanel extends FormPanel {
                   <Grid item xs={2} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.InsureeMaritalStatusPicker"
-                      value={!!edited && !!edited.marital ? edited.marital : ""}
+                      value={!!edited && !!edited?.marital ? edited?.marital : ""}
                       module="insuree"
                       readOnly={readOnly}
                       withNull={true}
-                      nullLabel="InsureeMaritalStatus.N"
+                      // nullLabel="InsureeMaritalStatus.N"
                       onChange={(v) => this.updateAttribute("marital", v)}
                     />
                   </Grid>
                   <Grid item xs={2} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.CountryPicker"
-                      value={!!edited && !!edited.jsonExt ? edited.jsonExt.nationality : ""}
+                      value={!!edited && !!edited.jsonExt ? edited?.jsonExt?.nationality : ""}
                       module="insuree"
                       readOnly={readOnly}
                       withNull={true}
@@ -329,7 +377,7 @@ class InsureeMasterPanel extends FormPanel {
                       label="Insuree.nbKids"
                       readOnly={readOnly}
                       type="number"
-                      value={!!edited && !!edited.jsonExt ? edited.jsonExt.nbKids : ""}
+                      value={!!edited && !!edited.jsonExt ? edited?.jsonExt?.nbKids : ""}
                       onChange={(v) => this.updateExts({ nbKids: v })}
                     />
                   </Grid>
@@ -338,9 +386,9 @@ class InsureeMasterPanel extends FormPanel {
                       control={
                         <Checkbox
                           color="primary"
-                          checked={!!edited && !!edited.cardIssued}
+                          checked={!!edited && !!edited?.cardIssued}
                           disabled={readOnly}
-                          onChange={(v) => this.updateAttribute("cardIssued", !edited || !edited.cardIssued)}
+                          onChange={(v) => this.updateAttribute("cardIssued", !edited || !edited?.cardIssued)}
                         />
                       }
                       label={formatMessage(intl, "insuree", "Insuree.cardIssued")}
@@ -352,7 +400,7 @@ class InsureeMasterPanel extends FormPanel {
                       label="Family.civilQuality"
                       required={false}
                       readOnly={readOnly}
-                      value={!!edited && !!edited.jsonExt ? edited.jsonExt.civilQuality : null}
+                      value={!!edited && !!edited.jsonExt ? edited?.jsonExt?.civilQuality : null}
                       onChange={(value) => this.updateExts({ civilQuality: value })}
                       constants={CAMU_CIVIL_QUALITY}
                       withNull
@@ -360,28 +408,39 @@ class InsureeMasterPanel extends FormPanel {
                   </Grid>
 
                   <Grid item xs={3} className={classes.item}>
+                    {/* <div style={{display:"flex"}}>
+                      <div style={{marginTop:"20px"}}>
+                        +
+                      </div>
+                      <div> */}
                     <TextInput
                       module="insuree"
                       label="Insuree.phone"
+                      inputProps={{ maxLength: MAX_PHONE_LENGTH }}
                       readOnly={readOnly}
-                      value={!!edited && !!edited.phone ? edited.phone : ""}
+                      value={!!edited && !!edited?.phone ? edited?.phone : ""}
+                      error={this.regexError("phone", edited?.phone)}
                       onChange={(v) => this.updateAttribute("phone", v)}
                     />
+                    {/* </div>
+                    </div> */}
+
                   </Grid>
                   <Grid item xs={6} className={classes.item}>
                     <TextInput
                       module="insuree"
                       label="Insuree.email"
                       readOnly={readOnly}
-                      value={!!edited && !!edited.email ? edited.email : ""}
+                      value={!!edited && !!edited.email ? edited?.email : ""}
                       onChange={(v) => this.updateAttribute("email", v)}
+                      
                     />
                   </Grid>
                   <Grid item xs={3} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.ProfessionPicker"
                       module="insuree"
-                      value={!!edited && !!edited.profession ? edited.profession.id : null}
+                      value={!!edited && !!edited.profession ? edited?.profession?.id : null}
                       readOnly={readOnly}
                       withNull={true}
                       nullLabel={formatMessage(intl, "insuree", "Profession.none")}
@@ -392,10 +451,10 @@ class InsureeMasterPanel extends FormPanel {
                     <PublishedComponent
                       pubRef="insuree.EducationPicker"
                       module="insuree"
-                      value={!!edited && !!edited.education ? edited.education.id : ""}
+                      value={!!edited && !!edited.education ? edited?.education?.id : ""}
                       readOnly={readOnly}
                       withNull={true}
-                      nullLabel={formatMessage(intl, "insuree", "insuree.Education.none")}
+                      // nullLabel={formatMessage(intl, "insuree", "insuree.Education.none")}
                       onChange={(v) => this.updateAttribute("education", { id: v })}
                     />
                   </Grid>
@@ -403,7 +462,7 @@ class InsureeMasterPanel extends FormPanel {
                     <PublishedComponent
                       pubRef="insuree.IdentificationTypePicker"
                       module="insuree"
-                      value={!!edited && !!edited.typeOfId ? edited.typeOfId.code : null}
+                      value={!!edited && !!edited.typeOfId ? edited?.typeOfId?.code : null}
                       readOnly={readOnly}
                       withNull={true}
                       nullLabel={formatMessage(intl, "insuree", "IdentificationType.none")}
@@ -415,7 +474,7 @@ class InsureeMasterPanel extends FormPanel {
                       module="insuree"
                       label="Insuree.passport"
                       readOnly={readOnly}
-                      value={!!edited && !!edited.passport ? edited.passport : ""}
+                      value={!!edited && !!edited.passport ? edited?.passport : ""}
                       onChange={(v) => this.updateAttribute("passport", !!v ? v : null)}
                     />
                   </Grid>

@@ -142,7 +142,7 @@ class FamilyFilter extends Component {
             </Grid>
           }
         />
-        <ControlledField
+        {/* <ControlledField
           module="insuree"
           id={`InsureeFilter.${anchor}.gender`}
           field={
@@ -164,7 +164,7 @@ class FamilyFilter extends Component {
               />
             </Grid>
           }
-        />
+        /> */}
         <ControlledField
           module="insuree"
           id={`FamilyFilter.${anchor}.phone`}
