@@ -43,7 +43,6 @@
   "insuree.InsureeGenderPicker.label": "Gender",
   "insuree.InsureeGender.M": "Male",
   "insuree.InsureeGender.F": "Female",
-  "insuree.InsureeGender.O": "Other",
   "insuree.InsureeOfficerPicker.label": "Officer",
   "insuree.InsureeOfficer.null": "Any",
   "insuree.InsureeOfficer.none": "None",

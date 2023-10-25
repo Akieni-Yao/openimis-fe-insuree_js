@@ -184,7 +184,7 @@ class InsureeMasterPanel extends FormPanel {
               <Grid item xs={2} className={classes.item}>
                 <TextInput
                   module="insuree"
-                  label="niu"
+                  label="NIU"
                   required={false}
                   inputProps={{ maxLength: MAX_MAIN_ACTIVITY_LENGTH }}
                   value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeniu : ""}
