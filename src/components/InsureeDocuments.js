@@ -34,7 +34,7 @@ import {
   fetchInsureeDocuments,
   updateInsureeDocument,
 } from "../actions";
-import { DisabledBiometric } from "../SvgIndex";
+import { DisabledBiometric, InvalidBiometric, ValidBiometric } from "../SvgIndex";
 import DocumentViewDialog from "../dialogs/DocumentViewDialogs";
 import HelpIcon from "@material-ui/icons/Help";
 
@@ -102,7 +102,31 @@ class InsureeDocuments extends PagedDataHandler {
     this.setState({ orderBy: null }, (e) => this.onChangeRowsPerPage(this.defaultPageSize));
     this.props.fetchInsureeDocuments(this.props?.edited?.chfId);
   }
+  // componentDidUpdate(prevProps, prevState) {
+  //   if (prevState.documentViewOpen !== this.state.documentViewOpen) {
+  //     this.adjustButtonZIndex();
+  //   }
+  // }
 
+  adjustButtonZIndex = () => {
+    const buttonElements = document.querySelectorAll('div[title="Save changes"], div[title="Create new"]');
+
+    if (buttonElements.length > 0) {
+      buttonElements.forEach((element) => {
+        if (element.style) {
+          if (this.state.documentViewOpen) {
+            // Store the original zIndex value
+            this.state.originalZIndexValues[element] = element.style.zIndex;
+            // Set the zIndex when the dialog is open
+            element.style.zIndex = "1000";
+          } else {
+            // Restore the original zIndex when the dialog is closed
+            element.style.zIndex = this.state.originalZIndexValues[element] || "2000";
+          }
+        }
+      });
+    }
+  };
   queryPrms = () => {
     let prms = [];
     if (!!this.state.orderBy) {
@@ -125,7 +149,7 @@ class InsureeDocuments extends PagedDataHandler {
     );
   };
   handleExternalNavigation = () => {
-    window.open("https://cnss.walkingtree.tech", "_blank"); // Opens in a new tab or window
+    window.open("https://abis.akieni.com/public/enrollment/index.html#/enroll/applicant-detail", "_blank");
   };
   approved = async (docData) => {
     const response = await this.props.updateInsureeDocument(docData);
@@ -189,7 +213,8 @@ class InsureeDocuments extends PagedDataHandler {
     switch (checkStatus) {
       case "APPROVED":
         selectedClass = this.props.classes.approvedIcon;
-        docsStatus = "Approved";
+        // docsStatus = "Approved";
+        docsStatus = formatMessage(this.props.intl, "insuree", "Insuree.approved");
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectIcon;
@@ -205,11 +230,13 @@ class InsureeDocuments extends PagedDataHandler {
             </IconButton>
           </Tooltip>
         );
-        docsStatus = "Rejected";
+        // docsStatus = "Rejected";
+        docsStatus = formatMessage(this.props.intl, "insuree", "Insuree.rejected");
         break;
       case "PENDING_FOR_REVIEW":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "NOT REVIEWED";
+        // docsStatus = "NOT REVIEWED";
+        docsStatus = formatMessage(this.props.intl, "insuree", "Insuree.notReviewed");
         break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
@@ -263,6 +290,7 @@ class InsureeDocuments extends PagedDataHandler {
       documentDetails,
       dataFromAPI,
     } = this.props;
+    console.log("checkBio", edited?.biometricsStatus);
     let actions =
       !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
         ? []
@@ -285,22 +313,18 @@ class InsureeDocuments extends PagedDataHandler {
         tooltip: formatMessage(intl, "insuree", "familyCheckCanAdd"),
       });
     }
-    // let bioActions =
-    //   !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
-    //     ? []
-    //     : [
-    //         {
-    //           button: (
-    //             <Button
-    //               onClick={(e) => this.checkCanAddInsuree(this.addNewInsuree)}
-    //               variant="contained"
-    //               color="primary"
-    //             >
-    //               Collect Biometric
-    //             </Button>
-    //           ),
-    //         },
-    //       ];
+    let bioActions =
+      !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
+        ? []
+        : [
+            {
+              button: (
+                <Button onClick={this.handleExternalNavigation} variant="contained" color="primary">
+                  Collect Biometric
+                </Button>
+              ),
+            },
+          ];
     if (!!checkingCanAddInsuree || !!errorCanAddInsuree) {
       actions.push({
         button: (
@@ -374,7 +398,7 @@ class InsureeDocuments extends PagedDataHandler {
                     padding: "6rem 0",
                   }}
                 >
-                  No Documents Found
+                  {formatMessage(this.props.intl, "insuree", "Insuree.noDocuments")}
                 </Typography>
               </Grid>
             ) : null}
@@ -388,7 +412,7 @@ class InsureeDocuments extends PagedDataHandler {
                   <FormattedMessage module="insuree" id="Insuree.BiometricHeading" />
                 </Typography>
               </Grid>
-              {/* <Grid item xs={4}>
+              <Grid item xs={4}>
                 <Grid container justify="flex-end">
                   {bioActions.map((a, idx) => {
                     return (
@@ -398,16 +422,36 @@ class InsureeDocuments extends PagedDataHandler {
                     );
                   })}
                 </Grid>
-              </Grid> */}
+              </Grid>
               <Grid item xs={12} className={classes.biometricPaper}>
                 <Divider />
                 <Grid container justify="center" alignItems="center" style={{ backgroundColor: "#00913E0D" }}>
-                  <Typography style={{ padding: "30px 0" }} alignItems="center">
+                  <Typography style={{ padding: "30px 20px" }} alignItems="center">
                     {/* <Box style={{ marginLeft: "2.2rem" }}> */}
-                    <DisabledBiometric fontSize="large" />
+                    {
+                      edited?.biometricsStatus ? (
+                        edited.biometricsIsMaster ? (
+                          <ValidBiometric fontSize="large" />
+                        ) : (
+                          <InvalidBiometric fontSize="large" />
+                        )
+                      ) : (
+                        <DisabledBiometric fontSize="large" />
+                      )
+                      // ) : (
+                      //   <ValidBiometric fontSize="large" />
+                      // )
+                      // <InvalidBiometric fontSize="large"/>
+                    }
                     {/* </Box> */}
                   </Typography>
-                  Biometric Details are not provided
+                  {` Biometric Details ${
+                    edited?.biometricsStatus
+                      ? edited.biometricsIsMaster
+                        ? "is provided"
+                        : "is duplicate"
+                      : "are not provided"
+                  }`}
                 </Grid>
               </Grid>
             </Grid>

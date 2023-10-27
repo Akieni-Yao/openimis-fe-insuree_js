@@ -8,20 +8,26 @@ import FamilyForm from "../components/FamilyForm";
 import { createFamily, updateFamily, clearInsuree } from "../actions";
 import { RIGHT_FAMILY, RIGHT_FAMILY_ADD, RIGHT_FAMILY_EDIT } from "../constants";
 import { familyLabel } from "../utils/utils";
+import CommonSnackbar from "../components/CommonSnackbar";
 
 const styles = (theme) => ({
   page: theme.page,
 });
 
 class FamilyPage extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = { temporary_number: "" };
-// }
+  constructor(props) {
+    super(props);
+    this.state = {
+      isOpenSnackbar: false,
+      camuNumberRes: null,
+      statusInsuree: null,
+      snackbarMsg: null,
+    };
+  }
   add = () => {
     historyPush(this.props.modulesManager, this.props.history, "insuree.route.family");
   };
-  
+
   save = async (family) => {
     if (!family.uuid) {
       const createFamilyResult = await this.props.createFamily(
@@ -30,23 +36,34 @@ class FamilyPage extends Component {
         formatMessageWithValues(this.props.intl, "insuree", "CreateFamily.mutationLabel", {
           label: familyLabel(family),
         }),
-        'families {family{id uuid headInsuree { id }}}'
+        "families {family{id uuid headInsuree { id chfId}}}",
       );
-      if (createFamilyResult
-          && createFamilyResult.status === 2
-          && createFamilyResult.families[0]?.family?.headInsuree?.id
+      if (
+        createFamilyResult &&
+        createFamilyResult.status === 2 &&
+        createFamilyResult.families[0]?.family?.headInsuree?.id
       ) {
-        // this.setState({ temporary_number: createFamilyResult.families[0]?.family?.headInsuree?.id });
-        console.log("Family created with head insuree id", createFamilyResult.families[0]?.family?.headInsuree?.id);
+        this.setState({ isOpenSnackbar: true });
+        this.setState({ snackbarMsg: `Family Created with Temporary CAMU number` });
+        this.setState({ camuNumberRes: createFamilyResult.families[0]?.family?.headInsuree?.chfId });
       }
     } else {
-      this.props.updateFamily(
+      const updateFamilyResult = await this.props.updateFamily(
         this.props.modulesManager,
         family,
         formatMessageWithValues(this.props.intl, "insuree", "UpdateFamily.mutationLabel", {
           label: familyLabel(family),
         }),
       );
+      if (
+        updateFamilyResult &&
+        updateFamilyResult.status === 2 &&
+        updateFamilyResult.families[0]?.family?.headInsuree?.chfId
+      ) {
+        this.setState({ isOpenSnackbar: true });
+        this.setState({ snackbarMsg: `Family Created with Temporary CAMU number` });
+        this.setState({ camuNumberRes: updateFamilyResult.families[0]?.family?.headInsuree?.chfId });
+      }
     }
   };
 
@@ -67,6 +84,14 @@ class FamilyPage extends Component {
           add={rights.includes(RIGHT_FAMILY_ADD) ? this.add : null}
           save={rights.includes(RIGHT_FAMILY_EDIT) ? this.save : null}
           readOnly={!rights.includes(RIGHT_FAMILY_EDIT) || !rights.includes(RIGHT_FAMILY_ADD)}
+        />
+        <CommonSnackbar
+          open={this.state.isOpenSnackbar}
+          onClose={this.handleCloseSnackbar}
+          message={this.state.snackbarMsg}
+          severity="success"
+          copyText={this.state.camuNumberRes && this.state.camuNumberRes}
+          backgroundColor="#00913E"
         />
       </div>
     );

@@ -231,7 +231,7 @@
   "insuree.Family.enrolmentType.Selfemployed_and_liberal_professions": "Self-employed and liberal professions",
   "insuree.Family.enrolmentType.CRF_and_CNSS_pensioners": "CRF and CNSS pensioners",
   "insuree.Family.enrolmentType.vulnerable_Persons": "Vulnerable persons",
-  "insuree.Family.enrolmentType.student": "Students",
+  "insuree.Family.enrolmentType.students": "Students",
   "insuree.Insuree.nbKids": "Number of Kids",
   "insuree.approx": "Approx.",
   "insuree.createdAt": "Created At",
@@ -430,6 +430,12 @@
  "insuree.Insuree.BiometricHeading":"Biometric",
  "insuree.Insuree.rejectComment":"Reason for Rejection",
  "insuree.Insuree.placeofbirth": "Place of Birth",
- "insuree.Insuree.Created on":"Created on"
+ "insuree.Insuree.approved":"Approved",
+ "insuree.Insuree.rejected":"Rejected",
+ "insuree.Insuree.Created on":"Created on",
+ "insuree.Insuree.noDocuments":"No Documents Found",
+ "insuree.Insuree.notReviewed":"NOT REVIEWED",
+ "insuree.Insuree.verify":"Verify",
+ "insuree.Insuree.reject":"Reject"
 
 }

@@ -31,32 +31,20 @@ const CAMU_ENROLMENT_TYPE = [
   "private_sector_employees",
   "Selfemployed_and_liberal_professions",
   "CRF_and_CNSS_pensioners",
-  "student",
+  "students",
   "vulnerable_Persons",
 ];
 const CAMU_CIVIL_QUALITY = ["Main Beneficiary", "Depedent Beneficiary spouse", "Depedent Beneficiary child"];
 class InsureeMasterPanel extends FormPanel {
   constructor(props) {
     super(props);
-    this.phoneValidation = props.modulesManager.getConf(
-      "policyHolder",
-      "policyHolderForm.phoneValidation",
-      {
-        regex: /^[0-9]*$/,
-        regexMsg: {
-          en: formatMessage(
-            props.intl,
-            "policyHolder",
-            "phoneValidation.regexMsg.en"
-          ),
-          fr: formatMessage(
-            props.intl,
-            "policyHolder",
-            "phoneValidation.regexMsg.fr"
-          ),
-        },
-      }
-    );
+    this.phoneValidation = props.modulesManager.getConf("policyHolder", "policyHolderForm.phoneValidation", {
+      regex: /^[0-9]*$/,
+      regexMsg: {
+        en: formatMessage(props.intl, "policyHolder", "phoneValidation.regexMsg.en"),
+        fr: formatMessage(props.intl, "policyHolder", "phoneValidation.regexMsg.fr"),
+      },
+    });
   }
   // The one from FormPanel does not allow jsonExt patching
   updateExts = (updates) => {
@@ -84,10 +72,7 @@ class InsureeMasterPanel extends FormPanel {
     const { edited } = this.props;
     if (prevProps.edited !== edited) {
       let isFormValid = true;
-      if (
-        !!this.regexError("phone", edited.phone) ||
-        !!this.regexError("email", edited.email)
-      ) {
+      if (!!this.regexError("phone", edited.phone) || !!this.regexError("email", edited.email)) {
         isFormValid = false;
       }
       // this.props.onValidation(isFormValid);
@@ -96,9 +81,7 @@ class InsureeMasterPanel extends FormPanel {
   regexError = (field, value) => {
     if (!!value) {
       let validation = this[`${field}Validation`];
-      return !!validation && !validation["regex"].test(value)
-        ? validation["regexMsg"][this.props.intl.locale]
-        : false;
+      return !!validation && !validation["regex"].test(value) ? validation["regexMsg"][this.props.intl.locale] : false;
     }
     return false;
   };
@@ -189,7 +172,7 @@ class InsureeMasterPanel extends FormPanel {
                   inputProps={{ maxLength: MAX_MAIN_ACTIVITY_LENGTH }}
                   value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeniu : ""}
                   onChange={(v) => this.updateExts({ insureeniu: v })}
-                // readOnly={isPolicyHolderPortalUser}
+                  // readOnly={isPolicyHolderPortalUser}
                 />
               </Grid>
               <Grid item xs={3} className={classes.item}>
@@ -201,7 +184,6 @@ class InsureeMasterPanel extends FormPanel {
                   inputProps={{ maxLength: MAX_BIRTHPLACE_LENGTH }}
                   // error={this.regexError("email", edited.email)}
 
-
                   // readOnly={readOnly}
                   value={!edited?.jsonExt?.BirthPlace ? "" : edited?.jsonExt?.BirthPlace}
                   // edited_id={edited_id}
@@ -212,9 +194,23 @@ class InsureeMasterPanel extends FormPanel {
                 <ConstantBasedPicker
                   module="insuree"
                   label="Family.enrolmentType"
+                  readOnly={
+                    !!edited &&
+                    !!edited.family &&
+                    !!edited.family.headInsuree &&
+                    edited.family.headInsuree.id !== edited.id
+                      ? readOnly
+                      : true
+                  }
                   required={true}
-                  readOnly={readOnly}
-                  value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeEnrolmentType : null}
+                  value={
+                    edited_id
+                      ? edited?.jsonExt?.insureeEnrolmentType
+                      : edited?.family?.jsonExt?.enrolmentType
+                      ? edited?.family?.jsonExt?.enrolmentType
+                      : this.props?.family?.jsonExt?.enrolmentType
+                  }
+                  // value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeEnrolmentType : null}
                   onChange={(value) => this.updateExts({ insureeEnrolmentType: value })}
                   constants={CAMU_ENROLMENT_TYPE}
                   withNull
@@ -233,7 +229,7 @@ class InsureeMasterPanel extends FormPanel {
                       : new Date().toISOString().slice(0, 10) // Set the default value to today's date
                   }
                   onChange={(v) => this.updateExts({ dateValidFrom: v ? v : new Date().toISOString().slice(0, 10) })}
-                  readOnly={(!!edited && !!edited.id) || readOnly}
+                  readOnly={true}
                 />
               </Grid>
               <Grid item xs={3} className={classes.item}>
@@ -253,9 +249,9 @@ class InsureeMasterPanel extends FormPanel {
                   withNull={true}
                   readOnly={
                     !!edited &&
-                      !!edited.family &&
-                      !!edited.family.headInsuree &&
-                      edited.family.headInsuree.id !== edited.id
+                    !!edited.family &&
+                    !!edited.family.headInsuree &&
+                    edited.family.headInsuree.id !== edited.id
                       ? readOnly
                       : true
                   }
@@ -264,8 +260,8 @@ class InsureeMasterPanel extends FormPanel {
                     edited_id
                       ? edited?.jsonExt?.insureelocations
                       : edited?.family?.location
-                        ? edited?.family?.location
-                        : this.props?.family?.location
+                      ? edited?.family?.location
+                      : this.props?.family?.location
                   }
                   // value={!edited?.jsonExt?.insureelocations ? "" : edited?.jsonExt?.insureelocations}
                   onChange={(v) => this.updateExts({ insureelocations: v })}
@@ -424,7 +420,6 @@ class InsureeMasterPanel extends FormPanel {
                     />
                     {/* </div>
                     </div> */}
-
                   </Grid>
                   <Grid item xs={6} className={classes.item}>
                     <TextInput
@@ -433,7 +428,6 @@ class InsureeMasterPanel extends FormPanel {
                       readOnly={readOnly}
                       value={!!edited && !!edited.email ? edited?.email : ""}
                       onChange={(v) => this.updateAttribute("email", v)}
-                      
                     />
                   </Grid>
                   <Grid item xs={3} className={classes.item}>
@@ -498,6 +492,7 @@ class InsureeMasterPanel extends FormPanel {
             {!!edited && !!edited?.chfId ? (
               <Contributions
                 {...this.props}
+                edited={edited}
                 updateAttribute={this.updateAttribute}
                 contributionKey={INSUREE_INSUREE_DOCUMENTS_KEY}
               />
