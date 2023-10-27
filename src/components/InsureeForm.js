@@ -201,6 +201,7 @@ class InsureeForm extends Component {
     // if (!this.props.isInsureeNumberValid) return false;
     // if (!this.state.insuree.chfId) return false;
     if (!this.state.insuree?.jsonExt?.insureeEnrolmentType) return false;
+    if (!this.state.insuree?.jsonExt?.createdAt) return false;
     if (!this.state.insuree.lastName) return false;
     if (!this.state.insuree.otherNames) return false;
     if (!this.state.insuree.dob) return false;

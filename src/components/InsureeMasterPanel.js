@@ -64,13 +64,13 @@ class InsureeMasterPanel extends FormPanel {
     } else if (this.props.edited?.family?.location && !updates?.insureelocations) {
       data["jsonExt"].insureelocations = this.props.edited?.family?.location;
     }
-    // if (updates?.insureeEnrolmentType) {
-    //   data["jsonExt"].insureeEnrolmentType = updates.insureeEnrolmentType;
-    // } else if (this.props.family?.location) {
-    //   data["jsonExt"].insureeEnrolmentType = this.props.family?.ext.enrolmentType;
-    // } else if (this.props.edited?.family?.ext.enrolmentType && !updates?.insureeEnrolmentType) {
-    //   data["jsonExt"].insureeEnrolmentType = this.props.edited?.family?.ext.enrolmentType;
-    // }
+    if (updates?.insureeEnrolmentType) {
+      data["jsonExt"].insureeEnrolmentType = updates.insureeEnrolmentType;
+    } else if (this.props.family?.jsonExt?.enrolmentType) {
+      data["jsonExt"].insureeEnrolmentType = this.props.family?.jsonExt?.enrolmentType;
+    } else if (this.props.edited?.family?.ext?.enrolmentType && !updates?.insureeEnrolmentType) {
+      data["jsonExt"].insureeEnrolmentType = this.props.edited?.family?.ext?.enrolmentType;
+    }
 
     this.props.onEditedChanged(data);
   };
@@ -201,24 +201,25 @@ class InsureeMasterPanel extends FormPanel {
                 <ConstantBasedPicker
                   module="insuree"
                   label="Family.enrolmentType"
-                  // readOnly={
-                  //   !!edited &&
-                  //   !!edited.family &&
-                  //   !!edited.family.headInsuree &&
-                  //   edited.family.headInsuree.id !== edited.id
-                  //     ? readOnly
-                  //     : true
-                  // }
-                  readOnly={readOnly}
+                  readOnly={
+                    !!edited &&
+                    !!edited.family &&
+                    !!edited.family.headInsuree &&
+                    edited.family.headInsuree.id !== edited.id &&
+                    edited_id == null
+                      ? readOnly
+                      : true
+                  }
+                  // readOnly={readOnly}
                   required={true}
-                  // value={
-                  //   edited_id
-                  //     ? edited?.jsonExt?.insureeEnrolmentType
-                  //     : edited?.family?.jsonExt?.enrolmentType
-                  //     ? edited?.family?.jsonExt?.enrolmentType
-                  //     : this.props?.family?.jsonExt?.enrolmentType
-                  // }
-                  value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeEnrolmentType : null}
+                  value={
+                    edited_id
+                      ? edited?.jsonExt?.insureeEnrolmentType
+                      : edited?.family?.jsonExt?.enrolmentType
+                      ? edited?.family?.jsonExt?.enrolmentType
+                      : this.props?.family?.jsonExt?.enrolmentType
+                  }
+                  // value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeEnrolmentType : null}
                   onChange={(value) => this.updateExts({ insureeEnrolmentType: value })}
                   constants={CAMU_ENROLMENT_TYPE}
                   withNull
@@ -246,9 +247,10 @@ class InsureeMasterPanel extends FormPanel {
                   withNull
                   label={formatMessage(intl, "insuree", "insuree.createdAt")}
                   filterLabels={false}
-                  value={!!edited && !!edited?.createdAt ? edited.createdAt : null}
+                  value={!!edited && !!edited?.jsonExt ? edited?.jsonExt.createdAt : null}
                   onChange={(v) => this.updateExts({ createdAt: v })}
                   readOnly={readOnly}
+                  required
                 />
               </Grid>
               <Grid item xs={12}>
@@ -485,7 +487,7 @@ class InsureeMasterPanel extends FormPanel {
               <Grid item xs={4} className={classes.item}>
                 <PublishedComponent
                   pubRef="insuree.Avatar"
-                  photo={!!edited ? edited.photo : null}
+                  photo={!!edited ? edited.photoUrl : null}
                   readOnly={readOnly}
                   withMeta={true}
                   onChange={(v) => this.updateAttribute("photo", !!v ? v : null)}

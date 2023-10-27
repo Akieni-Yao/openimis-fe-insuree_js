@@ -66,10 +66,10 @@ class FamilyPage extends Component {
       }
     }
   };
-
   componentWillUnmount = () => {
     this.props.clearInsuree();
   };
+  handleCloseSnackbar = () => this.setState({ isOpenSnackbar: false });
 
   render() {
     const { classes, modulesManager, history, rights, family_uuid, overview } = this.props;

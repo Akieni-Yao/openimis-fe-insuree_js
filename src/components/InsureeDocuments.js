@@ -102,29 +102,30 @@ class InsureeDocuments extends PagedDataHandler {
     this.setState({ orderBy: null }, (e) => this.onChangeRowsPerPage(this.defaultPageSize));
     this.props.fetchInsureeDocuments(this.props?.edited?.chfId);
   }
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (prevState.documentViewOpen !== this.state.documentViewOpen) {
-  //     this.adjustButtonZIndex();
-  //   }
-  // }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.documentViewOpen !== this.state.documentViewOpen) {
+      this.adjustButtonZIndex();
+    }
+  }
 
   adjustButtonZIndex = () => {
     const buttonElements = document.querySelectorAll('div[title="Save changes"], div[title="Create new"]');
-
-    if (buttonElements.length > 0) {
-      buttonElements.forEach((element) => {
-        if (element.style) {
-          if (this.state.documentViewOpen) {
-            // Store the original zIndex value
-            this.state.originalZIndexValues[element] = element.style.zIndex;
-            // Set the zIndex when the dialog is open
+    if (this.state.documentViewOpen) {
+      if (buttonElements.length > 0) {
+        buttonElements.forEach((element) => {
+          if (element.style) {
             element.style.zIndex = "1000";
-          } else {
-            // Restore the original zIndex when the dialog is closed
-            element.style.zIndex = this.state.originalZIndexValues[element] || "2000";
           }
-        }
-      });
+        });
+      }
+    } else {
+      if (buttonElements.length > 0) {
+        buttonElements.forEach((element) => {
+          if (element.style) {
+            element.style.zIndex = "2000";
+          }
+        });
+      }
     }
   };
   queryPrms = () => {
