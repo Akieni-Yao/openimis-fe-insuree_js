@@ -312,7 +312,7 @@ class FamilyFilter extends Component {
           }
         />
         {this.familyHeadFilter()}
-        {this.filterFamiliesOnMembers && this.familyMemberFilter()}
+        {/* {this.filterFamiliesOnMembers && this.familyMemberFilter()} */}
         <ControlledField
           module="insuree"
           id="FamilyFilter.poverty"
