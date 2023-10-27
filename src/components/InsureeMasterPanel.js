@@ -64,6 +64,13 @@ class InsureeMasterPanel extends FormPanel {
     } else if (this.props.edited?.family?.location && !updates?.insureelocations) {
       data["jsonExt"].insureelocations = this.props.edited?.family?.location;
     }
+    // if (updates?.insureeEnrolmentType) {
+    //   data["jsonExt"].insureeEnrolmentType = updates.insureeEnrolmentType;
+    // } else if (this.props.family?.location) {
+    //   data["jsonExt"].insureeEnrolmentType = this.props.family?.ext.enrolmentType;
+    // } else if (this.props.edited?.family?.ext.enrolmentType && !updates?.insureeEnrolmentType) {
+    //   data["jsonExt"].insureeEnrolmentType = this.props.edited?.family?.ext.enrolmentType;
+    // }
 
     this.props.onEditedChanged(data);
   };
@@ -194,23 +201,24 @@ class InsureeMasterPanel extends FormPanel {
                 <ConstantBasedPicker
                   module="insuree"
                   label="Family.enrolmentType"
-                  readOnly={
-                    !!edited &&
-                    !!edited.family &&
-                    !!edited.family.headInsuree &&
-                    edited.family.headInsuree.id !== edited.id
-                      ? readOnly
-                      : true
-                  }
+                  // readOnly={
+                  //   !!edited &&
+                  //   !!edited.family &&
+                  //   !!edited.family.headInsuree &&
+                  //   edited.family.headInsuree.id !== edited.id
+                  //     ? readOnly
+                  //     : true
+                  // }
+                  readOnly={readOnly}
                   required={true}
-                  value={
-                    edited_id
-                      ? edited?.jsonExt?.insureeEnrolmentType
-                      : edited?.family?.jsonExt?.enrolmentType
-                      ? edited?.family?.jsonExt?.enrolmentType
-                      : this.props?.family?.jsonExt?.enrolmentType
-                  }
-                  // value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeEnrolmentType : null}
+                  // value={
+                  //   edited_id
+                  //     ? edited?.jsonExt?.insureeEnrolmentType
+                  //     : edited?.family?.jsonExt?.enrolmentType
+                  //     ? edited?.family?.jsonExt?.enrolmentType
+                  //     : this.props?.family?.jsonExt?.enrolmentType
+                  // }
+                  value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeEnrolmentType : null}
                   onChange={(value) => this.updateExts({ insureeEnrolmentType: value })}
                   constants={CAMU_ENROLMENT_TYPE}
                   withNull
