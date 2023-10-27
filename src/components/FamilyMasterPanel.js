@@ -23,7 +23,7 @@ const CAMU_ENROLMENT_TYPE = [
   "private_sector_employees",
   "Selfemployed_and_liberal_professions",
   "CRF_and_CNSS_pensioners",
-  "student",
+  "students",
   "vulnerable_Persons",
 ];
 
