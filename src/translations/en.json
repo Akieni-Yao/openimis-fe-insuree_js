@@ -74,7 +74,7 @@
   "insuree.familySummaries.deleteFamily.tooltip": "Delete family",
   "insuree.Family.headInsuree.lastName": "Last Name",
   "insuree.Family.headInsuree.otherNames": "Given Name",
-  "insuree.Family.headInsuree.chfId": "Temp.Camu No.",
+  "insuree.Family.headInsuree.chfId": "Temporary Camu No.",
   "insuree.Family.headInsuree.email": "Email",
   "insuree.Family.headInsuree.phone": "Phone",
   "insuree.Family.headInsuree.dob": "Birth Date",
@@ -436,6 +436,8 @@
  "insuree.Insuree.noDocuments":"No Documents Found",
  "insuree.Insuree.notReviewed":"NOT REVIEWED",
  "insuree.Insuree.verify":"Verify",
- "insuree.Insuree.reject":"Reject"
+ "insuree.Insuree.reject":"Reject",
+ "insuree.camunumber":"CAMU No",
+ "insuree.sendmail":"sentNotification"
 
 }

@@ -169,7 +169,7 @@ class InsureeMasterPanel extends FormPanel {
                 <TextInput
                   pubRef="insuree"
                   module="insuree"
-                  label="Camu No."
+                  label="insuree.camunumber"
                   required={false}
                   readOnly={true}
                   value={!!edited && !!edited?.camuNumber ? edited?.camuNumber : ""}

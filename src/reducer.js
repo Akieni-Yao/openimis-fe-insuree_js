@@ -87,7 +87,9 @@ function reducer(
         ...state,
         fetchingInsuree: false,
         fetchedInsuree: true,
+        fetchedFamily: true,
         insuree: parseData(action.payload.data.insurees)[0],
+        family: parseData(action.payload.data.insurees)[0].family,
         errorInsuree: formatGraphQLError(action.payload),
       };
     case "INSUREE_INSUREE_ERR":
@@ -572,6 +574,8 @@ function reducer(
       return dispatchMutationResp(state, "setFamilyHead", action);
     case "INSUREE_CHANGE_FAMILY_HEAD_RESP":
       return dispatchMutationResp(state, "changeInsureeFamily", action);
+    case "INSUREE_SEND_EMAIL_RESP":
+      return dispatchMutationResp(state, "sentNotification", action);
     default:
       return state;
   }
