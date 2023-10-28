@@ -68,8 +68,15 @@ class InsureeMasterPanel extends FormPanel {
       data["jsonExt"].insureeEnrolmentType = updates.insureeEnrolmentType;
     } else if (this.props.family?.jsonExt?.enrolmentType) {
       data["jsonExt"].insureeEnrolmentType = this.props.family?.jsonExt?.enrolmentType;
-    } else if (this.props.edited?.family?.ext?.enrolmentType && !updates?.insureeEnrolmentType) {
-      data["jsonExt"].insureeEnrolmentType = this.props.edited?.family?.ext?.enrolmentType;
+    } else if (this.props.edited?.family?.jsonExt?.enrolmentType && !updates?.insureeEnrolmentType) {
+      data["jsonExt"].insureeEnrolmentType = this.props.edited?.family?.jsonExt?.enrolmentType;
+    }
+    if (updates?.insureeaddress) {
+      data["jsonExt"].insureeaddress = updates.insureeaddress;
+    } else if (this.props.family?.address) {
+      data["jsonExt"].insureeaddress = this.props.family?.address;
+    } else if (this.props.edited?.family?.address && !updates?.insureeaddress) {
+      data["jsonExt"].insureeaddress = this.props.edited?.family?.address;
     }
 
     this.props.onEditedChanged(data);
@@ -286,9 +293,25 @@ class InsureeMasterPanel extends FormPanel {
                   multiline
                   rows={2}
                   required={false}
+                  readOnly={
+                    !!edited &&
+                    !!edited.family &&
+                    !!edited.family.headInsuree &&
+                    edited.family.headInsuree.id !== edited.id &&
+                    edited_id == null
+                      ? readOnly
+                      : true
+                  }
                   // readOnly={readOnly}
-                  // value={!!edited && !!edited.jsonExt.address ? edited.jsonExt.address : ""}
-                  value={!edited && !edited?.jsonExt?.insureeaddress ? "" : edited?.jsonExt?.insureeaddress}
+                  value={
+                    edited_id
+                      ? edited?.jsonExt?.insureeaddress
+                      : edited?.family?.address
+                      ? edited?.family?.address
+                      : this.props?.family?.address
+                  }
+                  // readOnly={readOnly}
+                  // value={!edited && !edited?.jsonExt?.insureeaddress ? "" : edited?.jsonExt?.insureeaddress}
                   onChange={(v) => this.updateExts({ insureeaddress: v })}
                 />
               </Grid>
@@ -300,7 +323,9 @@ class InsureeMasterPanel extends FormPanel {
                   required={true}
                   readOnly={readOnly}
                   value={!!edited && !!edited.lastName ? edited.lastName : ""}
-                  onChange={(v) => this.updateAttribute("lastName", v)}
+                  onChange={(v) => {
+                    this.updateAttribute("lastName", v);
+                  }}
                 />
               </Grid>
               <Grid item xs={4} className={classes.item}>
@@ -310,7 +335,9 @@ class InsureeMasterPanel extends FormPanel {
                   required={true}
                   readOnly={readOnly}
                   value={!!edited && !!edited.otherNames ? edited.otherNames : ""}
-                  onChange={(v) => this.updateAttribute("otherNames", v)}
+                  onChange={(v) => {
+                    this.updateAttribute("otherNames", v);
+                  }}
                 />
               </Grid>
               <Grid item xs={8}>
@@ -352,7 +379,9 @@ class InsureeMasterPanel extends FormPanel {
                       readOnly={readOnly}
                       // withNull={true}
                       required={true}
-                      onChange={(v) => this.updateAttribute("gender", { code: v })}
+                      onChange={(v) => {
+                        this.updateAttribute("gender", { code: v });
+                      }}
                     />
                   </Grid>
                   <Grid item xs={2} className={classes.item}>

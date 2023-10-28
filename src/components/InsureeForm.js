@@ -81,7 +81,6 @@ class InsureeForm extends Component {
     statusCheck: null,
     payload: null,
     isFormValid: true,
-
   };
 
   _newInsuree() {
@@ -295,16 +294,16 @@ class InsureeForm extends Component {
             arrow
             classes={{ tooltip: this.props.classes.customWidth }}
             title={data.statusComment}
-          // componentsProps={{
-          //   tooltip: {
-          //     sx: {
-          //       bgcolor: "common.white",
-          //       "& .MuiTooltip-arrow": {
-          //         color: "common.white",
-          //       },
-          //     },
-          //   },
-          // }}
+            // componentsProps={{
+            //   tooltip: {
+            //     sx: {
+            //       bgcolor: "common.white",
+            //       "& .MuiTooltip-arrow": {
+            //         color: "common.white",
+            //       },
+            //     },
+            //   },
+            // }}
           >
             <IconButton>
               <HelpIcon />
@@ -383,11 +382,16 @@ class InsureeForm extends Component {
       documentsData.every(
         (document) => document.documentStatus === "APPROVED" || document.documentStatus === "REJECTED",
       );
-    const hasReject = allApprovedOrRejected && documentsData.some((document) => document.documentStatus === "REJECTED");
+    const hasReject =
+      allApprovedOrRejected &&
+      documentsData.some((document) => document.documentStatus === "REJECTED") &&
+      !this.state.insuree.biometricsIsMaster;
     const allApproved =
       documentsData && documentsData.length > 0
-        ? documentsData.every((document) => document.documentStatus === "APPROVED")
+        ? documentsData.every((document) => document.documentStatus === "APPROVED") &&
+          this.state.insuree.biometricsIsMaster
         : false;
+    console.log("this.state.insuree.biometricsIsMaste", this.state.insuree.biometricsIsMaster);
     return (
       <div className={runningMutation ? classes.lockedPage : null}>
         <Helmet
@@ -423,7 +427,6 @@ class InsureeForm extends Component {
               approveorreject={this._approveorreject}
               handleDialogOpen={this.handleDialogOpen}
               onValidation={this.onValidation}
-
             />
           )}
         <RejectDialog

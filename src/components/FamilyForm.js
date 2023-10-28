@@ -71,7 +71,6 @@ class FamilyForm extends Component {
     newFamily: true,
     confirmedAction: null,
     // isFormValid: true,
-
   };
 
   _newFamily() {
@@ -356,7 +355,6 @@ class FamilyForm extends Component {
             onActionToConfirm={this.onActionToConfirm}
             openDirty={save}
             // onValidation={this.onValidation}
-
           />
         )}
       </div>

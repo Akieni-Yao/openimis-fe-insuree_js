@@ -397,6 +397,7 @@ class InsureeDocuments extends PagedDataHandler {
                     textAlign: "center",
                     alignItems: "center",
                     padding: "6rem 0",
+                    fontSize: "1.8rem",
                   }}
                 >
                   {formatMessage(this.props.intl, "insuree", "Insuree.noDocuments")}
@@ -446,13 +447,15 @@ class InsureeDocuments extends PagedDataHandler {
                     }
                     {/* </Box> */}
                   </Typography>
-                  {` Biometric Details ${
-                    edited?.biometricsStatus
-                      ? edited.biometricsIsMaster
-                        ? "is provided"
-                        : "is duplicate"
-                      : "are not provided"
-                  }`}
+                  <Typography style={{ fontSize: "1.8rem" }}>
+                    {` Biometric Detail ${
+                      edited?.biometricsStatus
+                        ? edited.biometricsIsMaster
+                          ? "Master"
+                          : "is duplicate"
+                        : "is not provided"
+                    }`}
+                  </Typography>
                 </Grid>
               </Grid>
             </Grid>
