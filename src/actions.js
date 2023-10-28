@@ -320,7 +320,7 @@ function formatMail(edited) {
   }else{
     reportName="pre_enrollment_receipt"
   }
-  const formatMail = `insureeUuid: "${edited?.uuid}",  isEmail: ${true},reportName: "${reportName}"`
+  const formatMail = `uuid: "${edited?.uuid}",  isEmail: ${true},reportName: "${reportName}"`
   return formatMail;
 }
 // function formatExternalDocument(docs, tempCamu) {
