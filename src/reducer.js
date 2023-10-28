@@ -574,6 +574,8 @@ function reducer(
       return dispatchMutationResp(state, "setFamilyHead", action);
     case "INSUREE_CHANGE_FAMILY_HEAD_RESP":
       return dispatchMutationResp(state, "changeInsureeFamily", action);
+    case "INSUREE_SEND_EMAIL_RESP":
+      return dispatchMutationResp(state, "sentNotification", action);
     default:
       return state;
   }

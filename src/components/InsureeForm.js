@@ -24,6 +24,7 @@ import {
   fetchInsureeMutation,
   fetchInsureeDocuments,
   updateExternalDocuments,
+  sendEmail
 } from "../actions";
 import { RIGHT_INSUREE } from "../constants";
 import { insureeLabel } from "../utils/utils";
@@ -81,6 +82,7 @@ class InsureeForm extends Component {
     statusCheck: null,
     payload: null,
     isFormValid: true,
+    email:true
 
   };
 
@@ -227,6 +229,7 @@ class InsureeForm extends Component {
     );
     this.handleDialogClose();
   };
+
   handleDialogOpen = (status, data) => {
     this.setState({ confirmDialog: true });
     this.setState({ statusCheck: status });
@@ -314,6 +317,10 @@ class InsureeForm extends Component {
       </Grid>
     );
   };
+  emailButton = (edited) => {
+    console.log(edited,"edited")
+    this.props.sendEmail(this.props.modulesManager, edited)
+  }
   render() {
     const {
       rights,
@@ -332,7 +339,7 @@ class InsureeForm extends Component {
       save,
       documentsData,
     } = this.props;
-    const { insuree, clientMutationId, payload, statusCheck } = this.state;
+    const { insuree, clientMutationId, payload, statusCheck,email } = this.state;
 
     // const documentsData = [
     //   {
@@ -423,7 +430,9 @@ class InsureeForm extends Component {
               approveorreject={this._approveorreject}
               handleDialogOpen={this.handleDialogOpen}
               onValidation={this.onValidation}
-
+              emailButton={this.emailButton}
+              email={insuree_uuid}
+              print={true}
             />
           )}
         <RejectDialog
@@ -465,6 +474,7 @@ export default withHistory(
       journalize,
       fetchInsureeDocuments,
       updateExternalDocuments,
+      sendEmail
     })(injectIntl(withTheme(withStyles(styles)(InsureeForm)))),
   ),
 );

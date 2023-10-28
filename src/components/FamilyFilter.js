@@ -356,7 +356,7 @@ class FamilyFilter extends Component {
               />
             </Grid>
           }
-        />
+        /> 
         <ControlledField
           module="insuree"
           id="PolicyFilter.officer"
