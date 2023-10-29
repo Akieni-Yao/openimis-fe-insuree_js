@@ -283,11 +283,11 @@ class FamilyInsureesOverview extends PagedDataHandler {
         break;
       case "APPROVED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Active";
+        docsStatus = "Approved";
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
-        docsStatus = "Inactive";
+        docsStatus = "Rejected";
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;

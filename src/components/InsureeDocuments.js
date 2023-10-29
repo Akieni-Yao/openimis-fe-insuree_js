@@ -50,12 +50,12 @@ const styles = (theme) => ({
   btnPrimary: theme.formTable.actions,
   approvedIcon: {
     "&.Mui-checked": {
-      color: "#00913E", // Custom color for the approved checkbox when checked
+      color: "#00913E",
     },
   },
   rejectIcon: {
     "&.Mui-checked": {
-      color: "#FF0000", // Custom color for the rejected checkbox when checked
+      color: "#FF0000",
     },
   },
   commonBtn: {
@@ -67,9 +67,10 @@ const styles = (theme) => ({
   customArrow: {
     color: "#eeeaea",
   },
-  customWidth: {
-    maxWidth: 500,
+  tooltip: {
+    maxWidth: 1000,
     width: "fit-content",
+    // width: "auto",
     color: "white",
     backgroundColor: "#eeeaea",
   },
@@ -223,7 +224,7 @@ class InsureeDocuments extends PagedDataHandler {
           <Tooltip
             placement="right"
             arrow
-            classes={{ tooltip: this.props.classes.customWidth, arrow: this.props.classes.customArrow }}
+            classes={{ tooltip: this.props.classes.tooltip, arrow: this.props.classes.customArrow }}
             title={this.rejectedCommentsTooltip(status)}
           >
             <IconButton>
@@ -291,7 +292,6 @@ class InsureeDocuments extends PagedDataHandler {
       documentDetails,
       dataFromAPI,
     } = this.props;
-    console.log("checkBio", edited?.biometricsStatus);
     let actions =
       !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
         ? []
@@ -447,13 +447,19 @@ class InsureeDocuments extends PagedDataHandler {
                     }
                     {/* </Box> */}
                   </Typography>
-                  <Typography style={{ fontSize: "1.8rem" }}>
-                    {` Biometric Detail ${
+                  <Typography
+                    variant="h6"
+                    style={{
+                      fontSize: "1.8rem",
+                      color: edited?.biometricsStatus ? (edited.biometricsIsMaster ? "#00913E" : "#FF0000") : "grey",
+                    }}
+                  >
+                    {`  ${
                       edited?.biometricsStatus
                         ? edited.biometricsIsMaster
-                          ? "Master"
-                          : "is duplicate"
-                        : "is not provided"
+                          ? "Master record found"
+                          : "Duplicate record found"
+                        : "Biometric Detail is not provided"
                     }`}
                   </Typography>
                 </Grid>

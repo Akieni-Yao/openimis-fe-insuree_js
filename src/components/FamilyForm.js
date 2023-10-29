@@ -204,7 +204,7 @@ class FamilyForm extends Component {
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
-        docsStatus = "Inactive";
+        docsStatus = "Rejected";
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;

@@ -253,11 +253,11 @@ class InsureeForm extends Component {
         break;
       case "APPROVED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Active";
+        docsStatus = "Approved";
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
-        docsStatus = "Inactive";
+        docsStatus = "Rejected";
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;
@@ -390,9 +390,8 @@ class InsureeForm extends Component {
         (document) => document.documentStatus === "APPROVED" || document.documentStatus === "REJECTED",
       );
     const hasReject =
-      allApprovedOrRejected &&
-      documentsData.some((document) => document.documentStatus === "REJECTED") &&
-      !this.state.insuree.biometricsIsMaster;
+      (allApprovedOrRejected && documentsData.some((document) => document.documentStatus === "REJECTED")) ||
+      (allApprovedOrRejected && !this.state.insuree.biometricsIsMaster);
     const allApproved =
       documentsData && documentsData.length > 0
         ? documentsData.every((document) => document.documentStatus === "APPROVED") &&
