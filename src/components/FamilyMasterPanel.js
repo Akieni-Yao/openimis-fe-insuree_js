@@ -157,7 +157,14 @@ class FamilyMasterPanel extends FormPanel {
               label="Family.enrolmentType"
               required
               readOnly={readOnly}
-              value={!!edited && !!edited.ext ? edited.ext.enrolmentType : null}
+              value={
+                !!edited && edited?.jsonExt
+                  ? // ? edited.ext.enrolmentType
+                    // edited?.ext?.enrolmentType
+                    JSON.parse(edited?.jsonExt)?.enrolmentType
+                  : // edited?.jsonExt?.enrolmentType
+                    null
+              }
               onChange={(value) => this.updateExts({ enrolmentType: value })}
               constants={CAMU_ENROLMENT_TYPE}
               withNull
