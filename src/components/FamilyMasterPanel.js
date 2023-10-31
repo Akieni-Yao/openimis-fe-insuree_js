@@ -158,11 +158,11 @@ class FamilyMasterPanel extends FormPanel {
               required
               readOnly={readOnly}
               value={
-                !!edited && edited?.jsonExt
+                !!edited && edited?.ext
                   ? // ? edited.ext.enrolmentType
-                    // edited?.ext?.enrolmentType
-                    JSON.parse(edited?.jsonExt)?.enrolmentType
-                  : // edited?.jsonExt?.enrolmentType
+                    edited?.ext?.enrolmentType
+                  : // : edited?.jsonExt?.enrolmentType
+                    // edited?.jsonExt?.enrolmentType
                     null
               }
               onChange={(value) => this.updateExts({ enrolmentType: value })}
