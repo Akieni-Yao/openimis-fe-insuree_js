@@ -29,16 +29,19 @@ import HelpIcon from "@material-ui/icons/Help";
 const styles = (theme) => ({
   lockedPage: theme.page.locked,
   approvedBtn: {
+    backgroundColor: '#FFFFFF',
     borderColor: "#00913E",
     color: "#00913E",
     borderRadius: "2rem",
   },
   rejectBtn: {
+    backgroundColor: '#FFFFFF',
     borderColor: "##FF0000",
     color: "##FF0000",
     borderRadius: "2rem",
   },
   commonBtn: {
+    backgroundColor: '#FFFFFF',
     borderColor: "#FF841C",
     color: "#FF841C",
     borderRadius: "2rem",
@@ -56,6 +59,7 @@ const styles = (theme) => ({
   },
   spanPadding: {
     paddingTop: theme.spacing(1),
+    marginRight: '5px'
   },
 });
 

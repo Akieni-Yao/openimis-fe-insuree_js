@@ -37,18 +37,21 @@ const styles = (theme) => ({
   page: theme.page,
   lockedPage: theme.page.locked,
   approvedBtn: {
+    backgroundColor: '#FFFFFF',
     marginRight: "5px",
     borderColor: "#00913E",
     color: "#00913E",
     borderRadius: "2rem",
   },
   rejectBtn: {
+    backgroundColor: '#FFFFFF',
     marginRight: "5px",
     borderColor: "##FF0000",
     color: "##FF0000",
     borderRadius: "2rem",
   },
   commonBtn: {
+    backgroundColor: '#FFFFFF',
     marginRight: "5px",
     borderColor: "#FF841C",
     color: "#FF841C",
@@ -67,6 +70,7 @@ const styles = (theme) => ({
   },
   spanPadding: {
     paddingTop: theme.spacing(1),
+    marginRight: '5px'
   },
 });
 
@@ -286,7 +290,7 @@ class InsureeForm extends Component {
     return (
       <Grid className={this.props.classes.margin2}>
         <Typography component="span" className={this.props.classes.spanPadding}>
-          STATUS :
+          STATUS : 
         </Typography>
         <Button className={selectedClass} variant="outlined">
           {docsStatus}

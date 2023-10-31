@@ -450,8 +450,8 @@ class InsureeDocuments extends PagedDataHandler {
                   <Typography
                     variant="h6"
                     style={{
-                      fontSize: "1.8rem",
-                      color: edited?.biometricsStatus ? (edited.biometricsIsMaster ? "#00913E" : "#FF0000") : "grey",
+                      fontSize: "1.4rem",
+                      color: edited?.biometricsStatus ? (edited.biometricsIsMaster ? "#00913E" : "#FF0000") : "black",
                     }}
                   >
                     {`  ${
