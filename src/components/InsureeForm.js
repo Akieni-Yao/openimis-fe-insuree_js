@@ -24,6 +24,7 @@ import {
   fetchInsureeMutation,
   fetchInsureeDocuments,
   updateExternalDocuments,
+  sendEmail,
 } from "../actions";
 import { RIGHT_INSUREE } from "../constants";
 import { insureeLabel } from "../utils/utils";
@@ -36,18 +37,21 @@ const styles = (theme) => ({
   page: theme.page,
   lockedPage: theme.page.locked,
   approvedBtn: {
+    backgroundColor: '#FFFFFF',
     marginRight: "5px",
     borderColor: "#00913E",
     color: "#00913E",
     borderRadius: "2rem",
   },
   rejectBtn: {
+    backgroundColor: '#FFFFFF',
     marginRight: "5px",
     borderColor: "##FF0000",
     color: "##FF0000",
     borderRadius: "2rem",
   },
   commonBtn: {
+    backgroundColor: '#FFFFFF',
     marginRight: "5px",
     borderColor: "#FF841C",
     color: "#FF841C",
@@ -66,6 +70,7 @@ const styles = (theme) => ({
   },
   spanPadding: {
     paddingTop: theme.spacing(1),
+    marginRight: '5px'
   },
 });
 
@@ -80,6 +85,8 @@ class InsureeForm extends Component {
     confirmDialog: false,
     statusCheck: null,
     payload: null,
+    isFormValid: true,
+    email: true,
   };
 
   _newInsuree() {
@@ -188,17 +195,23 @@ class InsureeForm extends Component {
     }
     return true;
   };
-
+  onValidation = (isFormValid) => {
+    if (this.state.isFormValid !== isFormValid) {
+      this.setState({ isFormValid });
+    }
+  };
   canSave = () => {
     const doesInsureeChange = this.doesInsureeChange();
     if (!doesInsureeChange) return false;
     // if (!this.props.isInsureeNumberValid) return false;
     // if (!this.state.insuree.chfId) return false;
     if (!this.state.insuree?.jsonExt?.insureeEnrolmentType) return false;
+    if (!this.state.insuree?.jsonExt?.createdAt) return false;
     if (!this.state.insuree.lastName) return false;
     if (!this.state.insuree.otherNames) return false;
     if (!this.state.insuree.dob) return false;
     if (!this.state.insuree.gender || !this.state.insuree.gender?.code) return false;
+    // if (!this.state.isFormValid == true) return false;
     // if (this.state.lockNew) return false;
     // if (!!this.state.insuree.photo && (!this.state.insuree.photo.date || !this.state.insuree.photo.officerId))
     //   return false;
@@ -219,6 +232,7 @@ class InsureeForm extends Component {
     );
     this.handleDialogClose();
   };
+
   handleDialogOpen = (status, data) => {
     this.setState({ confirmDialog: true });
     this.setState({ statusCheck: status });
@@ -231,6 +245,7 @@ class InsureeForm extends Component {
   onEditedChanged = (insuree) => {
     this.setState({ insuree, newInsuree: false });
   };
+
   getStatusClass = (status) => {
     let selectedClass = null;
     let docsStatus = null;
@@ -242,11 +257,11 @@ class InsureeForm extends Component {
         break;
       case "APPROVED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Active";
+        docsStatus = "Approved";
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
-        docsStatus = "Inactive";
+        docsStatus = "Rejected";
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;
@@ -275,7 +290,7 @@ class InsureeForm extends Component {
     return (
       <Grid className={this.props.classes.margin2}>
         <Typography component="span" className={this.props.classes.spanPadding}>
-          STATUS :
+          STATUS : 
         </Typography>
         <Button className={selectedClass} variant="outlined">
           {docsStatus}
@@ -305,6 +320,10 @@ class InsureeForm extends Component {
       </Grid>
     );
   };
+  emailButton = (edited) => {
+    console.log(edited, "edited");
+    this.props.sendEmail(this.props.modulesManager, edited);
+  };
   render() {
     const {
       rights,
@@ -323,7 +342,7 @@ class InsureeForm extends Component {
       save,
       documentsData,
     } = this.props;
-    const { insuree, clientMutationId, payload, statusCheck } = this.state;
+    const { insuree, clientMutationId, payload, statusCheck, email } = this.state;
 
     // const documentsData = [
     //   {
@@ -374,11 +393,15 @@ class InsureeForm extends Component {
       documentsData.every(
         (document) => document.documentStatus === "APPROVED" || document.documentStatus === "REJECTED",
       );
-    const hasReject = allApprovedOrRejected && documentsData.some((document) => document.documentStatus === "REJECTED");
+    const hasReject =
+      (allApprovedOrRejected && documentsData.some((document) => document.documentStatus === "REJECTED")) ||
+      (allApprovedOrRejected && !this.state.insuree.biometricsIsMaster);
     const allApproved =
       documentsData && documentsData.length > 0
-        ? documentsData.every((document) => document.documentStatus === "APPROVED")
+        ? documentsData.every((document) => document.documentStatus === "APPROVED") &&
+          this.state.insuree.biometricsIsMaster
         : false;
+    console.log("this.state.insuree.biometricsIsMaste", this.state.insuree.biometricsIsMaster);
     return (
       <div className={runningMutation ? classes.lockedPage : null}>
         <Helmet
@@ -413,6 +436,10 @@ class InsureeForm extends Component {
               allApproved={allApproved}
               approveorreject={this._approveorreject}
               handleDialogOpen={this.handleDialogOpen}
+              onValidation={this.onValidation}
+              // emailButton={this.emailButton}
+              // email={insuree_uuid}
+              print={true}
             />
           )}
         <RejectDialog
@@ -454,6 +481,7 @@ export default withHistory(
       journalize,
       fetchInsureeDocuments,
       updateExternalDocuments,
+      sendEmail,
     })(injectIntl(withTheme(withStyles(styles)(InsureeForm)))),
   ),
 );

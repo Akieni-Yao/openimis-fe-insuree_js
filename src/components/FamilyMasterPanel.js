@@ -23,7 +23,7 @@ const CAMU_ENROLMENT_TYPE = [
   "private_sector_employees",
   "Selfemployed_and_liberal_professions",
   "CRF_and_CNSS_pensioners",
-  "student",
+  "students",
   "vulnerable_Persons",
 ];
 
@@ -157,7 +157,14 @@ class FamilyMasterPanel extends FormPanel {
               label="Family.enrolmentType"
               required
               readOnly={readOnly}
-              //value={!!edited && !!edited.enrolmentType ? edited.enrolmentType.code : null}
+              value={
+                !!edited && edited?.ext
+                  ? // ? edited.ext.enrolmentType
+                    edited?.ext?.enrolmentType
+                  : // : edited?.jsonExt?.enrolmentType
+                    // edited?.jsonExt?.enrolmentType
+                    null
+              }
               onChange={(value) => this.updateExts({ enrolmentType: value })}
               constants={CAMU_ENROLMENT_TYPE}
               withNull

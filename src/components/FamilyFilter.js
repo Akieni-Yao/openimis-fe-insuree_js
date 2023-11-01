@@ -142,7 +142,7 @@ class FamilyFilter extends Component {
             </Grid>
           }
         />
-        <ControlledField
+        {/* <ControlledField
           module="insuree"
           id={`InsureeFilter.${anchor}.gender`}
           field={
@@ -164,7 +164,7 @@ class FamilyFilter extends Component {
               />
             </Grid>
           }
-        />
+        /> */}
         <ControlledField
           module="insuree"
           id={`FamilyFilter.${anchor}.phone`}
@@ -312,7 +312,7 @@ class FamilyFilter extends Component {
           }
         />
         {this.familyHeadFilter()}
-        {this.filterFamiliesOnMembers && this.familyMemberFilter()}
+        {/* {this.filterFamiliesOnMembers && this.familyMemberFilter()} */}
         <ControlledField
           module="insuree"
           id="FamilyFilter.poverty"
@@ -356,7 +356,7 @@ class FamilyFilter extends Component {
               />
             </Grid>
           }
-        />
+        /> 
         <ControlledField
           module="insuree"
           id="PolicyFilter.officer"

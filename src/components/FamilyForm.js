@@ -29,16 +29,19 @@ import HelpIcon from "@material-ui/icons/Help";
 const styles = (theme) => ({
   lockedPage: theme.page.locked,
   approvedBtn: {
+    backgroundColor: '#FFFFFF',
     borderColor: "#00913E",
     color: "#00913E",
     borderRadius: "2rem",
   },
   rejectBtn: {
+    backgroundColor: '#FFFFFF',
     borderColor: "##FF0000",
     color: "##FF0000",
     borderRadius: "2rem",
   },
   commonBtn: {
+    backgroundColor: '#FFFFFF',
     borderColor: "#FF841C",
     color: "#FF841C",
     borderRadius: "2rem",
@@ -56,6 +59,7 @@ const styles = (theme) => ({
   },
   spanPadding: {
     paddingTop: theme.spacing(1),
+    marginRight: '5px'
   },
 });
 
@@ -70,6 +74,7 @@ class FamilyForm extends Component {
     family: this._newFamily(),
     newFamily: true,
     confirmedAction: null,
+    // isFormValid: true,
   };
 
   _newFamily() {
@@ -150,7 +155,11 @@ class FamilyForm extends Component {
       );
     }
   };
-
+  // onValidation = (isFormValid) => {
+  //   if (this.state.isFormValid !== isFormValid) {
+  //     this.setState({ isFormValid });
+  //   }
+  // };
   canSave = () => {
     // if (!this.state.family.location) return false;
     if (!this.state.family.headInsuree) return false;
@@ -199,7 +208,7 @@ class FamilyForm extends Component {
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
-        docsStatus = "Inactive";
+        docsStatus = "Rejected";
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;
@@ -349,6 +358,7 @@ class FamilyForm extends Component {
             save={!!save ? this._save : null}
             onActionToConfirm={this.onActionToConfirm}
             openDirty={save}
+            // onValidation={this.onValidation}
           />
         )}
       </div>

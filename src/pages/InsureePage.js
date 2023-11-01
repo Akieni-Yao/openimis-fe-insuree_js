@@ -46,20 +46,21 @@ class InsureePage extends Component {
           label: !!insuree.chfId ? insuree.chfId : "",
         }),
       );
-      if (!response.error) {
-      this.setState({ isOpenSnackbar: true });
       this.setState({ statusInsuree: insuree.status });
-      this.setState({
-        snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${
-          insuree.status == "Approved" ? "CAMU Number" : "Temporary CAMU Number"
-        } `,
-      });
-      this.setState({
-        camuNumberRes: response?.insurees[0].insuree.camuNumber
-          ? response?.insurees[0].insuree.camuNumber
-          : response?.insurees[0].insuree.chfId,
-      });
-       } }
+      if (!response.error) {
+        this.setState({ isOpenSnackbar: true });
+        this.setState({
+          snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${
+            insuree.status == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+          } `,
+        });
+        this.setState({
+          camuNumberRes: response?.insurees[0].insuree.camuNumber
+            ? response?.insurees[0].insuree.camuNumber
+            : response?.insurees[0].insuree.chfId,
+        });
+      }
+    }
   };
 
   render() {

@@ -45,7 +45,9 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   "validityTo",
   "status",
   "statusComment",
-  // "biometrics_status",
+  "biometricsStatus",
+  "biometricsIsMaster",
+  "photoUrl",
   `family{${FAMILY_FULL_PROJECTION(mm).join(",")}}`,
   `photo{id,uuid,date,folder,filename,officerId,photo}`,
   "gender{code}",
@@ -91,10 +93,12 @@ export function fetchInsuree(mm, chfid) {
       `family{id}`,
       "photo{folder,filename,photo}",
       "gender{code, gender, altLanguage}",
+      "photoUrl",
       "camuNumber",
       "status",
       "statusComment",
-      // "biometrics_status",
+      "biometricsStatus",
+      "biometricsIsMaster",
       "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
       "jsonExt",
     ],
@@ -307,6 +311,18 @@ function formatExternalDocument(docs, tempCamu) {
 
   return formattedResult;
 }
+function formatMail(edited) {
+  console.log(edited, "format")
+  let reportName=""
+  if(edited?.camuNumber!=null)
+  {
+    reportName="enrollment_receipt"
+  }else{
+    reportName="pre_enrollment_receipt"
+  }
+  const formatMail = `uuid: "${edited?.uuid}",  isEmail: ${true},reportName: "${reportName}"`
+  return formatMail;
+}
 // function formatExternalDocument(docs, tempCamu) {
 //   const newarray = docs.map((doc) => ({
 //     documentId: doc.documentId,
@@ -334,10 +350,9 @@ export function formatInsureeGQL(mm, insuree) {
     ${!!insuree.phone ? `phone: "${formatGQLString(insuree.phone)}"` : ""}
     ${!!insuree.email ? `email: "${formatGQLString(insuree.email)}"` : ""}
     ${!!insuree.currentAddress ? `currentAddress: "${formatGQLString(insuree.currentAddress)}"` : ""}
-    ${
-      !!insuree.currentVillage && !!insuree.currentVillage.id
-        ? `currentVillageId: ${decodeId(insuree.currentVillage.id)}`
-        : ""
+    ${!!insuree.currentVillage && !!insuree.currentVillage.id
+      ? `currentVillageId: ${decodeId(insuree.currentVillage.id)}`
+      : ""
     }
     ${!!insuree.photo ? `photo:${formatInsureePhoto(insuree.photo)}` : ""}
     cardIssued:${!!insuree.cardIssued}
@@ -346,10 +361,9 @@ export function formatInsureeGQL(mm, insuree) {
     ${!!insuree.typeOfId && !!insuree.typeOfId.code ? `typeOfIdId: "${insuree.typeOfId.code}"` : ""}
     ${!!insuree.family && !!insuree.family.id ? `familyId: ${decodeId(insuree.family.id)}` : ""}
     ${!!insuree.relationship && !!insuree.relationship.id ? `relationshipId: ${insuree.relationship.id}` : ""}
-    ${
-      !!insuree.healthFacility && !!insuree.healthFacility.id
-        ? `healthFacilityId: ${decodeId(insuree.healthFacility.id)}`
-        : ""
+    ${!!insuree.healthFacility && !!insuree.healthFacility.id
+      ? `healthFacilityId: ${decodeId(insuree.healthFacility.id)}`
+      : ""
     }
     ${!!insuree.status ? `status: "${insuree.status}"` : ""}
     ${!!insuree.statusComment ? `statusComment: "${insuree.statusComment}"` : ""}
@@ -367,10 +381,9 @@ export function formatFamilyGQL(mm, family) {
     poverty: ${!!family.poverty}
     ${!!family.familyType && !!family.familyType.code ? `familyTypeId: "${family.familyType.code}"` : ""}
     ${!!family.address ? `address: "${formatGQLString(family.address)}"` : ""}
-    ${
-      !!family.confirmationType && !!family.confirmationType.code
-        ? `confirmationTypeId: "${family.confirmationType.code}"`
-        : ""
+    ${!!family.confirmationType && !!family.confirmationType.code
+      ? `confirmationTypeId: "${family.confirmationType.code}"`
+      : ""
     }
     ${!!family.confirmationNo ? `confirmationNo: "${formatGQLString(family.confirmationNo)}"` : ""}
     ${!!family.jsonExt ? `jsonExt: ${formatJsonField(family.jsonExt)}` : ""}
@@ -473,7 +486,6 @@ export function removeInsuree(mm, family_uuid, insuree, cancelPolicies, clientMu
     familyUuid: family_uuid,
   });
 }
-
 export function deleteInsuree(mm, family_uuid, insuree, clientMutationLabel) {
   let mutation = formatMutation(
     "deleteInsurees",
@@ -617,6 +629,18 @@ export function updateExternalDocuments(mm, docs, tempCamu) {
   return graphql(
     mutation,
     ["INSUREE_MUTATION_REQ", "INSUREE_UPDATE_EXTERNAL_DOCUMENT_RESP", "INSUREE_MUTATION_ERR"],
+    "success message responses",
+  );
+}
+export function sendEmail(mm, edited) {
+  let mutation = `mutation SendNotification{
+    sentNotification(${formatMail(edited)}) {
+    success
+    message
+  }}`;
+  return graphql(
+    mutation,
+    ["INSUREE_MUTATION_REQ", "INSUREE_SEND_EMAIL_RESP", "INSUREE_MUTATION_ERR"],
     "success message responses",
   );
 }

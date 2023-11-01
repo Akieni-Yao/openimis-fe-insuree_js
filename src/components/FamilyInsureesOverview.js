@@ -51,16 +51,19 @@ const styles = (theme) => ({
   paperHeaderAction: theme.paper.action,
   tableTitle: theme.table.title,
   approvedBtn: {
+    backgroundColor: '#FFFFFF',
     borderColor: "#00913E",
     color: "#00913E",
     borderRadius: "2rem",
   },
   rejectBtn: {
+    backgroundColor: '#FFFFFF',
     borderColor: "##FF0000",
     color: "##FF0000",
     borderRadius: "2rem",
   },
   commonBtn: {
+    backgroundColor: '#FFFFFF',
     borderColor: "#FF841C",
     color: "#FF841C",
     borderRadius: "2rem",
@@ -283,11 +286,11 @@ class FamilyInsureesOverview extends PagedDataHandler {
         break;
       case "APPROVED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Active";
+        docsStatus = "Approved";
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
-        docsStatus = "Inactive";
+        docsStatus = "Rejected";
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;

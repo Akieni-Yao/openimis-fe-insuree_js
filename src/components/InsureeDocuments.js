@@ -34,10 +34,9 @@ import {
   fetchInsureeDocuments,
   updateInsureeDocument,
 } from "../actions";
-import { DisabledBiometric } from "../SvgIndex";
+import { DisabledBiometric, InvalidBiometric, ValidBiometric } from "../SvgIndex";
 import DocumentViewDialog from "../dialogs/DocumentViewDialogs";
 import HelpIcon from "@material-ui/icons/Help";
-import { Link, BrowserRouter } from "react-router-dom";
 
 const styles = (theme) => ({
   paper: theme.paper.paper,
@@ -51,12 +50,12 @@ const styles = (theme) => ({
   btnPrimary: theme.formTable.actions,
   approvedIcon: {
     "&.Mui-checked": {
-      color: "#00913E", // Custom color for the approved checkbox when checked
+      color: "#00913E",
     },
   },
   rejectIcon: {
     "&.Mui-checked": {
-      color: "#FF0000", // Custom color for the rejected checkbox when checked
+      color: "#FF0000",
     },
   },
   commonBtn: {
@@ -68,9 +67,10 @@ const styles = (theme) => ({
   customArrow: {
     color: "#eeeaea",
   },
-  customWidth: {
-    maxWidth: 500,
+  tooltip: {
+    maxWidth: 1000,
     width: "fit-content",
+    // width: "auto",
     color: "white",
     backgroundColor: "#eeeaea",
   },
@@ -103,7 +103,32 @@ class InsureeDocuments extends PagedDataHandler {
     this.setState({ orderBy: null }, (e) => this.onChangeRowsPerPage(this.defaultPageSize));
     this.props.fetchInsureeDocuments(this.props?.edited?.chfId);
   }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.documentViewOpen !== this.state.documentViewOpen) {
+      this.adjustButtonZIndex();
+    }
+  }
 
+  adjustButtonZIndex = () => {
+    const buttonElements = document.querySelectorAll('div[title="Save changes"], div[title="Create new"]');
+    if (this.state.documentViewOpen) {
+      if (buttonElements.length > 0) {
+        buttonElements.forEach((element) => {
+          if (element.style) {
+            element.style.zIndex = "1000";
+          }
+        });
+      }
+    } else {
+      if (buttonElements.length > 0) {
+        buttonElements.forEach((element) => {
+          if (element.style) {
+            element.style.zIndex = "2000";
+          }
+        });
+      }
+    }
+  };
   queryPrms = () => {
     let prms = [];
     if (!!this.state.orderBy) {
@@ -126,7 +151,7 @@ class InsureeDocuments extends PagedDataHandler {
     );
   };
   handleExternalNavigation = () => {
-    window.open("https://cnss.walkingtree.tech", "_blank"); // Opens in a new tab or window
+    window.open("https://abis.akieni.com/public/enrollment/index.html#/enroll/applicant-detail", "_blank");
   };
   approved = async (docData) => {
     const response = await this.props.updateInsureeDocument(docData);
@@ -169,9 +194,7 @@ class InsureeDocuments extends PagedDataHandler {
         value={!!rejectComment.comments && Number(rejectComment.comments)}
         readOnly={true}
       >
-        <div style={{ color: "white" }}>
-          {rejectComment.comments}
-        </div>
+        <div style={{ color: "white" }}>{rejectComment.comments}</div>
       </PublishedComponent>
     );
   };
@@ -192,7 +215,8 @@ class InsureeDocuments extends PagedDataHandler {
     switch (checkStatus) {
       case "APPROVED":
         selectedClass = this.props.classes.approvedIcon;
-        docsStatus = "Approved";
+        // docsStatus = "Approved";
+        docsStatus = formatMessage(this.props.intl, "insuree", "Insuree.approved");
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectIcon;
@@ -200,7 +224,7 @@ class InsureeDocuments extends PagedDataHandler {
           <Tooltip
             placement="right"
             arrow
-            classes={{ tooltip: this.props.classes.customWidth, arrow: this.props.classes.customArrow }}
+            classes={{ tooltip: this.props.classes.tooltip, arrow: this.props.classes.customArrow }}
             title={this.rejectedCommentsTooltip(status)}
           >
             <IconButton>
@@ -208,11 +232,13 @@ class InsureeDocuments extends PagedDataHandler {
             </IconButton>
           </Tooltip>
         );
-        docsStatus = "Rejected";
+        // docsStatus = "Rejected";
+        docsStatus = formatMessage(this.props.intl, "insuree", "Insuree.rejected");
         break;
       case "PENDING_FOR_REVIEW":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "NOT REVIEWED";
+        // docsStatus = "NOT REVIEWED";
+        docsStatus = formatMessage(this.props.intl, "insuree", "Insuree.notReviewed");
         break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
@@ -288,22 +314,18 @@ class InsureeDocuments extends PagedDataHandler {
         tooltip: formatMessage(intl, "insuree", "familyCheckCanAdd"),
       });
     }
-    // let bioActions =
-    //   !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
-    //     ? []
-    //     : [
-    //         {
-    //           button: (
-    //             <Button
-    //               onClick={(e) => this.checkCanAddInsuree(this.addNewInsuree)}
-    //               variant="contained"
-    //               color="primary"
-    //             >
-    //               Collect Biometric
-    //             </Button>
-    //           ),
-    //         },
-    //       ];
+    let bioActions =
+      !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
+        ? []
+        : [
+            {
+              button: (
+                <Button onClick={this.handleExternalNavigation} variant="contained" color="primary">
+                  Collect Biometric
+                </Button>
+              ),
+            },
+          ];
     if (!!checkingCanAddInsuree || !!errorCanAddInsuree) {
       actions.push({
         button: (
@@ -375,9 +397,10 @@ class InsureeDocuments extends PagedDataHandler {
                     textAlign: "center",
                     alignItems: "center",
                     padding: "6rem 0",
+                    fontSize: "1.8rem",
                   }}
                 >
-                  No Documents Found
+                  {formatMessage(this.props.intl, "insuree", "Insuree.noDocuments")}
                 </Typography>
               </Grid>
             ) : null}
@@ -391,7 +414,7 @@ class InsureeDocuments extends PagedDataHandler {
                   <FormattedMessage module="insuree" id="Insuree.BiometricHeading" />
                 </Typography>
               </Grid>
-              {/* <Grid item xs={4}>
+              <Grid item xs={4}>
                 <Grid container justify="flex-end">
                   {bioActions.map((a, idx) => {
                     return (
@@ -401,16 +424,44 @@ class InsureeDocuments extends PagedDataHandler {
                     );
                   })}
                 </Grid>
-              </Grid> */}
+              </Grid>
               <Grid item xs={12} className={classes.biometricPaper}>
                 <Divider />
                 <Grid container justify="center" alignItems="center" style={{ backgroundColor: "#00913E0D" }}>
-                  <Typography style={{ padding: "30px 0" }} alignItems="center">
+                  <Typography style={{ padding: "30px 20px" }} alignItems="center">
                     {/* <Box style={{ marginLeft: "2.2rem" }}> */}
-                    <DisabledBiometric fontSize="large" />
+                    {
+                      edited?.biometricsStatus ? (
+                        edited.biometricsIsMaster ? (
+                          <ValidBiometric fontSize="large" />
+                        ) : (
+                          <InvalidBiometric fontSize="large" />
+                        )
+                      ) : (
+                        <DisabledBiometric fontSize="large" />
+                      )
+                      // ) : (
+                      //   <ValidBiometric fontSize="large" />
+                      // )
+                      // <InvalidBiometric fontSize="large"/>
+                    }
                     {/* </Box> */}
                   </Typography>
-                  Biometric Details are not provided
+                  <Typography
+                    variant="h6"
+                    style={{
+                      fontSize: "1.4rem",
+                      color: edited?.biometricsStatus ? (edited.biometricsIsMaster ? "#00913E" : "#FF0000") : "black",
+                    }}
+                  >
+                    {`  ${
+                      edited?.biometricsStatus
+                        ? edited.biometricsIsMaster
+                          ? "Master record found"
+                          : "Duplicate record found"
+                        : "Biometric Detail is not provided"
+                    }`}
+                  </Typography>
                 </Grid>
               </Grid>
             </Grid>
