@@ -88,7 +88,7 @@ class FamilyFilter extends Component {
                     {
                       id: `${anchor}.chfId`,
                       value: v,
-                      filter: !!v ? `${anchor}_ChfId_Istartswith: "${v}"` : null,
+                      filter: !!v ? `${anchor}_ChfId_Icontains: "${v}"` : null,
                     },
                   ])
                 }
