@@ -138,6 +138,16 @@ export function fetchFamilySummaries(mm, filters) {
   const payload = formatPageQueryWithCount("families", filters, projections);
   return graphql(payload, "INSUREE_FAMILIES");
 }
+export function fetchPendingForApproval(mm, familyUuid, headInsureeChfId) {
+  let filters = [];
+  // if (!!familyUuid) {
+  //   filters.push(`uuid: "${familyUuid}"`, "showHistory: true");
+  // } else {
+  //   filters.push(`headInsuree_ChfId: "${headInsureeChfId}"`);
+  // }
+  const payload = formatPageQuery("approverFamilies", filters, FAMILY_FULL_PROJECTION(mm));
+  return graphql(payload, "INSUREE_PENDINGAPPROVAL");
+}
 
 export function fetchFamilyMembers(mm, filters) {
   let projections = [
@@ -312,15 +322,14 @@ function formatExternalDocument(docs, tempCamu) {
   return formattedResult;
 }
 function formatMail(edited) {
-  console.log(edited, "format")
-  let reportName=""
-  if(edited?.camuNumber!=null)
-  {
-    reportName="enrollment_receipt"
-  }else{
-    reportName="pre_enrollment_receipt"
+  console.log(edited, "format");
+  let reportName = "";
+  if (edited?.camuNumber != null) {
+    reportName = "enrollment_receipt";
+  } else {
+    reportName = "pre_enrollment_receipt";
   }
-  const formatMail = `uuid: "${edited?.uuid}",  isEmail: ${true},reportName: "${reportName}"`
+  const formatMail = `uuid: "${edited?.uuid}",  isEmail: ${true},reportName: "${reportName}"`;
   return formatMail;
 }
 // function formatExternalDocument(docs, tempCamu) {
@@ -350,9 +359,10 @@ export function formatInsureeGQL(mm, insuree) {
     ${!!insuree.phone ? `phone: "${formatGQLString(insuree.phone)}"` : ""}
     ${!!insuree.email ? `email: "${formatGQLString(insuree.email)}"` : ""}
     ${!!insuree.currentAddress ? `currentAddress: "${formatGQLString(insuree.currentAddress)}"` : ""}
-    ${!!insuree.currentVillage && !!insuree.currentVillage.id
-      ? `currentVillageId: ${decodeId(insuree.currentVillage.id)}`
-      : ""
+    ${
+      !!insuree.currentVillage && !!insuree.currentVillage.id
+        ? `currentVillageId: ${decodeId(insuree.currentVillage.id)}`
+        : ""
     }
     ${!!insuree.photo ? `photo:${formatInsureePhoto(insuree.photo)}` : ""}
     cardIssued:${!!insuree.cardIssued}
@@ -361,9 +371,10 @@ export function formatInsureeGQL(mm, insuree) {
     ${!!insuree.typeOfId && !!insuree.typeOfId.code ? `typeOfIdId: "${insuree.typeOfId.code}"` : ""}
     ${!!insuree.family && !!insuree.family.id ? `familyId: ${decodeId(insuree.family.id)}` : ""}
     ${!!insuree.relationship && !!insuree.relationship.id ? `relationshipId: ${insuree.relationship.id}` : ""}
-    ${!!insuree.healthFacility && !!insuree.healthFacility.id
-      ? `healthFacilityId: ${decodeId(insuree.healthFacility.id)}`
-      : ""
+    ${
+      !!insuree.healthFacility && !!insuree.healthFacility.id
+        ? `healthFacilityId: ${decodeId(insuree.healthFacility.id)}`
+        : ""
     }
     ${!!insuree.status ? `status: "${insuree.status}"` : ""}
     ${!!insuree.statusComment ? `statusComment: "${insuree.statusComment}"` : ""}
@@ -381,9 +392,10 @@ export function formatFamilyGQL(mm, family) {
     poverty: ${!!family.poverty}
     ${!!family.familyType && !!family.familyType.code ? `familyTypeId: "${family.familyType.code}"` : ""}
     ${!!family.address ? `address: "${formatGQLString(family.address)}"` : ""}
-    ${!!family.confirmationType && !!family.confirmationType.code
-      ? `confirmationTypeId: "${family.confirmationType.code}"`
-      : ""
+    ${
+      !!family.confirmationType && !!family.confirmationType.code
+        ? `confirmationTypeId: "${family.confirmationType.code}"`
+        : ""
     }
     ${!!family.confirmationNo ? `confirmationNo: "${formatGQLString(family.confirmationNo)}"` : ""}
     ${!!family.jsonExt ? `jsonExt: ${formatJsonField(family.jsonExt)}` : ""}

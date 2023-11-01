@@ -70,6 +70,10 @@ function reducer(
     fetchedDocuments: false,
     documentsData: null,
     errorDocument: null,
+    fetchingPendingApproval: false,
+    fetchedPendingApproval: false,
+    PendingApproval: null,
+    errorPendingApproval: null,
   },
   action,
 ) {
@@ -456,6 +460,29 @@ function reducer(
         ...state,
         fetchingCountries: false,
         errorCountries: formatServerError(action.payload),
+      };
+    case "INSUREE_PENDINGAPPROVAL_REQ":
+      return {
+        ...state,
+        fetchingPendingApproval: true,
+        fetchedPendingApproval: false,
+        PendingApproval: null,
+        errorPendingApproval: null,
+      };
+    case "INSUREE_PENDINGAPPROVAL_RESP":
+      var families = parseData(action.payload.data.approverFamilies);
+      return {
+        ...state,
+        fetchingPendingApproval: false,
+        fetchedPendingApproval: true,
+        PendingApproval: !!families && families.length > 0 ? families : null,
+        errorPendingApproval: formatGraphQLError(action.payload),
+      };
+    case "INSUREE_PENDINGAPPROVAL_ERR":
+      return {
+        ...state,
+        fetchingPendingApproval: false,
+        errorPendingApproval: formatServerError(action.payload),
       };
     case "INSUREE_DOCUMENTS_REQ":
       return {

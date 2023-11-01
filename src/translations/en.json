@@ -4,6 +4,7 @@
   "insuree.menu.addFamilyOrGroup": "Add Family/Group",
   "insuree.menu.familiesOrGroups": "Families/Groups",
   "insuree.menu.insurees": "Insurees",
+  "insuree.menu.pendingApproval": "Pending Approval",
   "insuree.ageUnit": "Years",
   "insuree.label.regionFSP": "Region of FSP",
   "insuree.label.districtFSP": "District of FSP",
@@ -438,6 +439,11 @@
  "insuree.Insuree.verify":"Verify",
  "insuree.Insuree.reject":"Reject",
  "insuree.camunumber":"CAMU No",
- "insuree.sendmail":"sentNotification"
-
+ "insuree.sendmail":"sentNotification",
+ "insuree.Insuree.pendingApproval":"Pending For Approval",
+ "insuree.PedingApproval.tempCamuNo":"Temp CAMU No.",
+ "insuree.PedingApproval.firstName":"Insuree First Name",
+ "insuree.PedingApproval.lastName":"Insuree Last Name",
+ "insuree.PedingApproval.gender":"Gender",
+ "insuree.PedingApproval.city":"City"
 }

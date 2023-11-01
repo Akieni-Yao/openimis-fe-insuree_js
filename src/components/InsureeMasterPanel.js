@@ -110,6 +110,7 @@ class InsureeMasterPanel extends FormPanel {
       actions,
       edited_id,
     } = this.props;
+    console.log("editedinsuree", edited);
     return (
       <Grid container>
         <Grid item xs={12}>
@@ -162,8 +163,6 @@ class InsureeMasterPanel extends FormPanel {
                   onChange={(v) => this.updateAttribute("chfId", v)}
                 />
               </Grid>
-
-              {/* New Added Fields */}
 
               <Grid item xs={4} className={classes.item}>
                 <TextInput

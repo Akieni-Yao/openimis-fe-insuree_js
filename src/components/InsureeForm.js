@@ -321,7 +321,6 @@ class InsureeForm extends Component {
     );
   };
   emailButton = (edited) => {
-    console.log(edited, "edited");
     this.props.sendEmail(this.props.modulesManager, edited);
   };
   render() {
@@ -344,38 +343,6 @@ class InsureeForm extends Component {
     } = this.props;
     const { insuree, clientMutationId, payload, statusCheck, email } = this.state;
 
-    // const documentsData = [
-    //   {
-    //     "id": "34",
-    //     "documentId": "ad303dbf-f6f2-4da3-9d47-cadc55c5e05c",
-    //     "documentName": "Declaration of employment",
-    //     "documentPath": "Declaration of employment.pdf",
-    //     "documentStatus": "APPROVED",
-    //     "comments": null,
-    //     "tempCamu": "T1915102023003719",
-    //     "isVerified": false,
-    //   },
-    //   {
-    //     "id": "35",
-    //     "documentId": "71ac4acf-bc58-46a9-a437-25a282386c5f",
-    //     "documentName": "Salary slips",
-    //     "documentPath": "Salary slips.pdf",
-    //     "documentStatus": "APPROVED",
-    //     "comments": null,
-    //     "tempCamu": "T1915102023003719",
-    //     "isVerified": false,
-    //   },
-    //   {
-    //     "id": "36",
-    //     "documentId": "208dc2e3-e132-400a-bc26-d9799110acbe",
-    //     "documentName": "Copy of passport",
-    //     "documentPath": "Copy of passport.pdf",
-    //     "documentStatus": "APPROVED",
-    //     "comments": null,
-    //     "tempCamu": "T1915102023003719",
-    //     "isVerified": false,
-    //   },
-    // ];
     if (!rights.includes(RIGHT_INSUREE)) return null;
     let runningMutation = !!insuree && !!clientMutationId;
     let actions = [
@@ -401,7 +368,6 @@ class InsureeForm extends Component {
         ? documentsData.every((document) => document.documentStatus === "APPROVED") &&
           this.state.insuree.biometricsIsMaster
         : false;
-    console.log("this.state.insuree.biometricsIsMaste", this.state.insuree.biometricsIsMaster);
     return (
       <div className={runningMutation ? classes.lockedPage : null}>
         <Helmet
@@ -449,6 +415,7 @@ class InsureeForm extends Component {
           approveorreject={this._approveorreject}
           statusCheck={statusCheck}
           classes={classes}
+          edited={this.state.insuree}
         />
       </div>
     );

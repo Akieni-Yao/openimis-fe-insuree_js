@@ -31,7 +31,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 const RejectDialog = (props) => {
-  const { classes, approveorreject, onClose, isOpen, payload, statusCheck } = props;
+  const { classes, approveorreject, onClose, isOpen, payload, statusCheck, edited } = props;
   const [comment, setComment] = useState({ statusComment: "", status: "", reviewer: null });
   const newClasses = useStyles();
   const handleChange = (name, value) => {
@@ -49,7 +49,7 @@ const RejectDialog = (props) => {
   }, [statusCheck]);
 
   const updatedPayload = { ...payload, ...comment };
-
+  console.log(edited, "edited");
   return (
     <div>
       <Dialog open={isOpen} onClose={() => onClose()} maxWidth="xs" fullWidth>
@@ -71,6 +71,7 @@ const RejectDialog = (props) => {
                 value={!comment ? null : comment.reviewer}
                 onChange={(v) => handleChange("reviewer", v)}
                 filterLabels={false}
+                createdAtCode={edited}
               />
             </Grid>
           )}

@@ -25,14 +25,17 @@ const ReviewerPicker = (props) => {
     readOnly = false,
     required = false,
     taskGroupUser,
+    insurees,
     setCenter,
     onChange,
+    createdAtCode,
   } = props;
+
   const [searchString, setSearchString] = useState(null);
   const { isLoading, data, error } = useGraphqlQuery(
     `
     {
-    taskGroup(center:"CG10-19")
+    taskGroup(center:"${createdAtCode?.jsonExt?.createdAt?.code}")
     {
     totalCount 
     pageInfo { hasNextPage, hasPreviousPage, startCursor, endCursor}
@@ -76,6 +79,7 @@ const mapStateToProps = (state) => ({
   fetching: state.insuree.fetchingProfessions,
   fetched: state.medical.fetchedProfessions,
   taskGroupUser: state,
+  insurees: state.insuree.insurees,
 });
 
 const mapDispatchToProps = (dispatch) => {

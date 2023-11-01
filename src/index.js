@@ -43,12 +43,14 @@ import InsureeMissingPhotoReport from "./reports/InsureeMissingPhotoReport";
 import InsureePendingEnrollmentReport from "./reports/InsureePendingEnrollmentReport";
 import RejectCommentPicker from "./pickers/RejectCommentPicker";
 import ReviewerPicker from "./pickers/ReviwerPicker";
+import PendingApproval from "./components/PendingApproval";
 
 const ROUTE_INSUREE_FAMILIES = "insuree/families";
 const ROUTE_INSUREE_FAMILY_OVERVIEW = "insuree/families/familyOverview";
 const ROUTE_INSUREE_FAMILY = "insuree/family";
 const ROUTE_INSUREE_INSUREES = "insuree/insurees";
 const ROUTE_INSUREE_INSUREE = "insuree/insurees/insuree";
+const ROUTE_INSUREE_PENDINGAPPROVAL = "insuree/insurees/pendingapproval";
 
 const DEFAULT_CONFIG = {
   "translations": [{ key: "en", messages: messages_en }],
@@ -133,6 +135,7 @@ const DEFAULT_CONFIG = {
     { key: "insuree.route.family", ref: ROUTE_INSUREE_FAMILY },
     { key: "insuree.route.insurees", ref: ROUTE_INSUREE_INSUREES },
     { key: "insuree.route.insuree", ref: ROUTE_INSUREE_INSUREE },
+    { key: "insuree.route.pendingApproval", ref: ROUTE_INSUREE_PENDINGAPPROVAL },
 
     { key: "insuree.Avatar", ref: InsureeAvatar },
     { key: "insuree.Summary", ref: InsureeSummary },
@@ -150,6 +153,7 @@ const DEFAULT_CONFIG = {
     { path: ROUTE_INSUREE_INSUREE + "/:insuree_uuid?/:family_uuid?", component: InsureePage },
     { path: "insuree/cappedItemService", component: CappedItemServicePage },
     { path: "insuree/profile", component: ProfilePage },
+    { path: "insuree/insurees/pendingapproval", component: PendingApproval },
   ],
   "core.AppBar": [Enquiry],
   "core.MainMenu": [InsureeMainMenu],

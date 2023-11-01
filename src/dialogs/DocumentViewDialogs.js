@@ -124,7 +124,6 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
         console.error("Login error:", error);
       });
   };
-  console.log("document dialog", onClose);
   const documentViewAPI = (token) => {
     const apiUrl = "https://dms.akieni.com/backend/cnss/documents/get";
 
@@ -148,31 +147,10 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
         setBlobURL(pdfUrl);
       })
       .catch((error) => {
-        // Handle any errors
         console.error("API request error:", error);
       });
   };
-
   useEffect(() => {
-    // const buttonElements = document.querySelectorAll('div[title="Save changes"], div[title="Create new"]');
-    // // const buttonElements = document.querySelectorAll(' [class^="Form-fab-"], [class^="Form-fabAbove-"]');
-    // if (open) {
-    //   if (buttonElements.length > 0) {
-    //     buttonElements.forEach((element) => {
-    //       if (element.style) {
-    //         element.style.zIndex = "1000";
-    //       }
-    //     });
-    //   }
-    // } else {
-    //   if (buttonElements.length > 0) {
-    //     buttonElements.forEach((element) => {
-    //       if (element.style) {
-    //         element.style.zIndex = "2000";
-    //       }
-    //     });
-    //   }
-    // }
     if (documentImage) {
       loginCnss();
       // documentViewAPI();
