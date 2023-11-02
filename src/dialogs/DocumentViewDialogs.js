@@ -29,8 +29,8 @@ const useStyles = makeStyles((theme) => ({
     width: "50%",
     height: "100vh",
     maxHeight: "100vh",
-    top: 2,
-    right: 0,
+    top: 0,
+    right: 75,
     bottom: 0,
     borderRadius: 0,
     borderTopLeftRadius: 0,
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
   closeButton: {
     position: "absolute",
     top: 0,
-    right: 15,
+    right: 5,
   },
   backdrop: {
     pointerEvents: "none",

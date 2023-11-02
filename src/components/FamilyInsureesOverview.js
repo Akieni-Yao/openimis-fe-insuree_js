@@ -282,31 +282,31 @@ class FamilyInsureesOverview extends PagedDataHandler {
     switch (status) {
       case "PRE_REGISTERED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Pre Registered";
+        docsStatus = "buttonStatus.preRegistered";
         break;
       case "APPROVED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Approved";
+        docsStatus = "buttonStatus.approved";
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
-        docsStatus = "Rejected";
+        docsStatus = "buttonStatus.rejected";
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Rework";
+        docsStatus = "buttonStatus.rework";
         break;
       case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting for document and biometric";
+        docsStatus = "buttonStatus.waitingDocumentBiometric";
         break;
       case "WAITING_FOR_APPROVAL":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting For Approval";
+        docsStatus = "buttonStatus.waitingApproval";
         break;
       case "WAITING_FOR_QUEUE":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting For Queue";
+        docsStatus = "buttonStatus.waitingQueue";
         break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
@@ -330,7 +330,7 @@ class FamilyInsureesOverview extends PagedDataHandler {
         return (
           <>
             <Button variant="outlined" className={selectedClass}>
-              {docsStatus}
+            {formatMessage(this.props.intl, "insuree", docsStatus)}
             </Button>
             {i.status === "REWORK" || i.status === "REJECTED" ? (
               <Tooltip

@@ -428,6 +428,10 @@
  "insuree.Insuree.viewDocuments":"View Documents",
  "insuree.Insuree.status":"Status",
  "insuree.Insuree.BiometricHeading":"Biometric",
+ "insuree.Insuree.CollectBiometric":"Collect Biometric",
+ "insuree.Insuree.biometricStatus.detailNotProvided": "Biometric Detail is not provided",
+ "insuree.Insuree.biometricStatus.masterRecordFound":"Master record found",
+ "insuree.Insuree.biometricStatus.duplicateRecordFound":"Duplicate record found",
  "insuree.Insuree.rejectComment":"Reason for Rejection",
  "insuree.Insuree.placeofbirth": "Place of Birth",
  "insuree.Insuree.approved":"Approved",
@@ -438,6 +442,13 @@
  "insuree.Insuree.verify":"Verify",
  "insuree.Insuree.reject":"Reject",
  "insuree.camunumber":"CAMU No",
- "insuree.sendmail":"sentNotification"
+ "insuree.sendmail":"sentNotification",
+ "insuree.buttonStatus.preRegistered": "Pre Registered",
+ "insuree.buttonStatus.approved": "Approved",
+ "insuree.buttonStatus.rejected": "Rejected",
+ "insuree.buttonStatus.rework": "Rework",
+ "insuree.buttonStatus.waitingDocumentBiometric": "Waiting for document and biometric",
+ "insuree.buttonStatus.waitingApproval": "Waiting For Approval",
+ "insuree.buttonStatus.waitingQueue": "Waiting For Queue"
 
 }
