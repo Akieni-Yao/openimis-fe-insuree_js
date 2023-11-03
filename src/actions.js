@@ -27,7 +27,6 @@ const FAMILY_FULL_PROJECTION = (mm) => [
   "status",
   FAMILY_HEAD_PROJECTION,
   "location" + mm.getProjection("location.Location.FlatProjection"),
-  "clientMutationId",
   "jsonExt",
 ];
 
