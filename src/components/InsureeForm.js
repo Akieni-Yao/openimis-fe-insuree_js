@@ -25,6 +25,7 @@ import {
   fetchInsureeDocuments,
   updateExternalDocuments,
   sendEmail,
+  printReport,
 } from "../actions";
 import { RIGHT_INSUREE } from "../constants";
 import { insureeLabel } from "../utils/utils";
@@ -320,10 +321,36 @@ class InsureeForm extends Component {
       </Grid>
     );
   };
+  displayPrintWindow = (base64Data, contentType) => {
+    const printWindow = window.open('', 'Print Window', 'width=600, height=400');
+    printWindow.document.open();
+
+    if (contentType === 'pdf') {
+      // printWindow.print(`<embed type="application/pdf" width="100%" height="100%" src="data:application/pdf;base64,${base64Data}" />`);
+      printWindow.document.write(`<embed type="application/pdf" width="100%" height="100%" src="data:application/pdf;base64,${base64Data}" />`);
+    } else {
+      printWindow.document.write(`<img src="data:image/png;base64,${base64Data}" />`);
+    }
+
+    printWindow.document.close();
+    // printWindow.print();
+  }
   emailButton = (edited) => {
-    console.log(edited, "edited");
-    this.props.sendEmail(this.props.modulesManager, edited);
-  };
+    console.log(edited, "edited")
+    this.props.sendEmail(this.props.modulesManager, edited)
+  }
+  printReport = async (edited) => {
+    console.log(edited, "edited")
+    const data = await this.props.printReport(this.props.modulesManager, edited)
+    console.log(data,"base64Data")
+    const base64Data = data?.payload?.data?.sentNotification?.data;
+    // const base64Data = "JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgaHR0cDovL3d3dy5yZXBvcnRsYWIuY29tCjEgMCBvYmoKPDwKL0YxIDIgMCBSCj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMSAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL0NvbnRlbnRzIDcgMCBSIC9NZWRpYUJveCBbIDAgMCA2MTIgNzkyIF0gL1BhcmVudCA2IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgNiAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL0F1dGhvciAoYW5vbnltb3VzKSAvQ3JlYXRpb25EYXRlIChEOjIwMjMxMDMwMTUzMzQyLTA1JzAwJykgL0NyZWF0b3IgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIHd3dy5yZXBvcnRsYWIuY29tKSAvS2V5d29yZHMgKCkgL01vZERhdGUgKEQ6MjAyMzEwMzAxNTMzNDItMDUnMDAnKSAvUHJvZHVjZXIgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIHd3dy5yZXBvcnRsYWIuY29tKSAKICAvU3ViamVjdCAodW5zcGVjaWZpZWQpIC9UaXRsZSAodW50aXRsZWQpIC9UcmFwcGVkIC9GYWxzZQo+PgplbmRvYmoKNiAwIG9iago8PAovQ291bnQgMSAvS2lkcyBbIDMgMCBSIF0gL1R5cGUgL1BhZ2VzCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9GaWx0ZXIgWyAvQVNDSUk4NURlY29kZSAvRmxhdGVEZWNvZGUgXSAvTGVuZ3RoIDEwNwo+PgpzdHJlYW0KR2FwUWgwRT1GLDBVXEgzVFxwTllUXlFLaz90Yz5JUCw7VyNVMV4yM2loUEVNXz9DVzRLSVNpOTBNakdeMixGUyM8UkM2OzwhW0dfO1s+dUlhPWYkajwhXlREI2dpXSY9NVgsWzNyQlkzfj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA4CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDA3MyAwMDAwMCBuIAowMDAwMDAwMTA0IDAwMDAwIG4gCjAwMDAwMDAyMTEgMDAwMDAgbiAKMDAwMDAwMDQwNCAwMDAwMCBuIAowMDAwMDAwNDcyIDAwMDAwIG4gCjAwMDAwMDA3NjggMDAwMDAgbiAKMDAwMDAwMDgyNyAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9JRCAKWzwxZjdiYzY3M2JmYzMzMWRiMTY3YmEwNjM4MjYxM2M2NT48MWY3YmM2NzNiZmMzMzFkYjE2N2JhMDYzODI2MTNjNjU+XQolIFJlcG9ydExhYiBnZW5lcmF0ZWQgUERGIGRvY3VtZW50IC0tIGRpZ2VzdCAoaHR0cDovL3d3dy5yZXBvcnRsYWIuY29tKQoKL0luZm8gNSAwIFIKL1Jvb3QgNCAwIFIKL1NpemUgOAo+PgpzdGFydHhyZWYKMTAyNAolJUVPRgo="
+    const contentType = 'pdf';
+    if (base64Data) {
+      this.displayPrintWindow(base64Data, contentType)
+    }
+    // console.log(decodeURI(data?.payload?.data?.sentNotification?.data), "decode data");
+  }
   render() {
     const {
       rights,
@@ -437,9 +464,9 @@ class InsureeForm extends Component {
               approveorreject={this._approveorreject}
               handleDialogOpen={this.handleDialogOpen}
               onValidation={this.onValidation}
-              // emailButton={this.emailButton}
-              // email={insuree_uuid}
-              print={true}
+              emailButton={this.emailButton}
+              email={insuree_uuid}
+              printButton={this.printReport}
             />
           )}
         <RejectDialog
@@ -455,7 +482,8 @@ class InsureeForm extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = (state, props) => (
+  console.log("state",state),{
   rights: !!state.core && !!state.core.user && !!state.core.user.i_user ? state.core.user.i_user.rights : [],
   fetchingInsuree: state.insuree.fetchingInsuree,
   errorInsuree: state.insuree.errorInsuree,
@@ -482,6 +510,7 @@ export default withHistory(
       fetchInsureeDocuments,
       updateExternalDocuments,
       sendEmail,
+      printReport
     })(injectIntl(withTheme(withStyles(styles)(InsureeForm)))),
   ),
 );

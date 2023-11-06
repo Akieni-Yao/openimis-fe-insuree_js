@@ -465,14 +465,22 @@ function reducer(
         documentsData: null,
         errorDocument: null,
       };
-    case "INSUREE_DOCUMENTS_RESP":
+    case "INSUREE_REPORT_RESP":
       return {
         ...state,
-        fetchingDocuments: false,
-        fetchedDocuments: true,
-        documentsData: action.payload.data.insureeDocuments,
-        errorDocument: formatGraphQLError(action.payload),
+        fetchingReport: false,
+        fetchedReport: true,
+        reportData: action.payload.data.sentNotification?.data,
+        errorreport: formatGraphQLError(action.payload),
       };
+      case "INSUREE_DOCUMENTS_RESP":
+        return {
+          ...state,
+          fetchingDocuments: false,
+          fetchedDocuments: true,
+          documentsData: action.payload.data.insureeDocuments,
+          errorDocument: formatGraphQLError(action.payload),
+        };
     case "INSUREE_DOCUMENTS_ERR":
       return {
         ...state,
@@ -576,6 +584,8 @@ function reducer(
       return dispatchMutationResp(state, "changeInsureeFamily", action);
     case "INSUREE_SEND_EMAIL_RESP":
       return dispatchMutationResp(state, "sentNotification", action);
+    // case "INSUREE_PRINT_REPORT_RESP":
+    //   return dispatchMutationResp(state, "sentNotification", action);
     default:
       return state;
   }
