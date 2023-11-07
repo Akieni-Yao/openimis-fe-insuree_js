@@ -54,7 +54,7 @@ class InsureeMasterPanel extends FormPanel {
   componentDidMount() {
     const { edited } = this.props;
     // if (edited?.status == "WAITING_FOR_APPROVAL") {
-      this.props.approverCountCheck(this.props.modulesManager, edited.uuid);
+      // this.props.approverCountCheck(this.props.modulesManager, edited.uuid);
     // }
   }
   // The one from FormPanel does not allow jsonExt patching
@@ -562,13 +562,13 @@ class InsureeMasterPanel extends FormPanel {
   }
 }
 
-const mapStateToProps = (state, props) => ({
-  documentsData: state.insuree.approverData,
-});
-const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ approverCountCheck }, dispatch);
-};
-export default withModulesManager(
-  injectIntl(connect(mapStateToProps, mapDispatchToProps)(withTheme(withStyles(styles)(InsureeMasterPanel)))),
-);
-// export default withModulesManager(withTheme(withStyles(styles)(InsureeMasterPanel)));
+// const mapStateToProps = (state, props) => ({
+//   documentsData: state.insuree.approverData,
+// });
+// const mapDispatchToProps = (dispatch) => {
+//   return bindActionCreators({ approverCountCheck }, dispatch);
+// };
+// export default withModulesManager(
+//   injectIntl(connect(mapStateToProps, mapDispatchToProps)(withTheme(withStyles(styles)(InsureeMasterPanel)))),
+// );
+export default withModulesManager(withTheme(withStyles(styles)(InsureeMasterPanel)));
