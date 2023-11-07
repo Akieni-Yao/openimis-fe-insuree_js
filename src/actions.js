@@ -65,6 +65,7 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
   "jsonExt",
   "camuNumber",
+  "createdBy"
 ];
 
 export const INSUREE_PICKER_PROJECTION = ["id", "uuid", "chfId", "lastName", "otherNames"];
@@ -100,6 +101,7 @@ export function fetchInsuree(mm, chfid) {
       "biometricsIsMaster",
       "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
       "jsonExt",
+      "createdBy"
     ],
   );
   return graphql(payload, "INSUREE_INSUREE");
@@ -667,4 +669,13 @@ export function printReport(mm, edited) {
     ["INSUREE_MUTATION_REQ", "INSUREE_REPORT_RESP", "INSUREE_MUTATION_ERR"],
     "success message",
   );
+}
+
+export function approverCountCheck(mm, edited) {
+  let mutation = `query ApproverInsureeComparison {
+    approverInsureeComparison(uuid: "${edited}") {
+        approverUuid
+    }
+}`;
+  return graphql(mutation, "INSUREE_APPROVER");
 }

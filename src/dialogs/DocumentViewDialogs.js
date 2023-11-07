@@ -92,14 +92,19 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
   };
 
   const loginCnss = () => {
-    const loginUrl = "https://dms.akieni.com/backend/cnss/oauth/token";
-
+    const loginUrl = `${process.env.REACT_APP_GED_URL}/oauth/token`;
+    const username = process.env.REACT_APP_USERNAME;
+    const password = process.env.REACT_APP_PASSWORD;
+    const base64CredentialsLog = process.env.REACT_APP_BASE64_CREDENTIALS;
     const loginData = new URLSearchParams();
-    loginData.append("username", "ankit.kumar");
-    loginData.append("password", "Ankit@11");
+    loginData.append("username", username);
+    // loginData.append("username", "ankit.kumar");
+    loginData.append("password", password);
+    // loginData.append("password", "Ankit@11");
     loginData.append("grant_type", "password");
     loginData.append("scope", "read");
 
+    // const base64Credentials = btoa(base64CredentialsLog);
     const base64Credentials = btoa("kiyas:Y@123$%^23*");
 
     fetch(loginUrl, {
@@ -124,9 +129,8 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
         console.error("Login error:", error);
       });
   };
-  console.log("document dialog", onClose);
   const documentViewAPI = (token) => {
-    const apiUrl = "https://dms.akieni.com/backend/cnss/documents/get";
+    const apiUrl = `${process.env.REACT_APP_GED_URL}/documents/get`;
 
     const headers = {
       "Authorization": `Bearer ${token}`,
@@ -148,7 +152,6 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
         setBlobURL(pdfUrl);
       })
       .catch((error) => {
-        // Handle any errors
         console.error("API request error:", error);
       });
   };

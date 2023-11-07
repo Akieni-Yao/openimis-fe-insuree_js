@@ -33,6 +33,7 @@ import FamilyDisplayPanel from "./FamilyDisplayPanel";
 import InsureeMasterPanel from "../components/InsureeMasterPanel";
 import RejectDialog from "../dialogs/RejectDialog";
 import HelpIcon from "@material-ui/icons/Help";
+import { approverCountCheck } from "../actions";
 
 const styles = (theme) => ({
   page: theme.page,
@@ -226,7 +227,8 @@ class InsureeForm extends Component {
     );
   };
   _approveorreject = (insuree) => {
-    // this.props.updateExternalDocuments(this.props.modulesManager, this.props.documentsData, insuree.chfId);
+    if (insuree.status !== "APPROVED")
+      this.props.updateExternalDocuments(this.props.modulesManager, this.props.documentsData, insuree.chfId);
     this.setState(
       { lockNew: true }, // avoid duplicates
       (e) => this.props.save(insuree),
@@ -368,6 +370,7 @@ class InsureeForm extends Component {
       add,
       save,
       documentsData,
+      approverData
     } = this.props;
     const { insuree, clientMutationId, payload, statusCheck, email } = this.state;
 
@@ -428,7 +431,7 @@ class InsureeForm extends Component {
         ? documentsData.every((document) => document.documentStatus === "APPROVED") &&
           this.state.insuree.biometricsIsMaster
         : false;
-    console.log("this.state.insuree.biometricsIsMaste", this.state.insuree.biometricsIsMaster);
+    console.log("approverData", approverData);
     return (
       <div className={runningMutation ? classes.lockedPage : null}>
         <Helmet
@@ -467,6 +470,7 @@ class InsureeForm extends Component {
               emailButton={this.emailButton}
               email={insuree_uuid}
               printButton={this.printReport}
+              approverData={approverData}
             />
           )}
         <RejectDialog
@@ -476,6 +480,8 @@ class InsureeForm extends Component {
           approveorreject={this._approveorreject}
           statusCheck={statusCheck}
           classes={classes}
+          edited={this.state.insuree}
+
         />
       </div>
     );
@@ -497,6 +503,7 @@ const mapStateToProps = (state, props) => (
   mutation: state.insuree.mutation,
   isInsureeNumberValid: state.insuree?.validationFields?.insureeNumber?.isValid,
   documentsData: state.insuree.documentsData,
+  approverData: state.insuree.approverData,
 });
 
 export default withHistory(
@@ -510,7 +517,8 @@ export default withHistory(
       fetchInsureeDocuments,
       updateExternalDocuments,
       sendEmail,
-      printReport
+      printReport,
+      approverCountCheck
     })(injectIntl(withTheme(withStyles(styles)(InsureeForm)))),
   ),
 );

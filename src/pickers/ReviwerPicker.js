@@ -27,29 +27,19 @@ const ReviewerPicker = (props) => {
     taskGroupUser,
     setCenter,
     onChange,
+    createdAtCode
   } = props;
   const [searchString, setSearchString] = useState(null);
+  console.log('createdAtCode',createdAtCode);
   const { isLoading, data, error } = useGraphqlQuery(
-    `
-    {
-    taskGroup(center:"CG10-19")
-    {
-    totalCount 
-    pageInfo { hasNextPage, hasPreviousPage, startCursor, endCursor}
-    edges
-    {
-    node
-    {
-    name,
-    center,
+    `query TaskGroupByInsureeCreator {
+      taskGroupByInsureeCreator(creatorUuid:"${createdAtCode?.createdBy}") {
+          id
+          uuid
+          name
+      }
+  }`,
     
-    location{id, uuid, code, name, type, parent{id,uuid,code,name,type,parent{id,uuid,code,name,type,parent{id,uuid,code,name,type}}}},
-    uuid,
-    }
-    }
-    }
-    }
-    `,
     { str: searchString },
   );
   let taskGroup = !!data?.taskGroup

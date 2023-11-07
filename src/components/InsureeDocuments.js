@@ -151,7 +151,7 @@ class InsureeDocuments extends PagedDataHandler {
     );
   };
   handleExternalNavigation = () => {
-    window.open("https://abis.akieni.com/public/enrollment/index.html#/enroll/applicant-detail", "_blank");
+    window.open(process.env.REACT_APP_ABIS_URL, "_blank");
   };
   approved = async (docData) => {
     const response = await this.props.updateInsureeDocument(docData);

@@ -70,6 +70,14 @@ function reducer(
     fetchedDocuments: false,
     documentsData: null,
     errorDocument: null,
+    fetchingCreatedBy: false,
+    fetchedCreatedBy: false,
+    createdByData:null,
+    errorCreatedBy: null,
+    fetchingApprover: false,
+    fetchedApprover: false,
+    approverData: null,
+    errorApprover:null,
   },
   action,
 ) {
@@ -487,6 +495,53 @@ function reducer(
         fetchingDocuments: false,
         errorDocument: formatServerError(action.payload),
       };
+      case "INSUREE_CREATEDBY_REQ":
+      return {
+        ...state,
+        fetchingCreatedBy: true,
+        fetchedCreatedBy: false,
+        createdByData: null,
+        errorCreatedBy: null,
+       
+      };
+    case "INSUREE_CREATEDBY_RESP":
+      var families = parseData(action.payload.data.approverFamilies);
+      return {
+        ...state,
+        fetchingCreatedBy: false,
+        fetchedCreatedBy: true,
+        createdByData: !!families && families.length > 0 ? families : null,
+        errorCreatedBy: formatGraphQLError(action.payload),
+      };
+    case "INSUREE_CREATEDBY_ERR":
+      return {
+        ...state,
+        fetchingCreatedBy: false,
+        errorCreatedBy: formatServerError(action.payload),
+      };
+      case "INSUREE_APPROVER_REQ":
+      return {
+        ...state,
+        fetchingApprover: true,
+        fetchedApprover: false,
+        approverData: null,
+        errorApprover: null,
+      };
+    case "INSUREE_APPROVER_RESP":
+      return {
+        ...state,
+        fetchingApprover: false,
+        fetchedApprover: true,
+        approverData: action.payload.data.approverInsureeComparison.approverUuid,
+        errorApprover: formatGraphQLError(action.payload),
+      };
+case "INSUREE_APPROVER_ERR":
+      return {
+        ...state,
+        fetchingApprover: false,
+        errorApprover: formatServerError(action.payload),
+      };
+
     case "INSUREE_NUMBER_VALIDATION_FIELDS_REQ":
       return {
         ...state,

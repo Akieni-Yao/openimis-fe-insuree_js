@@ -14,6 +14,11 @@ import {
 } from "@openimis/fe-core";
 import _ from "lodash";
 import { MAX_BIRTHPLACE_LENGTH, MAX_PHONE_LENGTH } from "../constants";
+import { injectIntl } from "react-intl";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { approverCountCheck } from "../actions";
+
 const styles = (theme) => ({
   paper: theme.paper.paper,
   tableTitle: theme.table.title,
@@ -45,6 +50,12 @@ class InsureeMasterPanel extends FormPanel {
         fr: formatMessage(props.intl, "policyHolder", "phoneValidation.regexMsg.fr"),
       },
     });
+  }
+  componentDidMount() {
+    const { edited } = this.props;
+    // if (edited?.status == "WAITING_FOR_APPROVAL") {
+      this.props.approverCountCheck(this.props.modulesManager, edited.uuid);
+    // }
   }
   // The one from FormPanel does not allow jsonExt patching
   updateExts = (updates) => {
@@ -551,4 +562,13 @@ class InsureeMasterPanel extends FormPanel {
   }
 }
 
-export default withModulesManager(withTheme(withStyles(styles)(InsureeMasterPanel)));
+const mapStateToProps = (state, props) => ({
+  documentsData: state.insuree.approverData,
+});
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({ approverCountCheck }, dispatch);
+};
+export default withModulesManager(
+  injectIntl(connect(mapStateToProps, mapDispatchToProps)(withTheme(withStyles(styles)(InsureeMasterPanel)))),
+);
+// export default withModulesManager(withTheme(withStyles(styles)(InsureeMasterPanel)));
