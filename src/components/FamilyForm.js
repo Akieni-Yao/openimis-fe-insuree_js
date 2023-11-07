@@ -30,19 +30,19 @@ import { formatMessage } from "@openimis/fe-core";
 const styles = (theme) => ({
   lockedPage: theme.page.locked,
   approvedBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderColor: "#00913E",
     color: "#00913E",
     borderRadius: "2rem",
   },
   rejectBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderColor: "##FF0000",
     color: "##FF0000",
     borderRadius: "2rem",
   },
   commonBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderColor: "#FF841C",
     color: "#FF841C",
     borderRadius: "2rem",
@@ -60,7 +60,7 @@ const styles = (theme) => ({
   },
   spanPadding: {
     paddingTop: theme.spacing(1),
-    marginRight: '5px'
+    marginRight: "5px",
   },
 });
 
@@ -164,6 +164,7 @@ class FamilyForm extends Component {
   canSave = () => {
     // if (!this.state.family.location) return false;
     if (!this.state.family.headInsuree) return false;
+    if (!this.state.family.headInsuree?.jsonExt?.createdAt) return false;
     // if (!this.state.family.headInsuree.chfId) return false;
     // if (!this.props.isChfIdValid) return false;
     if (!this.state.family?.jsonExt?.enrolmentType) return false;
@@ -359,6 +360,7 @@ class FamilyForm extends Component {
             save={!!save ? this._save : null}
             onActionToConfirm={this.onActionToConfirm}
             openDirty={save}
+            user={this.props.state.core.user}
             // onValidation={this.onValidation}
           />
         )}

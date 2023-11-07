@@ -30,6 +30,24 @@ const FAMILY_FULL_PROJECTION = (mm) => [
   "jsonExt",
 ];
 
+const PENDING_APPROVAL_PROJECTION =
+  "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code},camuNumber,status}";
+
+const PENDING_FULL_PROJECTION = (mm) => [
+  "id",
+  "uuid",
+  "poverty",
+  "confirmationNo",
+  "confirmationType{code}",
+  "familyType{code}",
+  "address",
+  "validityFrom",
+  "validityTo",
+  "status",
+  PENDING_APPROVAL_PROJECTION,
+  "location" + mm.getProjection("location.Location.FlatProjection"),
+  "jsonExt",
+];
 export const FAMILY_PICKER_PROJECTION = ["id", "uuid", "headInsuree{id chfId uuid lastName otherNames}"];
 
 const INSUREE_FULL_PROJECTION = (mm) => [
@@ -65,6 +83,7 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
   "jsonExt",
   "camuNumber",
+  "createdBy",
 ];
 
 export const INSUREE_PICKER_PROJECTION = ["id", "uuid", "chfId", "lastName", "otherNames"];
@@ -100,6 +119,7 @@ export function fetchInsuree(mm, chfid) {
       "biometricsIsMaster",
       "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
       "jsonExt",
+      "createdBy",
     ],
   );
   return graphql(payload, "INSUREE_INSUREE");
@@ -136,6 +156,11 @@ export function fetchFamilySummaries(mm, filters) {
   ];
   const payload = formatPageQueryWithCount("families", filters, projections);
   return graphql(payload, "INSUREE_FAMILIES");
+}
+export function fetchPendingForApproval(mm, familyUuid, headInsureeChfId) {
+  let filters = [];
+  const payload = formatPageQuery("approverFamilies", filters, PENDING_FULL_PROJECTION(mm));
+  return graphql(payload, "INSUREE_PENDINGAPPROVAL");
 }
 
 export function fetchFamilyMembers(mm, filters) {
@@ -654,6 +679,25 @@ export function sendEmail(mm, edited) {
     ["INSUREE_MUTATION_REQ", "INSUREE_SEND_EMAIL_RESP", "INSUREE_MUTATION_ERR"],
     "success message responses",
   );
+}
+export function approverCountCheck(mm, edited) {
+  let mutation = `query ApproverInsureeComparison {
+    approverInsureeComparison(uuid: "${edited}") {
+        approverUuid
+    }
+}`;
+  return graphql(mutation, "INSUREE_APPROVER");
+}
+
+export function taskGroupCreator(edited) {
+  let mutation = `query TaskGroupByInsureeCreator {
+    taskGroupByInsureeCreator(creatorUuid: "${edited}") {
+        id
+        uuid
+        name
+    }
+}`;
+  return graphql(mutation, "INSUREE_CREATEDBY");
 }
 export function printReport(mm, edited) {
   let mutation = `mutation SendNotification{

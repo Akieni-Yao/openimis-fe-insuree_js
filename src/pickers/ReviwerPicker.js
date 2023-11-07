@@ -15,6 +15,7 @@ import {
 // import { selectTaskGroupUser } from "../../actions";
 import _debounce from "lodash/debounce";
 import _ from "lodash";
+import { taskGroupCreator } from "../actions";
 
 const ReviewerPicker = (props) => {
   const {
@@ -29,12 +30,13 @@ const ReviewerPicker = (props) => {
     onChange,
   } = props;
   const [searchString, setSearchString] = useState(null);
+  // const [data, setData] = useState();
   const { isLoading, data, error } = useGraphqlQuery(
     `
     {
     taskGroup(center:"CG10-19")
     {
-    totalCount 
+    totalCount
     pageInfo { hasNextPage, hasPreviousPage, startCursor, endCursor}
     edges
     {
@@ -42,7 +44,7 @@ const ReviewerPicker = (props) => {
     {
     name,
     center,
-    
+
     location{id, uuid, code, name, type, parent{id,uuid,code,name,type,parent{id,uuid,code,name,type,parent{id,uuid,code,name,type}}}},
     uuid,
     }
@@ -52,6 +54,11 @@ const ReviewerPicker = (props) => {
     `,
     { str: searchString },
   );
+  console.log("createdAtCode", createdAtCode?.createdBy);
+  // useEffect(async () => {
+  //   const response = await taskGroupCreator(createdAtCode?.createdBy);
+  //   setData(response.data);
+  // }, [createdAtCode?.createdBy]);
   let taskGroup = !!data?.taskGroup
     ? data?.taskGroup.edges.map((v) => {
         const { name, uuid } = v.node;

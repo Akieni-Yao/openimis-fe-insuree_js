@@ -1,5 +1,8 @@
 import React from "react";
 import { withTheme, withStyles } from "@material-ui/core/styles";
+import { injectIntl } from "react-intl";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import { Paper, Grid, Typography, Divider, Checkbox, FormControlLabel } from "@material-ui/core";
 import {
   formatMessage,
@@ -14,6 +17,7 @@ import {
 } from "@openimis/fe-core";
 import _ from "lodash";
 import { MAX_BIRTHPLACE_LENGTH, MAX_PHONE_LENGTH } from "../constants";
+// import { approverCountCheck } from "../actions";
 const styles = (theme) => ({
   paper: theme.paper.paper,
   tableTitle: theme.table.title,
@@ -81,6 +85,12 @@ class InsureeMasterPanel extends FormPanel {
 
     this.props.onEditedChanged(data);
   };
+  componentDidMount() {
+    const { edited } = this.props;
+    // if (edited?.status == "WAITING_FOR_APPROVAL") {
+    //   this.props.approverCountCheck(this.props.modulesManager, edited.uuid);
+    // }
+  }
   componentDidUpdate(prevProps, prevState, snapshot) {
     this._componentDidUpdate(prevProps, prevState, snapshot);
     const { edited } = this.props;
@@ -516,7 +526,7 @@ class InsureeMasterPanel extends FormPanel {
               <Grid item xs={4} className={classes.item}>
                 <PublishedComponent
                   pubRef="insuree.Avatar"
-                  photo={!!edited ? edited.photoUrl : null}
+                  photo={!!edited ? edited?.photoUrl : null}
                   readOnly={readOnly}
                   withMeta={true}
                   onChange={(v) => this.updateAttribute("photo", !!v ? v : null)}
@@ -548,5 +558,13 @@ class InsureeMasterPanel extends FormPanel {
     );
   }
 }
-
+// const mapStateToProps = (state, props) => ({
+//   documentsData: state.insuree.approverData,
+// });
+// const mapDispatchToProps = (dispatch) => {
+//   return bindActionCreators({ approverCountCheck }, dispatch);
+// };
+// export default withModulesManager(
+//   injectIntl(connect(mapStateToProps, mapDispatchToProps)(withTheme(withStyles(styles)(InsureeMasterPanel)))),
+// );
 export default withModulesManager(withTheme(withStyles(styles)(InsureeMasterPanel)));

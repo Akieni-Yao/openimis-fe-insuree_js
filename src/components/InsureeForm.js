@@ -38,21 +38,21 @@ const styles = (theme) => ({
   page: theme.page,
   lockedPage: theme.page.locked,
   approvedBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     marginRight: "5px",
     borderColor: "#00913E",
     color: "#00913E",
     borderRadius: "2rem",
   },
   rejectBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     marginRight: "5px",
     borderColor: "##FF0000",
     color: "##FF0000",
     borderRadius: "2rem",
   },
   commonBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     marginRight: "5px",
     borderColor: "#FF841C",
     color: "#FF841C",
@@ -71,7 +71,7 @@ const styles = (theme) => ({
   },
   spanPadding: {
     paddingTop: theme.spacing(1),
-    marginRight: '5px'
+    marginRight: "5px",
   },
 });
 
@@ -291,7 +291,7 @@ class InsureeForm extends Component {
     return (
       <Grid className={this.props.classes.margin2}>
         <Typography component="span" className={this.props.classes.spanPadding}>
-          STATUS : 
+          STATUS :
         </Typography>
         <Button className={selectedClass} variant="outlined">
           {docsStatus}
@@ -370,39 +370,6 @@ class InsureeForm extends Component {
       documentsData,
     } = this.props;
     const { insuree, clientMutationId, payload, statusCheck, email } = this.state;
-
-    // const documentsData = [
-    //   {
-    //     "id": "34",
-    //     "documentId": "ad303dbf-f6f2-4da3-9d47-cadc55c5e05c",
-    //     "documentName": "Declaration of employment",
-    //     "documentPath": "Declaration of employment.pdf",
-    //     "documentStatus": "APPROVED",
-    //     "comments": null,
-    //     "tempCamu": "T1915102023003719",
-    //     "isVerified": false,
-    //   },
-    //   {
-    //     "id": "35",
-    //     "documentId": "71ac4acf-bc58-46a9-a437-25a282386c5f",
-    //     "documentName": "Salary slips",
-    //     "documentPath": "Salary slips.pdf",
-    //     "documentStatus": "APPROVED",
-    //     "comments": null,
-    //     "tempCamu": "T1915102023003719",
-    //     "isVerified": false,
-    //   },
-    //   {
-    //     "id": "36",
-    //     "documentId": "208dc2e3-e132-400a-bc26-d9799110acbe",
-    //     "documentName": "Copy of passport",
-    //     "documentPath": "Copy of passport.pdf",
-    //     "documentStatus": "APPROVED",
-    //     "comments": null,
-    //     "tempCamu": "T1915102023003719",
-    //     "isVerified": false,
-    //   },
-    // ];
     if (!rights.includes(RIGHT_INSUREE)) return null;
     let runningMutation = !!insuree && !!clientMutationId;
     let actions = [
