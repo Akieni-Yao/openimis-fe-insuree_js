@@ -412,7 +412,8 @@ class InsureeMasterPanel extends FormPanel {
                       label="Insuree.nbKids"
                       readOnly={readOnly}
                       type="number"
-                      value={!!edited && !!edited.jsonExt ? edited?.jsonExt?.nbKids : ""}
+                      required
+                      value={!!edited && !!edited.jsonExt?.nbKids ? edited?.jsonExt?.nbKids : "0"}
                       onChange={(v) => this.updateExts({ nbKids: v })}
                     />
                   </Grid>
@@ -452,6 +453,7 @@ class InsureeMasterPanel extends FormPanel {
                       module="insuree"
                       label="Insuree.phone"
                       inputProps={{ maxLength: MAX_PHONE_LENGTH }}
+                      required
                       readOnly={readOnly}
                       value={!!edited && !!edited?.phone ? edited?.phone : ""}
                       error={this.regexError("phone", edited?.phone)}
