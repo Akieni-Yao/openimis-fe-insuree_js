@@ -210,8 +210,16 @@ class InsureeForm extends Component {
     // if (!this.state.insuree.chfId) return false;
     if (!this.state.insuree?.jsonExt?.insureeEnrolmentType) return false;
     if (!this.state.insuree?.jsonExt?.createdAt) return false;
+    if (!this.state.insuree?.jsonExt?.BirthPlace) return false;
+    if (!this.state.insuree?.jsonExt?.nationality) return false;
+    if (!this.state.insuree?.jsonExt?.nbKids) return false;
+    if (!this.state.insuree?.jsonExt?.civilQuality) return false;
     if (!this.state.insuree.lastName) return false;
+    if (!this.state.insuree.phone) return false;
     if (!this.state.insuree.otherNames) return false;
+    if (!this.state.insuree.marital) return false;
+    if (!this.state.insuree.typeOfId) return false;
+    if (!this.state.insuree.passport) return false;
     if (!this.state.insuree.dob) return false;
     if (!this.state.insuree.gender || !this.state.insuree.gender?.code) return false;
     // if (!this.state.isFormValid == true) return false;

@@ -185,6 +185,7 @@ class FamilyMasterPanel extends FormPanel {
               multiline
               rows={2}
               readOnly={readOnly}
+              required={true}
               value={!edited ? "" : edited.address}
               onChange={(v) => this.updateAttribute("address", v)}
             />

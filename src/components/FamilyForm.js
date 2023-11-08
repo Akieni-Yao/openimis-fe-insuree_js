@@ -169,7 +169,17 @@ class FamilyForm extends Component {
     if (!this.state.family?.jsonExt?.enrolmentType) return false;
     if (!this.state.family.headInsuree.lastName) return false;
     if (!this.state.family.headInsuree.otherNames) return false;
+    if (!this.state.family.headInsuree.phone) return false;
+    if (!this.state?.family?.headInsuree?.jsonExt?.BirthPlace) return false;
+    if (!this.state?.family?.headInsuree?.jsonExt?.nationality) return false;
+    if (!this.state?.family?.headInsuree?.jsonExt?.nbKids) return false;
+    if (!this.state?.family?.headInsuree?.jsonExt?.civilQuality) return false;
+    if (!this.state?.family?.headInsuree?.jsonExt?.createdAt) return false;
+    if (!this.state?.family?.headInsuree?.marital) return false;
+    if (!this.state?.family?.headInsuree?.typeOfId) return false;
+    if (!this.state?.family?.headInsuree?.passport) return false;
     if (!this.state.family.headInsuree.dob) return false;
+    if (!this.state.family?.address) return false;
     if (!this.state.family.headInsuree.gender || !this.state.family?.headInsuree.gender?.code) return false;
     if (
       !!this.state.family.headInsuree.photo &&
@@ -252,6 +262,7 @@ class FamilyForm extends Component {
       back,
       mutation,
     } = this.props;
+    // console.log(state,"state")
     const { family, newFamily } = this.state;
     if (!rights.includes(RIGHT_FAMILY)) return null;
     let runningMutation = !!family && !!family.clientMutationId;
