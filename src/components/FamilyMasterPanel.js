@@ -49,6 +49,7 @@ class FamilyMasterPanel extends FormPanel {
 
   headSummary = () => {
     const { classes, edited } = this.props;
+
     return (
       <Fragment>
         <Grid item xs={3} className={classes.item}>
@@ -159,11 +160,13 @@ class FamilyMasterPanel extends FormPanel {
               readOnly={readOnly}
               value={
                 !!edited && edited?.ext
-                  ? // ? edited.ext.enrolmentType
+                  ? // ? edited?.jsonExt?.enrolmentType
                     edited?.ext?.enrolmentType
-                  : // : edited?.jsonExt?.enrolmentType
-                    // edited?.jsonExt?.enrolmentType
-                    null
+                  : !!edited && (edited?.jsonExt).length
+                  ? JSON.parse(edited?.jsonExt)?.enrolmentType
+                  : null
+                // edited?.jsonExt?.enrolmentType
+                // null
               }
               onChange={(value) => this.updateExts({ enrolmentType: value })}
               constants={CAMU_ENROLMENT_TYPE}

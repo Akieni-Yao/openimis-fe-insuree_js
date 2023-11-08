@@ -16,6 +16,7 @@ import {
   parseData,
   ProgressOrError,
   Helmet,
+  formatMessage,
 } from "@openimis/fe-core";
 import {
   fetchInsureeFull,
@@ -26,6 +27,7 @@ import {
   updateExternalDocuments,
   sendEmail,
   printReport,
+  approverInsureeComparison,
 } from "../actions";
 import { RIGHT_INSUREE } from "../constants";
 import { insureeLabel } from "../utils/utils";
@@ -108,6 +110,10 @@ class InsureeForm extends Component {
       let insuree = { ...this.state.insuree };
       insuree.family = { ...this.props.family };
       this.setState({ insuree });
+    }
+
+    if (!!this.props.insuree_uuid) {
+      this.props.approverInsureeComparison(this.props.modulesManager, this.props.insuree_uuid);
     }
   }
 
@@ -226,10 +232,11 @@ class InsureeForm extends Component {
     );
   };
   _approveorreject = (insuree) => {
-    // this.props.updateExternalDocuments(this.props.modulesManager, this.props.documentsData, insuree.chfId);
+    // if (insuree.status !== "APPROVED")
+    //   this.props.updateExternalDocuments(this.props.modulesManager, this.props.documentsData, insuree.chfId);
     this.setState(
       { lockNew: true }, // avoid duplicates
-      (e) => this.props.save(insuree),
+      (e) => this.props.save({ ...insuree, documentData: this.props.documentsData }),
     );
     this.handleDialogClose();
   };
@@ -254,31 +261,31 @@ class InsureeForm extends Component {
     switch (status) {
       case "PRE_REGISTERED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Pre Registered";
+        docsStatus = "buttonStatus.preRegistered";
         break;
       case "APPROVED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Approved";
+        docsStatus = "buttonStatus.approved";
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
-        docsStatus = "Rejected";
+        docsStatus = "buttonStatus.rejected";
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Rework";
+        docsStatus = "buttonStatus.rework";
         break;
       case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting for document and biometric";
+        docsStatus = "buttonStatus.waitingDocumentBiometric";
         break;
       case "WAITING_FOR_APPROVAL":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting For Approval";
+        docsStatus = "buttonStatus.waitingApproval";
         break;
       case "WAITING_FOR_QUEUE":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting For Queue";
+        docsStatus = "buttonStatus.waitingQueue";
         break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
@@ -294,7 +301,7 @@ class InsureeForm extends Component {
           STATUS :
         </Typography>
         <Button className={selectedClass} variant="outlined">
-          {docsStatus}
+          {formatMessage(this.props.intl, "insuree", docsStatus)}
         </Button>
         {data.status == "REWORK" || data.status == "REJECTED" ? (
           <Tooltip
@@ -322,35 +329,33 @@ class InsureeForm extends Component {
     );
   };
   displayPrintWindow = (base64Data, contentType) => {
-    const printWindow = window.open('', 'Print Window', 'width=600, height=400');
+    const printWindow = window.open("", "Print Window", "width=600, height=400");
     printWindow.document.open();
 
-    if (contentType === 'pdf') {
+    if (contentType === "pdf") {
       // printWindow.print(`<embed type="application/pdf" width="100%" height="100%" src="data:application/pdf;base64,${base64Data}" />`);
-      printWindow.document.write(`<embed type="application/pdf" width="100%" height="100%" src="data:application/pdf;base64,${base64Data}" />`);
+      printWindow.document.write(
+        `<embed type="application/pdf" width="100%" height="100%" src="data:application/pdf;base64,${base64Data}" />`,
+      );
     } else {
       printWindow.document.write(`<img src="data:image/png;base64,${base64Data}" />`);
     }
 
     printWindow.document.close();
     // printWindow.print();
-  }
+  };
   emailButton = (edited) => {
-    console.log(edited, "edited")
-    this.props.sendEmail(this.props.modulesManager, edited)
-  }
+    this.props.sendEmail(this.props.modulesManager, edited);
+  };
   printReport = async (edited) => {
-    console.log(edited, "edited")
-    const data = await this.props.printReport(this.props.modulesManager, edited)
-    console.log(data,"base64Data")
+    const data = await this.props.printReport(this.props.modulesManager, edited);
     const base64Data = data?.payload?.data?.sentNotification?.data;
-    // const base64Data = "JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgaHR0cDovL3d3dy5yZXBvcnRsYWIuY29tCjEgMCBvYmoKPDwKL0YxIDIgMCBSCj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMSAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL0NvbnRlbnRzIDcgMCBSIC9NZWRpYUJveCBbIDAgMCA2MTIgNzkyIF0gL1BhcmVudCA2IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgNiAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL0F1dGhvciAoYW5vbnltb3VzKSAvQ3JlYXRpb25EYXRlIChEOjIwMjMxMDMwMTUzMzQyLTA1JzAwJykgL0NyZWF0b3IgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIHd3dy5yZXBvcnRsYWIuY29tKSAvS2V5d29yZHMgKCkgL01vZERhdGUgKEQ6MjAyMzEwMzAxNTMzNDItMDUnMDAnKSAvUHJvZHVjZXIgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIHd3dy5yZXBvcnRsYWIuY29tKSAKICAvU3ViamVjdCAodW5zcGVjaWZpZWQpIC9UaXRsZSAodW50aXRsZWQpIC9UcmFwcGVkIC9GYWxzZQo+PgplbmRvYmoKNiAwIG9iago8PAovQ291bnQgMSAvS2lkcyBbIDMgMCBSIF0gL1R5cGUgL1BhZ2VzCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9GaWx0ZXIgWyAvQVNDSUk4NURlY29kZSAvRmxhdGVEZWNvZGUgXSAvTGVuZ3RoIDEwNwo+PgpzdHJlYW0KR2FwUWgwRT1GLDBVXEgzVFxwTllUXlFLaz90Yz5JUCw7VyNVMV4yM2loUEVNXz9DVzRLSVNpOTBNakdeMixGUyM8UkM2OzwhW0dfO1s+dUlhPWYkajwhXlREI2dpXSY9NVgsWzNyQlkzfj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA4CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDA3MyAwMDAwMCBuIAowMDAwMDAwMTA0IDAwMDAwIG4gCjAwMDAwMDAyMTEgMDAwMDAgbiAKMDAwMDAwMDQwNCAwMDAwMCBuIAowMDAwMDAwNDcyIDAwMDAwIG4gCjAwMDAwMDA3NjggMDAwMDAgbiAKMDAwMDAwMDgyNyAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9JRCAKWzwxZjdiYzY3M2JmYzMzMWRiMTY3YmEwNjM4MjYxM2M2NT48MWY3YmM2NzNiZmMzMzFkYjE2N2JhMDYzODI2MTNjNjU+XQolIFJlcG9ydExhYiBnZW5lcmF0ZWQgUERGIGRvY3VtZW50IC0tIGRpZ2VzdCAoaHR0cDovL3d3dy5yZXBvcnRsYWIuY29tKQoKL0luZm8gNSAwIFIKL1Jvb3QgNCAwIFIKL1NpemUgOAo+PgpzdGFydHhyZWYKMTAyNAolJUVPRgo="
-    const contentType = 'pdf';
+
+    const contentType = "pdf";
     if (base64Data) {
-      this.displayPrintWindow(base64Data, contentType)
+      this.displayPrintWindow(base64Data, contentType);
     }
-    // console.log(decodeURI(data?.payload?.data?.sentNotification?.data), "decode data");
-  }
+  };
   render() {
     const {
       rights,
@@ -368,7 +373,9 @@ class InsureeForm extends Component {
       add,
       save,
       documentsData,
+      approverData,
     } = this.props;
+
     const { insuree, clientMutationId, payload, statusCheck, email } = this.state;
     if (!rights.includes(RIGHT_INSUREE)) return null;
     let runningMutation = !!insuree && !!clientMutationId;
@@ -395,7 +402,7 @@ class InsureeForm extends Component {
         ? documentsData.every((document) => document.documentStatus === "APPROVED") &&
           this.state.insuree.biometricsIsMaster
         : false;
-    console.log("this.state.insuree.biometricsIsMaste", this.state.insuree.biometricsIsMaster);
+ 
     return (
       <div className={runningMutation ? classes.lockedPage : null}>
         <Helmet
@@ -434,6 +441,7 @@ class InsureeForm extends Component {
               emailButton={this.emailButton}
               email={insuree_uuid}
               printButton={this.printReport}
+              approverData={approverData}
             />
           )}
         <RejectDialog
@@ -443,14 +451,14 @@ class InsureeForm extends Component {
           approveorreject={this._approveorreject}
           statusCheck={statusCheck}
           classes={classes}
+          edited={this.state.insuree}
         />
       </div>
     );
   }
 }
 
-const mapStateToProps = (state, props) => (
-  console.log("state",state),{
+const mapStateToProps = (state, props) => ({
   rights: !!state.core && !!state.core.user && !!state.core.user.i_user ? state.core.user.i_user.rights : [],
   fetchingInsuree: state.insuree.fetchingInsuree,
   errorInsuree: state.insuree.errorInsuree,
@@ -464,6 +472,7 @@ const mapStateToProps = (state, props) => (
   mutation: state.insuree.mutation,
   isInsureeNumberValid: state.insuree?.validationFields?.insureeNumber?.isValid,
   documentsData: state.insuree.documentsData,
+  approverData: state.insuree.approverData,
 });
 
 export default withHistory(
@@ -477,7 +486,8 @@ export default withHistory(
       fetchInsureeDocuments,
       updateExternalDocuments,
       sendEmail,
-      printReport
+      printReport,
+      approverInsureeComparison,
     })(injectIntl(withTheme(withStyles(styles)(InsureeForm)))),
   ),
 );

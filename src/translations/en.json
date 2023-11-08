@@ -4,6 +4,7 @@
   "insuree.menu.addFamilyOrGroup": "Add Family/Group",
   "insuree.menu.familiesOrGroups": "Families/Groups",
   "insuree.menu.insurees": "Insurees",
+  "insuree.menu.pendingApproval": "Pending Approval",
   "insuree.ageUnit": "Years",
   "insuree.label.regionFSP": "Region of FSP",
   "insuree.label.districtFSP": "District of FSP",
@@ -417,7 +418,7 @@
   "insuree.Country.UZ": "Uzbekistan",
   "insuree.Country.VU": "Vanuatu",
   "insuree.Country.VE": "Venezuela",
-  "insuree.Country.VN": "Vietnam",
+  "insuree.Country.YE": "Vietnam",
   "insuree.Family.civilQuality": "Civil Quality",
   "insuree.Family.civilQuality.null": "None",
   "insuree.Family.civilQuality.Main Beneficiary": "Main Beneficiary",
@@ -449,6 +450,11 @@
  "insuree.buttonStatus.rework": "Rework",
  "insuree.buttonStatus.waitingDocumentBiometric": "Waiting for document and biometric",
  "insuree.buttonStatus.waitingApproval": "Waiting For Approval",
- "insuree.buttonStatus.waitingQueue": "Waiting For Queue"
-
+ "insuree.buttonStatus.waitingQueue": "Waiting For Queue",
+ "insuree.Insuree.pendingApproval":"Pending For Approval",
+ "insuree.PedingApproval.tempCamuNo":"Temp CAMU No.",
+ "insuree.PedingApproval.firstName":"Insuree First Name",
+ "insuree.PedingApproval.lastName":"Insuree Last Name",
+ "insuree.PedingApproval.gender":"Gender",
+ "insuree.PedingApproval.city":"City"
 }

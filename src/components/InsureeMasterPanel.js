@@ -17,7 +17,7 @@ import {
 } from "@openimis/fe-core";
 import _ from "lodash";
 import { MAX_BIRTHPLACE_LENGTH, MAX_PHONE_LENGTH } from "../constants";
-// import { approverCountCheck } from "../actions";
+
 const styles = (theme) => ({
   paper: theme.paper.paper,
   tableTitle: theme.table.title,
@@ -58,25 +58,25 @@ class InsureeMasterPanel extends FormPanel {
     } else {
       data["jsonExt"] = { ...data["jsonExt"], ...updates };
     }
-    if (!data["jsonExt"].dateValidFrom) {
+    if (!data["jsonExt"]?.dateValidFrom) {
       data["jsonExt"].dateValidFrom = new Date().toISOString().slice(0, 10);
     }
     if (updates?.insureelocations) {
-      data["jsonExt"].insureelocations = updates.insureelocations;
+      data["jsonExt"].insureelocations = updates?.insureelocations;
     } else if (this.props.family?.location) {
       data["jsonExt"].insureelocations = this.props.family?.location;
     } else if (this.props.edited?.family?.location && !updates?.insureelocations) {
       data["jsonExt"].insureelocations = this.props.edited?.family?.location;
     }
     if (updates?.insureeEnrolmentType) {
-      data["jsonExt"].insureeEnrolmentType = updates.insureeEnrolmentType;
+      data["jsonExt"].insureeEnrolmentType = updates?.insureeEnrolmentType;
     } else if (this.props.family?.jsonExt?.enrolmentType) {
       data["jsonExt"].insureeEnrolmentType = this.props.family?.jsonExt?.enrolmentType;
     } else if (this.props.edited?.family?.jsonExt?.enrolmentType && !updates?.insureeEnrolmentType) {
       data["jsonExt"].insureeEnrolmentType = this.props.edited?.family?.jsonExt?.enrolmentType;
     }
     if (updates?.insureeaddress) {
-      data["jsonExt"].insureeaddress = updates.insureeaddress;
+      data["jsonExt"].insureeaddress = updates?.insureeaddress;
     } else if (this.props.family?.address) {
       data["jsonExt"].insureeaddress = this.props.family?.address;
     } else if (this.props.edited?.family?.address && !updates?.insureeaddress) {
@@ -85,12 +85,7 @@ class InsureeMasterPanel extends FormPanel {
 
     this.props.onEditedChanged(data);
   };
-  componentDidMount() {
-    const { edited } = this.props;
-    // if (edited?.status == "WAITING_FOR_APPROVAL") {
-    //   this.props.approverCountCheck(this.props.modulesManager, edited.uuid);
-    // }
-  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
     this._componentDidUpdate(prevProps, prevState, snapshot);
     const { edited } = this.props;
@@ -120,6 +115,7 @@ class InsureeMasterPanel extends FormPanel {
       actions,
       edited_id,
     } = this.props;
+    console.log("this.propsCheckMaste", edited);
     return (
       <Grid container>
         <Grid item xs={12}>
@@ -173,8 +169,6 @@ class InsureeMasterPanel extends FormPanel {
                 />
               </Grid>
 
-              {/* New Added Fields */}
-
               <Grid item xs={4} className={classes.item}>
                 <TextInput
                   pubRef="insuree"
@@ -191,10 +185,10 @@ class InsureeMasterPanel extends FormPanel {
               <Grid item xs={2} className={classes.item}>
                 <TextInput
                   module="insuree"
-                  label="NIU"
+                  // label="NIU"
                   required={false}
                   inputProps={{ maxLength: MAX_MAIN_ACTIVITY_LENGTH }}
-                  value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeniu : ""}
+                  value={!!edited && !!edited.jsonExt ? edited.jsonExt?.insureeniu : ""}
                   onChange={(v) => this.updateExts({ insureeniu: v })}
                   // readOnly={isPolicyHolderPortalUser}
                 />
@@ -221,7 +215,7 @@ class InsureeMasterPanel extends FormPanel {
                   readOnly={
                     !!edited &&
                     !!edited.family &&
-                    !!edited.family.headInsuree &&
+                    !!edited.family?.headInsuree &&
                     edited.family.headInsuree.id !== edited.id &&
                     edited_id == null
                       ? readOnly
@@ -248,7 +242,7 @@ class InsureeMasterPanel extends FormPanel {
                   module="insuree"
                   label="Insuree.Created on"
                   required={false}
-                  maxDate={!!edited && !!edited.dateValidTo && edited.dateValidTo}
+                  maxDate={!!edited && !!edited?.dateValidTo && edited?.dateValidTo}
                   value={
                     !!edited && !!edited?.jsonExt?.dateValidFrom
                       ? edited.jsonExt.dateValidFrom
@@ -264,7 +258,7 @@ class InsureeMasterPanel extends FormPanel {
                   withNull
                   label={formatMessage(intl, "insuree", "insuree.createdAt")}
                   filterLabels={false}
-                  value={!!edited && !!edited?.jsonExt ? edited?.jsonExt.createdAt : null}
+                  value={!!edited && !!edited?.jsonExt ? edited?.jsonExt?.createdAt : null}
                   onChange={(v) => this.updateExts({ createdAt: v })}
                   readOnly={readOnly}
                   required
@@ -344,7 +338,7 @@ class InsureeMasterPanel extends FormPanel {
                   label="Insuree.otherNames"
                   required={true}
                   readOnly={readOnly}
-                  value={!!edited && !!edited.otherNames ? edited.otherNames : ""}
+                  value={!!edited && !!edited?.otherNames ? edited?.otherNames : ""}
                   onChange={(v) => {
                     this.updateAttribute("otherNames", v);
                   }}
@@ -369,7 +363,7 @@ class InsureeMasterPanel extends FormPanel {
                       control={
                         <Checkbox
                           color="primary"
-                          checked={!!edited && !!edited.jsonExt && edited.jsonExt.approx}
+                          checked={!!edited && !!edited.jsonExt && edited.jsonExt?.approx}
                           disabled={readOnly}
                           onChange={(e) => {
                             // console.log("e", e, e.target.checked);
@@ -526,7 +520,7 @@ class InsureeMasterPanel extends FormPanel {
               <Grid item xs={4} className={classes.item}>
                 <PublishedComponent
                   pubRef="insuree.Avatar"
-                  photo={!!edited ? edited?.photoUrl : null}
+                  photo={!!edited?.photoUrl ? edited?.photoUrl : null}
                   readOnly={readOnly}
                   withMeta={true}
                   onChange={(v) => this.updateAttribute("photo", !!v ? v : null)}

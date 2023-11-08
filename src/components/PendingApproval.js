@@ -12,6 +12,7 @@ import {
   withModulesManager,
   formatDateFromISO,
   historyPush,
+  withHistory,
   withTooltip,
   FormattedMessage,
   formatSorter,
@@ -21,6 +22,7 @@ import {
   PagedDataHandler,
   PublishedComponent,
   ProgressOrError,
+  clearCurrentPaginationPage,
 } from "@openimis/fe-core";
 import EnquiryDialog from "./EnquiryDialog";
 import {
@@ -33,6 +35,8 @@ import {
   checkCanAddInsuree,
   fetchInsureeDocuments,
   updateInsureeDocument,
+  fetchPendingForApproval,
+  fetchInsureeSummaries,
 } from "../actions";
 import { DisabledBiometric, InvalidBiometric, ValidBiometric } from "../SvgIndex";
 import DocumentViewDialog from "../dialogs/DocumentViewDialogs";
@@ -76,7 +80,7 @@ const styles = (theme) => ({
   },
 });
 
-class InsureeDocuments extends PagedDataHandler {
+class PendingApproval extends PagedDataHandler {
   state = {
     documentViewOpen: false,
     chfid: null,
@@ -97,11 +101,18 @@ class InsureeDocuments extends PagedDataHandler {
       [5, 10, 20],
     );
     this.defaultPageSize = props.modulesManager.getConf("fe-insuree", "familyInsureesOverview.defaultPageSize", 5);
+    this.locationLevels = this.props.modulesManager.getConf("fe-location", "location.Location.MaxLevels", 4);
   }
-
+  onDoubleClick = (f, newTab = false) => {
+    historyPush(this.props.modulesManager, this.props.history, "insuree.route.familyOverview", [f.uuid], newTab);
+  };
   componentDidMount() {
     this.setState({ orderBy: null }, (e) => this.onChangeRowsPerPage(this.defaultPageSize));
-    this.props.fetchInsureeDocuments(this.props?.edited?.chfId);
+    this.props.fetchPendingForApproval(this.props.modulesManager);
+
+    const moduleName = "insuree";
+    const { module } = this.props;
+    if (module !== moduleName) this.props.clearCurrentPaginationPage();
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevState.documentViewOpen !== this.state.documentViewOpen) {
@@ -109,26 +120,15 @@ class InsureeDocuments extends PagedDataHandler {
     }
   }
 
-  adjustButtonZIndex = () => {
-    const buttonElements = document.querySelectorAll('div[title="Save changes"], div[title="Create new"]');
-    if (this.state.documentViewOpen) {
-      if (buttonElements.length > 0) {
-        buttonElements.forEach((element) => {
-          if (element.style) {
-            element.style.zIndex = "1000";
-          }
-        });
-      }
-    } else {
-      if (buttonElements.length > 0) {
-        buttonElements.forEach((element) => {
-          if (element.style) {
-            element.style.zIndex = "2000";
-          }
-        });
-      }
-    }
+  componentWillUnmount = () => {
+    const { location, history } = this.props;
+    const {
+      location: { pathname },
+    } = history;
+    const urlPath = location.pathname;
+    if (!pathname.includes(urlPath)) this.props.clearCurrentPaginationPage();
   };
+
   queryPrms = () => {
     let prms = [];
     if (!!this.state.orderBy) {
@@ -142,34 +142,33 @@ class InsureeDocuments extends PagedDataHandler {
   };
 
   onDoubleClick = (i, newTab = false) => {
-    historyPush(
-      this.props.modulesManager,
-      this.props.history,
-      "insuree.route.insuree",
-      [i.uuid, this.props.family.uuid],
-      newTab,
-    );
+    historyPush(this.props.modulesManager, this.props.history, "insuree.route.insuree", [i.uuid], newTab);
   };
-  handleExternalNavigation = () => {
-    window.open(process.env.REACT_APP_ABIS_URL, "_blank");
-  };
-  approved = async (docData) => {
-    const response = await this.props.updateInsureeDocument(docData);
-    setTimeout(() => {
-      this.props.fetchInsureeDocuments(this.props?.edited?.chfId);
-    }, 2000);
-  };
-  rejectDoc = async (docData) => {
-    const response = await this.props.updateInsureeDocument(docData);
-    setTimeout(() => {
-      this.props.fetchInsureeDocuments(this.props?.edited?.chfId);
-    }, 1000);
-  };
+
+  // onDoubleClick = (f, newTab = false) => {
+  //   console.log("checkf", f);
+  //   historyPush(
+  //     this.props.modulesManager,
+  //     this.props.history,
+  //     "insuree.route.familyOverview",
+  //     [f.headInsuree.uuid],
+  //     newTab,
+  //   );
+  //   // historyPush(this.props.modulesManager, this.props.history, "insuree.route.family");
+  // };
+
   onChangeSelection = (i) => {
     this.props.selectFamilyMember(i[0] || null);
   };
 
-  headers = ["Insuree.documentsName", "Insuree.viewDocuments", "Insuree.status"];
+  headers = [
+    "PedingApproval.tempCamuNo",
+    "PedingApproval.firstName",
+    "PedingApproval.lastName",
+    "PedingApproval.gender",
+    // "PedingApproval.city",
+    ...Array.from(Array(this.locationLevels)).map((_, i) => `location.locationType.${i}`),
+  ];
 
   sorter = (attr, asc = true) => [
     () =>
@@ -180,7 +179,12 @@ class InsureeDocuments extends PagedDataHandler {
     () => formatSorter(this.state.orderBy, attr, asc),
   ];
 
-  headerActions = [this.sorter("documentsName"), this.sorter("viewDocuments"), this.sorter("status")];
+  headerActions = [
+    this.sorter("PedingApproval.tempCamuNo"),
+    this.sorter("PedingApproval.firstName"),
+    this.sorter("PedingApproval.lastName"),
+    this.sorter("PedingApproval.lastName"),
+  ];
 
   onDocumentViewClose = () => {
     this.setState({ documentViewOpen: false });
@@ -247,27 +251,97 @@ class InsureeDocuments extends PagedDataHandler {
 
     return { selectedClass, rejectedTooltip, docsStatus };
   };
-
+  parentLocation = (location, level) => {
+    if (!location) return "";
+    let loc = location;
+    for (var i = 1; i < this.locationLevels - level; i++) {
+      if (!loc.parent) return "";
+      loc = loc.parent;
+    }
+    return !!loc ? loc.name : "";
+  };
   formatters = [
-    (i) => i.documentName || "",
-    (i) => !!i.documentId && this.viewDocumentAction(i.documentId),
+    (i) => i.headInsuree.chfId || "",
+    (i) => i.headInsuree.otherNames,
 
-    (i) => {
-      const { selectedClass, rejectedTooltip, docsStatus } = this.getCheckBoxClass(i);
-      return (
-        <>
-          <Checkbox
-            className={selectedClass}
-            readOnly={true}
-            disabled={true}
-            checked={i.documentStatus == "APPROVED" || i.documentStatus == "REJECTED"}
-          />
-          {docsStatus}
-          {rejectedTooltip}
-        </>
-      );
+    (i) => i.headInsuree.lastName,
+    (i) => (
+      <PublishedComponent
+        pubRef="insuree.InsureeGenderPicker"
+        withLabel={false}
+        readOnly={true}
+        value={!!i.headInsuree.gender ? i.headInsuree.gender.code : null}
+      />
+    ),
+    (i) => () => {
+      for (var i = 0; i < this.locationLevels; i++) {
+        // need a fixed variable to refer to as parentLocation argument
+        let j = i + 0;
+        // formatters.push((i) => {
+        //   console.log("familloc", i);
+        this.parentLocation(i.currentVillage || (!!i.family && i.family.location), j);
+      }
     },
+    // })
   ];
+  // formatters = [
+  //   (i) => i.headInsuree.chfId || "",
+  //   (i) => i.headInsuree.otherNames,
+
+  //   (i) => i.headInsuree.lastName,
+  //   (i) => (
+  //     <PublishedComponent
+  //       pubRef="insuree.InsureeGenderPicker"
+  //       withLabel={false}
+  //       readOnly={true}
+  //       value={!!i.headInsuree.gender ? i.headInsuree.gender.code : null}
+  //     />
+  //   ),
+  //   // (i)=>( for (var i = 0; i < this.locationLevels; i++) {
+  //   //   // need a fixed variable to refer to as parentLocation argument
+  //   //   let j = i + 0;
+  //   //   // formatters.push((i) => {
+  //   //   //   console.log("familloc", i);
+  //   //    this.parentLocation(i.currentVillage || (!!i.family && i.family.location), j));
+  //   // // })
+  // ];
+  // itemFormatters = () => {
+  //   var formatters = [
+  //     // (i) => i.headInsuree.chfId || "",
+  //     // (i) => i.headInsuree.otherNames,
+
+  //     // (i) => i.headInsuree.lastName,
+
+  //     // (i) => (
+  //     //   <PublishedComponent
+  //     //     pubRef="insuree.InsureeGenderPicker"
+  //     //     withLabel={false}
+  //     //     readOnly={true}
+  //     //     value={!!i.headInsuree.gender ? i.headInsuree.gender.code : null}
+  //     //   />
+  //     // ),
+  //     (i) => i.chfId,
+  //     (i) => i.lastName,
+  //     (i) => i.otherNames,
+
+  //     (i) => (
+  //       <PublishedComponent
+  //         pubRef="insuree.InsureeGenderPicker"
+  //         withLabel={false}
+  //         readOnly={true}
+  //         value={!!i.gender ? i.gender.code : null}
+  //       />
+  //     ),
+  //   ];
+  //   for (var i = 0; i < this.locationLevels; i++) {
+  //     // need a fixed variable to refer to as parentLocation argument
+  //     let j = i + 0;
+  //     formatters.push((i) => {
+  //       console.log("familloc", i);
+  //     }, this.parentLocation(i.currentVillage || (!!i.family && i.family.location), j));
+  //   }
+  //   return formatters.filter;
+  // };
 
   addNewInsuree = () =>
     historyPush(this.props.modulesManager, this.props.history, "insuree.route.insuree", [
@@ -275,7 +349,6 @@ class InsureeDocuments extends PagedDataHandler {
       this.props.family.uuid,
     ]);
   rowLocked = (i) => !!i.clientMutationId;
-
   render() {
     const {
       intl,
@@ -290,8 +363,12 @@ class InsureeDocuments extends PagedDataHandler {
       errorCanAddInsuree,
       edited,
       documentDetails,
-      dataFromAPI,
+      PendingApproval,
+      insurees,
+      fetchingInsurees,
+      errorInsurees,
     } = this.props;
+    console.log("itemFormatters", this.itemFormatters);
     let actions =
       !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
         ? []
@@ -314,18 +391,18 @@ class InsureeDocuments extends PagedDataHandler {
         tooltip: formatMessage(intl, "insuree", "familyCheckCanAdd"),
       });
     }
-    let bioActions =
-      !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
-        ? []
-        : [
-            {
-              button: (
-                <Button onClick={this.handleExternalNavigation} variant="contained" color="primary">
-                  {formatMessage(intl, "insuree", "Insuree.CollectBiometric")}
-                </Button>
-              ),
-            },
-          ];
+    // let bioActions =
+    //   !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
+    //     ? []
+    //     : [
+    //         {
+    //           button: (
+    //             <Button onClick={this.handleExternalNavigation} variant="contained" color="primary">
+    //               Collect Biometric
+    //             </Button>
+    //           ),
+    //         },
+    //       ];
     if (!!checkingCanAddInsuree || !!errorCanAddInsuree) {
       actions.push({
         button: (
@@ -338,12 +415,12 @@ class InsureeDocuments extends PagedDataHandler {
     }
     return (
       <Grid container>
-        <Grid item xs={7}>
+        <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Grid container alignItems="center" direction="row" className={classes.paperHeader}>
               <Grid item xs={8}>
                 <Typography className={classes.tableTitle}>
-                  <FormattedMessage module="insuree" id="Insuree.documentTitle" />
+                  <FormattedMessage module="insuree" id="Insuree.pendingApproval" />
                 </Typography>
               </Grid>
               <Grid item xs={4}>
@@ -361,29 +438,29 @@ class InsureeDocuments extends PagedDataHandler {
                 <Divider />
               </Grid>
             </Grid>
-            {documentDetails?.length > 0 && !fetchingDocuments ? (
-              <Table
-                module="insuree"
-                headers={this.headers}
-                headerActions={this.headerActions}
-                itemFormatters={this.formatters}
-                items={documentDetails}
-                fetching={fetchingDocuments}
-                error={errorDocuments}
-                onDoubleClick={this.onDoubleClick}
-                withSelection={"single"}
-                onChangeSelection={this.onChangeSelection}
-                withPagination={false}
-                rowsPerPageOptions={this.rowsPerPageOptions}
-                defaultPageSize={this.defaultPageSize}
-                page={this.currentPage()}
-                pageSize={this.currentPageSize()}
-                count={pageInfo.totalCount}
-                onChangePage={this.onChangePage}
-                onChangeRowsPerPage={this.onChangeRowsPerPage}
-                rowLocked={this.rowLocked}
-              />
-            ) : !fetchingDocuments && documentDetails?.length == 0 ? (
+            {/* {documentDetails?.length > 0 && !fetchingDocuments ? ( */}
+            <Table
+              module="insuree"
+              headers={this.headers}
+              headerActions={this.headerActions}
+              itemFormatters={this.formatters}
+              items={PendingApproval}
+              fetching={fetchingInsurees}
+              error={errorInsurees}
+              onDoubleClick={this.onDoubleClick}
+              withSelection={"single"}
+              onChangeSelection={this.onChangeSelection}
+              withPagination={false}
+              rowsPerPageOptions={this.rowsPerPageOptions}
+              defaultPageSize={this.defaultPageSize}
+              page={this.currentPage()}
+              pageSize={this.currentPageSize()}
+              count={pageInfo.totalCount}
+              onChangePage={this.onChangePage}
+              onChangeRowsPerPage={this.onChangeRowsPerPage}
+              rowLocked={this.rowLocked}
+            />
+            {/* ) : !fetchingDocuments && documentDetails?.length == 0 ? (
               <Grid
                 style={{
                   dispaly: "flex",
@@ -403,79 +480,9 @@ class InsureeDocuments extends PagedDataHandler {
                   {formatMessage(this.props.intl, "insuree", "Insuree.noDocuments")}
                 </Typography>
               </Grid>
-            ) : null}
+            ) : null} */}
           </Paper>
         </Grid>
-        <Grid item xs={5}>
-          <Paper className={classes.paper}>
-            <Grid container alignItems="center" direction="row" className={classes.paperHeader}>
-              <Grid item xs={8}>
-                <Typography className={classes.tableTitle}>
-                  <FormattedMessage module="insuree" id="Insuree.BiometricHeading" />
-                </Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Grid container justify="flex-end">
-                  {bioActions.map((a, idx) => {
-                    return (
-                      <Grid item key={`form-action-${idx}`} className={classes.paperHeaderAction}>
-                        {withTooltip(a.button, a.tooltip)}
-                      </Grid>
-                    );
-                  })}
-                </Grid>
-              </Grid>
-              <Grid item xs={12} className={classes.biometricPaper}>
-                <Divider />
-                <Grid container justify="center" alignItems="center" style={{ backgroundColor: "#00913E0D" }}>
-                  <Typography style={{ padding: "30px 20px" }} alignItems="center">
-                    {/* <Box style={{ marginLeft: "2.2rem" }}> */}
-                    {
-                      edited?.biometricsStatus ? (
-                        edited.biometricsIsMaster ? (
-                          <ValidBiometric fontSize="large" />
-                        ) : (
-                          <InvalidBiometric fontSize="large" />
-                        )
-                      ) : (
-                        <DisabledBiometric fontSize="large" />
-                      )
-                      // ) : (
-                      //   <ValidBiometric fontSize="large" />
-                      // )
-                      // <InvalidBiometric fontSize="large"/>
-                    }
-                    {/* </Box> */}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    style={{
-                      fontSize: "1.4rem",
-                      color: edited?.biometricsStatus ? (edited.biometricsIsMaster ? "#00913E" : "#FF0000") : "black",
-                    }}
-                  >
-                    {`  ${
-                      edited?.biometricsStatus
-                        ? edited.biometricsIsMaster
-                          ? formatMessage(this.props.intl, "insuree", "Insuree.biometricStatus.masterRecordFound")
-                          : formatMessage(this.props.intl, "insuree", "Insuree.biometricStatus.duplicateRecordFound")
-                        : formatMessage(this.props.intl, "insuree", "Insuree.biometricStatus.detailNotProvided")
-                    }`}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-        {!!this.state.documentViewOpen && (
-          <DocumentViewDialog
-            open={this.state.documentViewOpen}
-            onClose={this.onDocumentViewClose}
-            documentImage={this.state.documentId}
-            approved={this.approved}
-            rejectDoc={this.rejectDoc}
-          />
-        )}
       </Grid>
     );
   }
@@ -485,11 +492,11 @@ const mapStateToProps = (state) => ({
   rights: !!state.core && !!state.core.user && !!state.core.user.i_user ? state.core.user.i_user.rights : [],
   alert: !!state.core ? state.core.alert : null,
   family: state.insuree.family,
-  fetchingDocuments: state.insuree.fetchingDocuments,
-  fetchedDocuments: state.insuree.fetchedDocuments,
+  fetchingDocuments: state.insuree.fetchingPendingApproval,
+  fetchedDocuments: state.insuree.fetchedPendingApproval,
   familyMembers: state.insuree.familyMembers,
   pageInfo: state.insuree.familyMembersPageInfo,
-  errorDocuments: state.insuree.errorDocument,
+  errorDocuments: state.insuree.errorPendingApproval,
   checkingCanAddInsuree: state.insuree.checkingCanAddInsuree,
   checkedCanAddInsuree: state.insuree.checkedCanAddInsuree,
   canAddInsureeWarnings: state.insuree.canAddInsureeWarnings,
@@ -497,6 +504,12 @@ const mapStateToProps = (state) => ({
   submittingMutation: state.insuree.submittingMutation,
   mutation: state.insuree.mutation,
   documentDetails: state.insuree.documentsData,
+  family: state.insuree.family,
+  PendingApproval: state.insuree.PendingApproval,
+  insurees: state.insuree.insurees,
+  insureesPageInfo: state.insuree.insureesPageInfo,
+  fetchingInsurees: state.insuree.fetchingInsurees,
+  fetchedInsurees: state.insuree.fetchedInsurees,
 });
 
 const mapDispatchToProps = (dispatch) => {
@@ -512,11 +525,14 @@ const mapDispatchToProps = (dispatch) => {
       coreAlert,
       fetchInsureeDocuments,
       updateInsureeDocument,
+      fetchPendingForApproval,
+      clearCurrentPaginationPage,
+      fetchInsureeSummaries,
     },
     dispatch,
   );
 };
 
 export default withModulesManager(
-  injectIntl(withTheme(withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(InsureeDocuments)))),
+  withHistory(injectIntl(withTheme(withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(PendingApproval))))),
 );
