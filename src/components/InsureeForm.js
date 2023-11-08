@@ -354,7 +354,7 @@ class InsureeForm extends Component {
     // console.log(edited, "edited")
     const message = await this.props.sendEmail(this.props.modulesManager, edited)
     // console.log("message", message?.payload?.data?.sentNotification?.message)
-    if (message?.payload?.data?.sentNotification?.message) {
+    if (!!message?.payload?.data?.sentNotification?.data) {
       // If the email was sent successfully, update the success state and message
       this.setState({
         success: true,

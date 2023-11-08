@@ -315,7 +315,7 @@ function formatExternalDocument(docs, tempCamu) {
 function formatMail(edited) {
   console.log(edited, "format")
   let reportName=""
-  if(edited?.camuNumber!=null)
+  if(!!edited?.camuNumber)
   {
     reportName="enrollment_receipt"
   }else{
