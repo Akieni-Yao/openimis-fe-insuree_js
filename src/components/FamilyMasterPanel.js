@@ -157,13 +157,21 @@ class FamilyMasterPanel extends FormPanel {
               label="Family.enrolmentType"
               required
               readOnly={readOnly}
+              // value={
+              //   !!edited && edited?.ext
+              //     ? // ? edited.ext.enrolmentType
+              //       edited?.ext?.enrolmentType
+              //     : // : edited?.jsonExt?.enrolmentType
+              //       // edited?.jsonExt?.enrolmentType
+              //       null
+              // }
               value={
                 !!edited && edited?.ext
-                  ? // ? edited.ext.enrolmentType
-                    edited?.ext?.enrolmentType
-                  : // : edited?.jsonExt?.enrolmentType
-                    // edited?.jsonExt?.enrolmentType
-                    null
+                  ?
+                  edited?.ext?.enrolmentType
+                  : !!edited && (edited?.jsonExt).length
+                    ? JSON.parse(edited?.jsonExt)?.enrolmentType
+                    : null
               }
               onChange={(value) => this.updateExts({ enrolmentType: value })}
               constants={CAMU_ENROLMENT_TYPE}

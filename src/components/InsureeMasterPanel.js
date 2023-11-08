@@ -51,12 +51,12 @@ class InsureeMasterPanel extends FormPanel {
       },
     });
   }
-  componentDidMount() {
-    const { edited } = this.props;
+  // componentDidMount() {
+    // const { edited } = this.props;
     // if (edited?.status == "WAITING_FOR_APPROVAL") {
       // this.props.approverCountCheck(this.props.modulesManager, edited.uuid);
     // }
-  }
+  // }
   // The one from FormPanel does not allow jsonExt patching
   updateExts = (updates) => {
     let data = { ...this.state.data };

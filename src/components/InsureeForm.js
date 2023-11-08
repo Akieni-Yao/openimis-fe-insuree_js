@@ -103,7 +103,8 @@ class InsureeForm extends Component {
         (state, props) => ({ insuree_uuid: props.insuree_uuid }),
         (e) => this.props.fetchInsureeFull(this.props.modulesManager, this.props.insuree_uuid),
       );
-    } else if (!!this.props.family_uuid && (!this.props.family || this.props.family.uuid !== this.props.family_uuid)) {
+    } 
+    else if (!!this.props.family_uuid && (!this.props.family || this.props.family.uuid !== this.props.family_uuid)) {
       this.props.fetchFamily(this.props.modulesManager, this.props.family_uuid);
     } else if (!!this.props.family_uuid) {
       let insuree = { ...this.state.insuree };
