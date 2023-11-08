@@ -650,11 +650,12 @@ export function sendEmail(mm, edited) {
     sentNotification(${formatMail(edited)}) {
     success
     message
+    data
   }}`;
   return graphql(
     mutation,
     ["INSUREE_MUTATION_REQ", "INSUREE_SEND_EMAIL_RESP", "INSUREE_MUTATION_ERR"],
-    "success message responses",
+    "success message",
   );
 }
 export function printReport(mm, edited) {

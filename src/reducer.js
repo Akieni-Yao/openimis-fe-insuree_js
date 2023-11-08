@@ -481,6 +481,14 @@ function reducer(
         reportData: action.payload.data.sentNotification?.data,
         errorreport: formatGraphQLError(action.payload),
       };
+      case "INSUREE_SEND_EMAIL_RESP":
+        return {
+          ...state,
+          fetchingEmail: false,
+          fetchedEmail: true,
+          EmailData: action.payload.data.sentNotification?.data,
+          errorrEmail: formatGraphQLError(action.payload),
+        };
       case "INSUREE_DOCUMENTS_RESP":
         return {
           ...state,
@@ -637,8 +645,8 @@ case "INSUREE_APPROVER_ERR":
       return dispatchMutationResp(state, "setFamilyHead", action);
     case "INSUREE_CHANGE_FAMILY_HEAD_RESP":
       return dispatchMutationResp(state, "changeInsureeFamily", action);
-    case "INSUREE_SEND_EMAIL_RESP":
-      return dispatchMutationResp(state, "sentNotification", action);
+    // case "INSUREE_SEND_EMAIL_RESP":
+    //   return dispatchMutationResp(state, "sentNotification", action);
     // case "INSUREE_PRINT_REPORT_RESP":
     //   return dispatchMutationResp(state, "sentNotification", action);
     default:

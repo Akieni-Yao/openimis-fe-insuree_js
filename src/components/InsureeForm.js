@@ -17,6 +17,8 @@ import {
   ProgressOrError,
   Helmet,
 } from "@openimis/fe-core";
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
 import {
   fetchInsureeFull,
   fetchFamily,
@@ -89,6 +91,8 @@ class InsureeForm extends Component {
     payload: null,
     isFormValid: true,
     email: true,
+    success: false,
+    successMessage: ""
   };
 
   _newInsuree() {
@@ -103,7 +107,7 @@ class InsureeForm extends Component {
         (state, props) => ({ insuree_uuid: props.insuree_uuid }),
         (e) => this.props.fetchInsureeFull(this.props.modulesManager, this.props.insuree_uuid),
       );
-    } 
+    }
     else if (!!this.props.family_uuid && (!this.props.family || this.props.family.uuid !== this.props.family_uuid)) {
       this.props.fetchFamily(this.props.modulesManager, this.props.family_uuid);
     } else if (!!this.props.family_uuid) {
@@ -302,7 +306,7 @@ class InsureeForm extends Component {
     return (
       <Grid className={this.props.classes.margin2}>
         <Typography component="span" className={this.props.classes.spanPadding}>
-          STATUS : 
+          STATUS :
         </Typography>
         <Button className={selectedClass} variant="outlined">
           {docsStatus}
@@ -313,16 +317,16 @@ class InsureeForm extends Component {
             arrow
             classes={{ tooltip: this.props.classes.customWidth }}
             title={data.statusComment}
-            // componentsProps={{
-            //   tooltip: {
-            //     sx: {
-            //       bgcolor: "common.white",
-            //       "& .MuiTooltip-arrow": {
-            //         color: "common.white",
-            //       },
-            //     },
-            //   },
-            // }}
+          // componentsProps={{
+          //   tooltip: {
+          //     sx: {
+          //       bgcolor: "common.white",
+          //       "& .MuiTooltip-arrow": {
+          //         color: "common.white",
+          //       },
+          //     },
+          //   },
+          // }}
           >
             <IconButton>
               <HelpIcon />
@@ -346,14 +350,29 @@ class InsureeForm extends Component {
     printWindow.document.close();
     // printWindow.print();
   }
-  emailButton = (edited) => {
-    console.log(edited, "edited")
-    this.props.sendEmail(this.props.modulesManager, edited)
+  emailButton = async (edited) => {
+    // console.log(edited, "edited")
+    const message = await this.props.sendEmail(this.props.modulesManager, edited)
+    // console.log("message", message?.payload?.data?.sentNotification?.message)
+    if (message?.payload?.data?.sentNotification?.message) {
+      // If the email was sent successfully, update the success state and message
+      this.setState({
+        success: true,
+        successMessage: 'Email sent successfully',
+      });
+    } else {
+      // If the email send was not successful, you can also set success to false here
+      // and provide an appropriate error message.
+      this.setState({
+        success: false,
+        successMessage: 'Email sending failed',
+      });
+    }
   }
   printReport = async (edited) => {
-    console.log(edited, "edited")
+    // console.log(edited, "edited")
     const data = await this.props.printReport(this.props.modulesManager, edited)
-    console.log(data,"base64Data")
+    // console.log(data,"base64Data")
     const base64Data = data?.payload?.data?.sentNotification?.data;
     // const base64Data = "JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgaHR0cDovL3d3dy5yZXBvcnRsYWIuY29tCjEgMCBvYmoKPDwKL0YxIDIgMCBSCj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMSAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL0NvbnRlbnRzIDcgMCBSIC9NZWRpYUJveCBbIDAgMCA2MTIgNzkyIF0gL1BhcmVudCA2IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago0IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgNiAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL0F1dGhvciAoYW5vbnltb3VzKSAvQ3JlYXRpb25EYXRlIChEOjIwMjMxMDMwMTUzMzQyLTA1JzAwJykgL0NyZWF0b3IgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIHd3dy5yZXBvcnRsYWIuY29tKSAvS2V5d29yZHMgKCkgL01vZERhdGUgKEQ6MjAyMzEwMzAxNTMzNDItMDUnMDAnKSAvUHJvZHVjZXIgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIHd3dy5yZXBvcnRsYWIuY29tKSAKICAvU3ViamVjdCAodW5zcGVjaWZpZWQpIC9UaXRsZSAodW50aXRsZWQpIC9UcmFwcGVkIC9GYWxzZQo+PgplbmRvYmoKNiAwIG9iago8PAovQ291bnQgMSAvS2lkcyBbIDMgMCBSIF0gL1R5cGUgL1BhZ2VzCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9GaWx0ZXIgWyAvQVNDSUk4NURlY29kZSAvRmxhdGVEZWNvZGUgXSAvTGVuZ3RoIDEwNwo+PgpzdHJlYW0KR2FwUWgwRT1GLDBVXEgzVFxwTllUXlFLaz90Yz5JUCw7VyNVMV4yM2loUEVNXz9DVzRLSVNpOTBNakdeMixGUyM8UkM2OzwhW0dfO1s+dUlhPWYkajwhXlREI2dpXSY9NVgsWzNyQlkzfj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA4CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDA3MyAwMDAwMCBuIAowMDAwMDAwMTA0IDAwMDAwIG4gCjAwMDAwMDAyMTEgMDAwMDAgbiAKMDAwMDAwMDQwNCAwMDAwMCBuIAowMDAwMDAwNDcyIDAwMDAwIG4gCjAwMDAwMDA3NjggMDAwMDAgbiAKMDAwMDAwMDgyNyAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9JRCAKWzwxZjdiYzY3M2JmYzMzMWRiMTY3YmEwNjM4MjYxM2M2NT48MWY3YmM2NzNiZmMzMzFkYjE2N2JhMDYzODI2MTNjNjU+XQolIFJlcG9ydExhYiBnZW5lcmF0ZWQgUERGIGRvY3VtZW50IC0tIGRpZ2VzdCAoaHR0cDovL3d3dy5yZXBvcnRsYWIuY29tKQoKL0luZm8gNSAwIFIKL1Jvb3QgNCAwIFIKL1NpemUgOAo+PgpzdGFydHhyZWYKMTAyNAolJUVPRgo="
     const contentType = 'pdf';
@@ -438,9 +457,9 @@ class InsureeForm extends Component {
     const allApproved =
       documentsData && documentsData.length > 0
         ? documentsData.every((document) => document.documentStatus === "APPROVED") &&
-          this.state.insuree.biometricsIsMaster
+        this.state.insuree.biometricsIsMaster
         : false;
-    console.log("approverData", approverData);
+    // console.log("approverData", approverData);
     return (
       <div className={runningMutation ? classes.lockedPage : null}>
         <Helmet
@@ -492,28 +511,44 @@ class InsureeForm extends Component {
           edited={this.state.insuree}
 
         />
+        {this.state.success && (
+          <Snackbar
+            open={this.state.success}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "center",
+            }}
+            style={{ marginRight: "50px", color: "white" }}
+            onClose={this.onHandlerClose}
+          >
+            <Alert variant="filled" severity="success">
+              {this.state.successMessage}
+            </Alert>
+          </Snackbar>
+        )}
       </div>
+
     );
   }
 }
 
 const mapStateToProps = (state, props) => (
-  console.log("state",state),{
-  rights: !!state.core && !!state.core.user && !!state.core.user.i_user ? state.core.user.i_user.rights : [],
-  fetchingInsuree: state.insuree.fetchingInsuree,
-  errorInsuree: state.insuree.errorInsuree,
-  fetchedInsuree: state.insuree.fetchedInsuree,
-  insuree: state.insuree.insuree,
-  fetchingFamily: state.insuree.fetchingFamily,
-  errorFamily: state.insuree.errorFamily,
-  fetchedFamily: state.insuree.fetchedFamily,
-  family: state.insuree.family,
-  submittingMutation: state.insuree.submittingMutation,
-  mutation: state.insuree.mutation,
-  isInsureeNumberValid: state.insuree?.validationFields?.insureeNumber?.isValid,
-  documentsData: state.insuree.documentsData,
-  approverData: state.insuree.approverData,
-});
+  console.log("state", state), {
+    rights: !!state.core && !!state.core.user && !!state.core.user.i_user ? state.core.user.i_user.rights : [],
+    fetchingInsuree: state.insuree.fetchingInsuree,
+    errorInsuree: state.insuree.errorInsuree,
+    fetchedInsuree: state.insuree.fetchedInsuree,
+    insuree: state.insuree.insuree,
+    fetchingFamily: state.insuree.fetchingFamily,
+    errorFamily: state.insuree.errorFamily,
+    fetchedFamily: state.insuree.fetchedFamily,
+    family: state.insuree.family,
+    submittingMutation: state.insuree.submittingMutation,
+    mutation: state.insuree.mutation,
+    isInsureeNumberValid: state.insuree?.validationFields?.insureeNumber?.isValid,
+    documentsData: state.insuree.documentsData,
+    approverData: state.insuree.approverData,
+  });
 
 export default withHistory(
   withModulesManager(
