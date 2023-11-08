@@ -54,17 +54,23 @@ class InsureePage extends Component {
           snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${
             insuree.status == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
           } `,
+          // camuNumberRes: response?.insurees[0].insuree.camuNumber
+          //   ? response?.insurees[0].insuree.camuNumber
+          //   : response?.insurees[0].insuree.chfId,
         });
-        // const allApprovedOrRejected =
-        //   insuree.documentsData &&
-        //   insuree.documentsData.every(
-        //     (document) => document.documentStatus === "APPROVED" || document.documentStatus === "REJECTED",
-        //   );
-        // const hasReject =
-        //   allApprovedOrRejected && insuree.documentsData.some((document) => document.documentStatus === "REJECTED");
-        // if (!!hasReject) {
-        if (insuree.status !== "APPROVED") {
-          this.props.updateExternalDocuments(this.props.modulesManager, insuree.documentData, insuree.chfId);
+        const allApprovedOrRejected =
+          insuree.documentData &&
+          insuree.documentData.every(
+            (document) => document.documentStatus === "APPROVED" || document.documentStatus === "REJECTED",
+          );
+        const hasReject =
+          allApprovedOrRejected && insuree.documentData.some((document) => document.documentStatus === "REJECTED");
+
+        if (!!hasReject) {
+          console.log("hiinter", insuree);
+
+          // if (insuree.status !== "APPROVED" && (insuree.status == "REWORK" || insuree.status == "REJECTED")) {
+          this.props.updateExternalDocuments(this.props.modulesManager, insuree?.documentData, insuree?.chfId);
         }
         this.setState({
           camuNumberRes: response?.insurees[0].insuree.camuNumber
