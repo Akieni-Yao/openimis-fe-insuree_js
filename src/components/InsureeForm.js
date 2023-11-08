@@ -18,6 +18,8 @@ import {
   Helmet,
   formatMessage,
 } from "@openimis/fe-core";
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
 import {
   fetchInsureeFull,
   fetchFamily,
@@ -35,6 +37,7 @@ import FamilyDisplayPanel from "./FamilyDisplayPanel";
 import InsureeMasterPanel from "../components/InsureeMasterPanel";
 import RejectDialog from "../dialogs/RejectDialog";
 import HelpIcon from "@material-ui/icons/Help";
+import { approverCountCheck } from "../actions";
 
 const styles = (theme) => ({
   page: theme.page,
@@ -90,6 +93,8 @@ class InsureeForm extends Component {
     payload: null,
     isFormValid: true,
     email: true,
+    success: false,
+    successMessage: ""
   };
 
   _newInsuree() {
@@ -104,7 +109,8 @@ class InsureeForm extends Component {
         (state, props) => ({ insuree_uuid: props.insuree_uuid }),
         (e) => this.props.fetchInsureeFull(this.props.modulesManager, this.props.insuree_uuid),
       );
-    } else if (!!this.props.family_uuid && (!this.props.family || this.props.family.uuid !== this.props.family_uuid)) {
+    }
+    else if (!!this.props.family_uuid && (!this.props.family || this.props.family.uuid !== this.props.family_uuid)) {
       this.props.fetchFamily(this.props.modulesManager, this.props.family_uuid);
     } else if (!!this.props.family_uuid) {
       let insuree = { ...this.state.insuree };
@@ -214,8 +220,16 @@ class InsureeForm extends Component {
     // if (!this.state.insuree.chfId) return false;
     if (!this.state.insuree?.jsonExt?.insureeEnrolmentType) return false;
     if (!this.state.insuree?.jsonExt?.createdAt) return false;
+    if (!this.state.insuree?.jsonExt?.BirthPlace) return false;
+    if (!this.state.insuree?.jsonExt?.nationality) return false;
+    if (!this.state.insuree?.jsonExt?.nbKids) return false;
+    if (!this.state.insuree?.jsonExt?.civilQuality) return false;
     if (!this.state.insuree.lastName) return false;
+    if (!this.state.insuree.phone) return false;
     if (!this.state.insuree.otherNames) return false;
+    if (!this.state.insuree.marital) return false;
+    if (!this.state.insuree.typeOfId) return false;
+    if (!this.state.insuree.passport) return false;
     if (!this.state.insuree.dob) return false;
     if (!this.state.insuree.gender || !this.state.insuree.gender?.code) return false;
     // if (!this.state.isFormValid == true) return false;
@@ -309,16 +323,16 @@ class InsureeForm extends Component {
             arrow
             classes={{ tooltip: this.props.classes.customWidth }}
             title={data.statusComment}
-            // componentsProps={{
-            //   tooltip: {
-            //     sx: {
-            //       bgcolor: "common.white",
-            //       "& .MuiTooltip-arrow": {
-            //         color: "common.white",
-            //       },
-            //     },
-            //   },
-            // }}
+          // componentsProps={{
+          //   tooltip: {
+          //     sx: {
+          //       bgcolor: "common.white",
+          //       "& .MuiTooltip-arrow": {
+          //         color: "common.white",
+          //       },
+          //     },
+          //   },
+          // }}
           >
             <IconButton>
               <HelpIcon />
@@ -343,12 +357,30 @@ class InsureeForm extends Component {
 
     printWindow.document.close();
     // printWindow.print();
-  };
-  emailButton = (edited) => {
-    this.props.sendEmail(this.props.modulesManager, edited);
-  };
+  }
+  emailButton = async (edited) => {
+    // console.log(edited, "edited")
+    const message = await this.props.sendEmail(this.props.modulesManager, edited)
+    // console.log("message", message?.payload?.data?.sentNotification?.message)
+    if (!!message?.payload?.data?.sentNotification?.data) {
+      // If the email was sent successfully, update the success state and message
+      this.setState({
+        success: true,
+        successMessage: 'Email sent successfully',
+      });
+    } else {
+      // If the email send was not successful, you can also set success to false here
+      // and provide an appropriate error message.
+      this.setState({
+        success: false,
+        successMessage: 'Email sending failed',
+      });
+    }
+  }
   printReport = async (edited) => {
-    const data = await this.props.printReport(this.props.modulesManager, edited);
+    // console.log(edited, "edited")
+    const data = await this.props.printReport(this.props.modulesManager, edited)
+    // console.log(data,"base64Data")
     const base64Data = data?.payload?.data?.sentNotification?.data;
 
     const contentType = "pdf";
@@ -373,7 +405,7 @@ class InsureeForm extends Component {
       add,
       save,
       documentsData,
-      approverData,
+      approverData
     } = this.props;
 
     const { insuree, clientMutationId, payload, statusCheck, email } = this.state;
@@ -400,7 +432,7 @@ class InsureeForm extends Component {
     const allApproved =
       documentsData && documentsData.length > 0
         ? documentsData.every((document) => document.documentStatus === "APPROVED") &&
-          this.state.insuree.biometricsIsMaster
+        this.state.insuree.biometricsIsMaster
         : false;
  
     return (
@@ -442,6 +474,7 @@ class InsureeForm extends Component {
               email={insuree_uuid}
               printButton={this.printReport}
               approverData={approverData}
+              approverData={approverData}
             />
           )}
         <RejectDialog
@@ -452,8 +485,25 @@ class InsureeForm extends Component {
           statusCheck={statusCheck}
           classes={classes}
           edited={this.state.insuree}
+
         />
+        {this.state.success && (
+          <Snackbar
+            open={this.state.success}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "center",
+            }}
+            style={{ marginRight: "50px", color: "white" }}
+            onClose={this.onHandlerClose}
+          >
+            <Alert variant="filled" severity="success">
+              {this.state.successMessage}
+            </Alert>
+          </Snackbar>
+        )}
       </div>
+
     );
   }
 }
@@ -487,7 +537,8 @@ export default withHistory(
       updateExternalDocuments,
       sendEmail,
       printReport,
-      approverInsureeComparison,
+      approverInsureeComparison,,
+      approverCountCheck
     })(injectIntl(withTheme(withStyles(styles)(InsureeForm)))),
   ),
 );

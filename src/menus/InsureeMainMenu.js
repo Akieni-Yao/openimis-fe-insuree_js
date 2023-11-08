@@ -12,21 +12,14 @@ class InsureeMainMenu extends Component {
   render() {
     const { modulesManager, rights } = this.props;
     let entries = [];
-    if (rights.includes(RIGHT_INSUREE)) {
-      entries.push({
-        text: formatMessage(this.props.intl, "insuree", "menu.pendingApproval"),
-        icon: <HistoryIcon />,
-        route: "/" + modulesManager.getRef("insuree.route.pendingApproval"),
-        withDivider: true,
-      });
-    }
-    if (rights.includes(RIGHT_FAMILY_ADD)) {
-      entries.push({
-        text: formatMessage(this.props.intl, "insuree", "menu.addFamilyOrGroup"),
-        icon: <GroupAdd />,
-        route: "/" + modulesManager.getRef("insuree.route.family"),
-      });
-    }
+    // if (rights.includes(RIGHT_FAMILY_ADD)) {
+    //   entries.push({
+    //     text: formatMessage(this.props.intl, "insuree", "menu.addFamilyOrGroup"),
+    //     icon: <GroupAdd />,
+    //     route: "/" + modulesManager.getRef("insuree.route.family"),
+    //     withDivider: true,
+    //   });
+    // }
     if (rights.includes(RIGHT_FAMILY)) {
       entries.push({
         text: formatMessage(this.props.intl, "insuree", "menu.familiesOrGroups"),

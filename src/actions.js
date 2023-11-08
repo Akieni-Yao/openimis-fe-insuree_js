@@ -336,11 +336,13 @@ function formatExternalDocument(docs, tempCamu) {
   return formattedResult;
 }
 function formatMail(edited) {
-  let reportName = "";
-  if (edited?.camuNumber != null) {
-    reportName = "enrollment_receipt";
-  } else {
-    reportName = "pre_enrollment_receipt";
+  console.log(edited, "format")
+  let reportName=""
+  if(!!edited?.camuNumber)
+  {
+    reportName="enrollment_receipt"
+  }else{
+    reportName="pre_enrollment_receipt"
   }
   const formatMail = `uuid: "${edited?.uuid}",  isEmail: ${true},reportName: "${reportName}"`;
   return formatMail;
@@ -673,12 +675,32 @@ export function sendEmail(mm, edited) {
     sentNotification(${formatMail(edited)}) {
     success
     message
+    data
   }}`;
   return graphql(
     mutation,
     ["INSUREE_MUTATION_REQ", "INSUREE_SEND_EMAIL_RESP", "INSUREE_MUTATION_ERR"],
-    "success message responses",
+    "success message",
   );
+}
+export function approverInsureeComparison(mm, edited) {
+  let mutation = `query ApproverInsureeComparison {
+    approverInsureeComparison(uuid: "${edited}") {
+        approverUuid
+    }
+}`;
+  return graphql(mutation, "INSUREE_APPROVER");
+}
+
+export function taskGroupCreator(edited) {
+  let mutation = `query TaskGroupByInsureeCreator {
+    taskGroupByInsureeCreator(creatorUuid: "${edited}") {
+        id
+        uuid
+        name
+    }
+}`;
+  return graphql(mutation, "INSUREE_CREATEDBY");
 }
 export function approverInsureeComparison(mm, edited) {
   let mutation = `query ApproverInsureeComparison {
@@ -707,4 +729,13 @@ export function printReport(mm, edited) {
     data
   }}`;
   return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_REPORT_RESP", "INSUREE_MUTATION_ERR"], "success message");
+}
+
+export function approverCountCheck(mm, edited) {
+  let mutation = `query ApproverInsureeComparison {
+    approverInsureeComparison(uuid: "${edited}") {
+        approverUuid
+    }
+}`;
+  return graphql(mutation, "INSUREE_APPROVER");
 }

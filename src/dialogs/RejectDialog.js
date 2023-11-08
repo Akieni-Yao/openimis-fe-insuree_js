@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import {useSelector} from  "react-redux";
 import {
+
   Dialog,
   DialogActions,
   DialogContent,
@@ -31,7 +33,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 const RejectDialog = (props) => {
-  const { classes, approveorreject, onClose, isOpen, payload, statusCheck, edited } = props;
+  const { classes, approveorreject, onClose, isOpen, payload, statusCheck,edited } = props;
+  const approverData=useSelector((store)=>store)
+  console.log('approverSata',approverData);
   const [comment, setComment] = useState({ statusComment: "", status: "", reviewer: null });
   const newClasses = useStyles();
   const handleChange = (name, value) => {

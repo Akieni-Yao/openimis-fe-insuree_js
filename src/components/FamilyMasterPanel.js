@@ -158,6 +158,14 @@ class FamilyMasterPanel extends FormPanel {
               label="Family.enrolmentType"
               required
               readOnly={readOnly}
+              // value={
+              //   !!edited && edited?.ext
+              //     ? // ? edited.ext.enrolmentType
+              //       edited?.ext?.enrolmentType
+              //     : // : edited?.jsonExt?.enrolmentType
+              //       // edited?.jsonExt?.enrolmentType
+              //       null
+              // }
               value={
                 !!edited && edited?.ext
                   ? // ? edited?.jsonExt?.enrolmentType
@@ -180,6 +188,7 @@ class FamilyMasterPanel extends FormPanel {
               multiline
               rows={2}
               readOnly={readOnly}
+              required={true}
               value={!edited ? "" : edited.address}
               onChange={(v) => this.updateAttribute("address", v)}
             />
