@@ -426,8 +426,10 @@ class InsureeForm extends Component {
         (document) => document.documentStatus === "APPROVED" || document.documentStatus === "REJECTED",
       );
     const hasReject =
-      (allApprovedOrRejected && documentsData.some((document) => document.documentStatus === "REJECTED")) ||
-      (allApprovedOrRejected && !this.state.insuree.biometricsIsMaster);
+      documentsData && documentsData.length > 0
+        ? (allApprovedOrRejected && documentsData.some((document) => document.documentStatus === "REJECTED")) ||
+          (allApprovedOrRejected && !this.state.insuree.biometricsIsMaster)
+        : false;
     const allApproved =
       documentsData && documentsData.length > 0
         ? documentsData.every((document) => document.documentStatus === "APPROVED") &&

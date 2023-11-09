@@ -123,7 +123,6 @@ class InsureeMasterPanel extends FormPanel {
       actions,
       edited_id,
     } = this.props;
-    console.log("this.propsCheckMaste", edited);
     return (
       <Grid container>
         <Grid item xs={12}>
@@ -257,7 +256,8 @@ class InsureeMasterPanel extends FormPanel {
                       : new Date().toISOString().slice(0, 10) // Set the default value to today's date
                   }
                   onChange={(v) => this.updateExts({ dateValidFrom: v ? v : new Date().toISOString().slice(0, 10) })}
-                  readOnly={true}
+                  // readOnly={true}
+                  readOnly={readOnly}
                 />
               </Grid>
               <Grid item xs={3} className={classes.item}>
@@ -276,14 +276,15 @@ class InsureeMasterPanel extends FormPanel {
                 <PublishedComponent
                   pubRef="location.DetailedLocation"
                   withNull={true}
-                  readOnly={
-                    !!edited &&
-                    !!edited.family &&
-                    !!edited.family.headInsuree &&
-                    edited.family.headInsuree.id !== edited.id
-                      ? readOnly
-                      : true
-                  }
+                  // readOnly={
+                  //   !!edited &&
+                  //   !!edited.family &&
+                  //   !!edited.family.headInsuree &&
+                  //   edited.family.headInsuree.id !== edited.id
+                  //     ? readOnly
+                  //     : true
+                  // }
+                  readOnly={readOnly}
                   required={true}
                   value={
                     edited_id
@@ -305,16 +306,16 @@ class InsureeMasterPanel extends FormPanel {
                   multiline
                   rows={2}
                   required={true}
-                  readOnly={
-                    !!edited &&
-                    !!edited.family &&
-                    !!edited.family.headInsuree &&
-                    edited.family.headInsuree.id !== edited.id &&
-                    edited_id == null
-                      ? readOnly
-                      : true
-                  }
-                  // readOnly={readOnly}
+                  // readOnly={
+                  //   !!edited &&
+                  //   !!edited.family &&
+                  //   !!edited.family.headInsuree &&
+                  //   edited.family.headInsuree.id !== edited.id &&
+                  //   edited_id == null
+                  //     ? readOnly
+                  //     : true
+                  // }
+                  readOnly={readOnly}
                   value={
                     edited_id
                       ? edited?.jsonExt?.insureeaddress
@@ -427,7 +428,7 @@ class InsureeMasterPanel extends FormPanel {
                       readOnly={readOnly}
                       type="number"
                       required={true}
-                      value={!!edited && !!edited.jsonExt ? edited?.jsonExt?.nbKids : ""}
+                      value={!!edited && !!edited.jsonExt && !!edited?.jsonExt?.nbKids ? edited?.jsonExt?.nbKids : "0"}
                       onChange={(v) => this.updateExts({ nbKids: v })}
                     />
                   </Grid>
