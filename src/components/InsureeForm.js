@@ -16,7 +16,8 @@ import {
   parseData,
   ProgressOrError,
   Helmet,
-  formatMessage,
+  FormattedMessage,
+  formatMessage
 } from "@openimis/fe-core";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
@@ -38,6 +39,7 @@ import InsureeMasterPanel from "../components/InsureeMasterPanel";
 import RejectDialog from "../dialogs/RejectDialog";
 import HelpIcon from "@material-ui/icons/Help";
 // import { approverCountCheck } from "../actions";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
 
 const styles = (theme) => ({
   page: theme.page,
@@ -78,6 +80,46 @@ const styles = (theme) => ({
     paddingTop: theme.spacing(1),
     marginRight: "5px",
   },
+  dialogBg: {
+    backgroundColor: "#FFFFFF",
+    width: 300,
+    paddingRight: 20,
+    paddingLeft: 20,
+    paddingTop: 10,
+    paddingBootom: 10
+  },
+  dialogText: {
+    color: "#000000",
+    fontWeight: "Bold"
+  },
+  primaryHeading: {
+    font: 'normal normal medium 20px/22px Roboto',
+    color: '#333333'
+  },
+  primaryButton: {
+    backgroundColor: "#FFFFFF 0% 0% no-repeat padding-box",
+    border: '1px solid #999999',
+    color: "#999999",
+    borderRadius: '4px',
+    // fontWeight: "bold",
+    "&:hover": {
+      backgroundColor: '#FF0000',
+      border: '1px solid #FF0000',
+      color: '#FFFFFF'
+    },
+  },//theme.dialog.primaryButton,
+  secondaryButton: {
+    backgroundColor: "#FFFFFF 0% 0% no-repeat padding-box",
+    border: '1px solid #999999',
+    color: "#999999",
+    borderRadius: '4px',
+    // fontWeight: "bold",
+    "&:hover": {
+      backgroundColor: '#FF0000',
+      border: '1px solid #FF0000',
+      color: '#FFFFFF'
+    },
+  }
 });
 
 const INSUREE_INSUREE_FORM_CONTRIBUTION_KEY = "insuree.InsureeForm";
@@ -365,7 +407,7 @@ class InsureeForm extends Component {
       // If the email was sent successfully, update the success state and message
       this.setState({
         success: true,
-        successMessage: "Email sent successfully",
+        successMessage: 'Email_sent_successfully',
       });
     } else {
       // If the email send was not successful, you can also set success to false here
@@ -386,7 +428,13 @@ class InsureeForm extends Component {
     if (base64Data) {
       this.displayPrintWindow(base64Data, contentType);
     }
-  };
+    // console.log(decodeURI(data?.payload?.data?.sentNotification?.data), "decode data");
+  }
+  cancel = () => {
+    this.setState({
+      success: false,
+    });
+  }
   render() {
     const {
       rights,
@@ -420,6 +468,7 @@ class InsureeForm extends Component {
         button: this.statusButton(insuree),
       },
     ];
+
     const allApprovedOrRejected =
       documentsData &&
       documentsData.every(
@@ -475,6 +524,7 @@ class InsureeForm extends Component {
               email={insuree_uuid}
               printButton={this.printReport}
               approverData={approverData}
+              success={this.state.success}
             />
           )}
         <RejectDialog
@@ -487,19 +537,22 @@ class InsureeForm extends Component {
           edited={this.state.insuree}
         />
         {this.state.success && (
-          <Snackbar
-            open={this.state.success}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "center",
-            }}
-            style={{ marginRight: "50px", color: "white" }}
-            onClose={this.onHandlerClose}
-          >
-            <Alert variant="filled" severity="success">
-              {this.state.successMessage}
-            </Alert>
-          </Snackbar>
+          <Dialog open={this.state.success} onClose={this.cancel} maxWidth="md">
+            <DialogContent className={classes.dialogBg}>
+              <DialogContentText className={classes.primaryHeading}>
+                <FormattedMessage
+                  module="insuree"
+                  id="success"
+                // values={this.state.successMessage}
+                />
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions className={classes.dialogBg}>
+              <Button onClick={this.cancel} className={classes.secondaryButton}>
+                <FormattedMessage module="core" id="cancel" />
+              </Button>
+            </DialogActions>
+          </Dialog>
         )}
       </div>
     );
