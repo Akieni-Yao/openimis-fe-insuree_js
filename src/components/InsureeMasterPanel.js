@@ -428,7 +428,7 @@ class InsureeMasterPanel extends FormPanel {
                       readOnly={readOnly}
                       type="number"
                       required={true}
-                      value={!!edited && !!edited.jsonExt && !!edited?.jsonExt?.nbKids ? edited?.jsonExt?.nbKids : "0"}
+                      value={!!edited && !!edited.jsonExt && !!edited?.jsonExt?.nbKids ? edited?.jsonExt?.nbKids : ""}
                       onChange={(v) => this.updateExts({ nbKids: v })}
                     />
                   </Grid>
