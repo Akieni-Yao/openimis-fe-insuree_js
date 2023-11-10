@@ -456,5 +456,6 @@
  "insuree.PedingApproval.firstName":"Insuree First Name",
  "insuree.PedingApproval.lastName":"Insuree Last Name",
  "insuree.PedingApproval.gender":"Gender",
- "insuree.PedingApproval.city":"City"
+ "insuree.PedingApproval.city":"City",
+ "insuree.success":"Email sent successfully"
 }
