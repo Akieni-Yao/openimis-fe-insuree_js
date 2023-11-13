@@ -156,6 +156,13 @@ class FamilyForm extends Component {
       );
     }
   };
+  doesInsureeChange = () => {
+    const { insuree } = this.props;
+    if (_.isEqual(insuree, this.state.insuree)) {
+      return false;
+    }
+    return true;
+  };
   // onValidation = (isFormValid) => {
   //   if (this.state.isFormValid !== isFormValid) {
   //     this.setState({ isFormValid });
@@ -173,7 +180,7 @@ class FamilyForm extends Component {
     if (!this.state.family.headInsuree.phone) return false;
     if (!this.state?.family?.headInsuree?.jsonExt?.BirthPlace) return false;
     if (!this.state?.family?.headInsuree?.jsonExt?.nationality) return false;
-    if (!this.state?.family?.headInsuree?.jsonExt?.nbKids) return false;
+    if (!this.state?.family?.headInsuree?.jsonExt?.nbKids || !0) return false;
     if (!this.state?.family?.headInsuree?.jsonExt?.civilQuality) return false;
     if (!this.state?.family?.headInsuree?.jsonExt?.createdAt) return false;
     if (!this.state?.family?.headInsuree?.marital) return false;

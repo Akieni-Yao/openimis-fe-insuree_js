@@ -10,7 +10,8 @@ const INSUREE_MAIN_MENU_CONTRIBUTION_KEY = "insuree.MainMenu";
 
 class InsureeMainMenu extends Component {
   render() {
-    const { modulesManager, rights } = this.props;
+    const { modulesManager, rights, insureeCount } = this.props;
+
     let entries = [];
     // if (rights.includes(RIGHT_FAMILY_ADD)) {
     //   entries.push({
@@ -20,6 +21,14 @@ class InsureeMainMenu extends Component {
     //     withDivider: true,
     //   });
     // }
+    if (rights.includes(RIGHT_INSUREE) && insureeCount) {
+      entries.push({
+        text: formatMessage(this.props.intl, "insuree", "menu.pendingApproval"),
+        icon: <HistoryIcon />,
+        route: "/" + modulesManager.getRef("insuree.route.pendingApproval"),
+        withDivider: true,
+      });
+    }
     if (rights.includes(RIGHT_FAMILY)) {
       entries.push({
         text: formatMessage(this.props.intl, "insuree", "menu.familiesOrGroups"),
@@ -55,6 +64,7 @@ class InsureeMainMenu extends Component {
 
 const mapStateToProps = (state) => ({
   rights: !!state.core && !!state.core.user && !!state.core.user.i_user ? state.core.user.i_user.rights : [],
+  insureeCount: state.insuree.countData,
 });
 
 export default withModulesManager(injectIntl(connect(mapStateToProps)(InsureeMainMenu)));

@@ -702,7 +702,6 @@ export function taskGroupCreator(edited) {
   return graphql(mutation, "INSUREE_CREATEDBY");
 }
 
-
 export function printReport(mm, edited) {
   let mutation = `mutation SendNotification{
     sentNotification(${formatPrint(edited)}) {
@@ -712,12 +711,3 @@ export function printReport(mm, edited) {
   }}`;
   return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_REPORT_RESP", "INSUREE_MUTATION_ERR"], "success message");
 }
-
-// export function approverCountCheck(mm, edited) {
-//   let mutation = `query ApproverInsureeComparison {
-//     approverInsureeComparison(uuid: "${edited}") {
-//         approverUuid
-//     }
-// }`;
-//   return graphql(mutation, "INSUREE_APPROVER");
-// }

@@ -104,7 +104,7 @@ class PendingApproval extends PagedDataHandler {
     this.locationLevels = this.props.modulesManager.getConf("fe-location", "location.Location.MaxLevels", 4);
   }
   onDoubleClick = (f, newTab = false) => {
-    historyPush(this.props.modulesManager, this.props.history, "insuree.route.familyOverview", [f.uuid], newTab);
+    historyPush(this.props.modulesManager, this.props.history, "insuree/insurees/familyOverview", [f.uuid], newTab);
   };
   componentDidMount() {
     this.setState({ orderBy: null }, (e) => this.onChangeRowsPerPage(this.defaultPageSize));
@@ -141,8 +141,12 @@ class PendingApproval extends PagedDataHandler {
     return null;
   };
 
-  onDoubleClick = (i, newTab = false) => {
-    historyPush(this.props.modulesManager, this.props.history, "insuree.route.insuree", [i.uuid], newTab);
+  // onDoubleClick = (i, newTab = false) => {
+  //   historyPush(this.props.modulesManager, this.props.history, "insuree.route.insuree", [i.uuid], newTab);
+  // };
+  onDoubleClick = (f, newTab = false) => {
+    console.log("familyClick", f);
+    historyPush(this.props.modulesManager, this.props.history, "insuree.route.familyOverview", [f.uuid], newTab);
   };
 
   // onDoubleClick = (f, newTab = false) => {
@@ -161,14 +165,20 @@ class PendingApproval extends PagedDataHandler {
     this.props.selectFamilyMember(i[0] || null);
   };
 
-  headers = [
-    "PedingApproval.tempCamuNo",
-    "PedingApproval.firstName",
-    "PedingApproval.lastName",
-    "PedingApproval.gender",
+  headers = () => {
+    var h = [
+      "PedingApproval.tempCamuNo",
+      "PedingApproval.lastName",
+      "PedingApproval.firstName",
+      "PedingApproval.gender",
+    ];
     // "PedingApproval.city",
-    ...Array.from(Array(this.locationLevels)).map((_, i) => `location.locationType.${i}`),
-  ];
+    // ...Array.from(Array(this.locationLevels)).map((_, i) => `location.locationType.${i}`),
+    for (var i = 0; i < this.locationLevels; i++) {
+      h.push(`location.locationType.${i}`);
+    }
+    return h;
+  };
 
   sorter = (attr, asc = true) => [
     () =>
@@ -260,88 +270,31 @@ class PendingApproval extends PagedDataHandler {
     }
     return !!loc ? loc.name : "";
   };
-  formatters = [
-    (i) => i.headInsuree.chfId || "",
-    (i) => i.headInsuree.otherNames,
+  formatters = () => {
+    var row = [
+      (family) => family.headInsuree.chfId || "",
+      (family) => family.headInsuree.otherNames,
 
-    (i) => i.headInsuree.lastName,
-    (i) => (
-      <PublishedComponent
-        pubRef="insuree.InsureeGenderPicker"
-        withLabel={false}
-        readOnly={true}
-        value={!!i.headInsuree.gender ? i.headInsuree.gender.code : null}
-      />
-    ),
-    (i) => () => {
-      for (var i = 0; i < this.locationLevels; i++) {
-        // need a fixed variable to refer to as parentLocation argument
-        let j = i + 0;
-        // formatters.push((i) => {
-        //   console.log("familloc", i);
-        this.parentLocation(i.currentVillage || (!!i.family && i.family.location), j);
-      }
-    },
-    // })
-  ];
-  // formatters = [
-  //   (i) => i.headInsuree.chfId || "",
-  //   (i) => i.headInsuree.otherNames,
+      (family) => family.headInsuree.lastName,
+      (family) => (
+        <PublishedComponent
+          pubRef="insuree.InsureeGenderPicker"
+          withLabel={false}
+          readOnly={true}
+          value={!!family.headInsuree.gender ? family.headInsuree.gender.code : null}
+        />
+      ),
+    ];
 
-  //   (i) => i.headInsuree.lastName,
-  //   (i) => (
-  //     <PublishedComponent
-  //       pubRef="insuree.InsureeGenderPicker"
-  //       withLabel={false}
-  //       readOnly={true}
-  //       value={!!i.headInsuree.gender ? i.headInsuree.gender.code : null}
-  //     />
-  //   ),
-  //   // (i)=>( for (var i = 0; i < this.locationLevels; i++) {
-  //   //   // need a fixed variable to refer to as parentLocation argument
-  //   //   let j = i + 0;
-  //   //   // formatters.push((i) => {
-  //   //   //   console.log("familloc", i);
-  //   //    this.parentLocation(i.currentVillage || (!!i.family && i.family.location), j));
-  //   // // })
-  // ];
-  // itemFormatters = () => {
-  //   var formatters = [
-  //     // (i) => i.headInsuree.chfId || "",
-  //     // (i) => i.headInsuree.otherNames,
-
-  //     // (i) => i.headInsuree.lastName,
-
-  //     // (i) => (
-  //     //   <PublishedComponent
-  //     //     pubRef="insuree.InsureeGenderPicker"
-  //     //     withLabel={false}
-  //     //     readOnly={true}
-  //     //     value={!!i.headInsuree.gender ? i.headInsuree.gender.code : null}
-  //     //   />
-  //     // ),
-  //     (i) => i.chfId,
-  //     (i) => i.lastName,
-  //     (i) => i.otherNames,
-
-  //     (i) => (
-  //       <PublishedComponent
-  //         pubRef="insuree.InsureeGenderPicker"
-  //         withLabel={false}
-  //         readOnly={true}
-  //         value={!!i.gender ? i.gender.code : null}
-  //       />
-  //     ),
-  //   ];
-  //   for (var i = 0; i < this.locationLevels; i++) {
-  //     // need a fixed variable to refer to as parentLocation argument
-  //     let j = i + 0;
-  //     formatters.push((i) => {
-  //       console.log("familloc", i);
-  //     }, this.parentLocation(i.currentVillage || (!!i.family && i.family.location), j));
-  //   }
-  //   return formatters.filter;
-  // };
+    for (var i = 0; i < this.locationLevels; i++) {
+      // need a fixed variable to refer to as parentLocation argument
+      let j = i + 0;
+      row.push((family) => {
+        return this.parentLocation(family.location, j);
+      });
+    }
+    return row;
+  };
 
   addNewInsuree = () =>
     historyPush(this.props.modulesManager, this.props.history, "insuree.route.insuree", [
@@ -368,7 +321,6 @@ class PendingApproval extends PagedDataHandler {
       fetchingInsurees,
       errorInsurees,
     } = this.props;
-    console.log("itemFormatters", this.itemFormatters);
     let actions =
       !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
         ? []
@@ -441,9 +393,9 @@ class PendingApproval extends PagedDataHandler {
             {/* {documentDetails?.length > 0 && !fetchingDocuments ? ( */}
             <Table
               module="insuree"
-              headers={this.headers}
+              headers={this.headers()}
               headerActions={this.headerActions}
-              itemFormatters={this.formatters}
+              itemFormatters={this.formatters()}
               items={PendingApproval}
               fetching={fetchingInsurees}
               error={errorInsurees}

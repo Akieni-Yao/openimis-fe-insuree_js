@@ -84,12 +84,16 @@ function reducer(
     errorCreatedBy: null,
     fetchingCreatedBy: false,
     fetchedCreatedBy: false,
-    createdByData:null,
+    createdByData: null,
     errorCreatedBy: null,
     fetchingApprover: false,
     fetchedApprover: false,
     approverData: null,
-    errorApprover:null,
+    errorApprover: null,
+    fetchingCount: false,
+    fetchedCount: false,
+    countData: null,
+    errorCount: null,
   },
   action,
 ) {
@@ -507,7 +511,6 @@ function reducer(
         fetchedCreatedBy: false,
         createdByData: null,
         errorCreatedBy: null,
-       
       };
     case "INSUREE_CREATEDBY_RESP":
       var families = parseData(action.payload.data.approverFamilies);
@@ -540,36 +543,35 @@ function reducer(
         reportData: action.payload.data.sentNotification?.data,
         errorreport: formatGraphQLError(action.payload),
       };
-      case "INSUREE_SEND_EMAIL_RESP":
-        return {
-          ...state,
-          fetchingEmail: false,
-          fetchedEmail: true,
-          EmailData: action.payload.data.sentNotification?.data,
-          errorrEmail: formatGraphQLError(action.payload),
-        };
-      case "INSUREE_DOCUMENTS_RESP":
-        return {
-          ...state,
-          fetchingDocuments: false,
-          fetchedDocuments: true,
-          documentsData: action.payload.data.insureeDocuments,
-          errorDocument: formatGraphQLError(action.payload),
-        };
+    case "INSUREE_SEND_EMAIL_RESP":
+      return {
+        ...state,
+        fetchingEmail: false,
+        fetchedEmail: true,
+        EmailData: action.payload.data.sentNotification?.data,
+        errorrEmail: formatGraphQLError(action.payload),
+      };
+    case "INSUREE_DOCUMENTS_RESP":
+      return {
+        ...state,
+        fetchingDocuments: false,
+        fetchedDocuments: true,
+        documentsData: action.payload.data.insureeDocuments,
+        errorDocument: formatGraphQLError(action.payload),
+      };
     case "INSUREE_DOCUMENTS_ERR":
       return {
         ...state,
         fetchingDocuments: false,
         errorDocument: formatServerError(action.payload),
       };
-      case "INSUREE_CREATEDBY_REQ":
+    case "INSUREE_CREATEDBY_REQ":
       return {
         ...state,
         fetchingCreatedBy: true,
         fetchedCreatedBy: false,
         createdByData: null,
         errorCreatedBy: null,
-       
       };
     case "INSUREE_CREATEDBY_RESP":
       var families = parseData(action.payload.data.approverFamilies);
@@ -586,7 +588,7 @@ function reducer(
         fetchingCreatedBy: false,
         errorCreatedBy: formatServerError(action.payload),
       };
-      case "INSUREE_APPROVER_REQ":
+    case "INSUREE_APPROVER_REQ":
       return {
         ...state,
         fetchingApprover: true,
@@ -602,11 +604,34 @@ function reducer(
         approverData: action.payload.data.approverInsureeComparison.approverUuid,
         errorApprover: formatGraphQLError(action.payload),
       };
-case "INSUREE_APPROVER_ERR":
+    case "INSUREE_APPROVER_ERR":
       return {
         ...state,
         fetchingApprover: false,
         errorApprover: formatServerError(action.payload),
+      };
+    case "INSUREE_COUNT_REQ":
+      return {
+        ...state,
+        fetchingCount: true,
+        fetchedCount: false,
+        countData: null,
+        errorCount: null,
+      };
+    case "INSUREE_COUNT_RESP":
+      console.log("RESPONSE", action.payload.approverFamiliesCount.approverFamiliesCount);
+      return {
+        ...state,
+        fetchingCount: false,
+        fetchedCount: true,
+        countData: action.payload.approverFamiliesCount.approverFamiliesCount,
+        errorCount: formatGraphQLError(action.payload),
+      };
+    case "INSUREE_COUNT_ERR":
+      return {
+        ...state,
+        fetchingCount: false,
+        errorCount: formatServerError(action.payload),
       };
 
     case "INSUREE_NUMBER_VALIDATION_FIELDS_REQ":
