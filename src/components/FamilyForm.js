@@ -26,6 +26,7 @@ import { Button, Tooltip, IconButton, Typography, Grid } from "@material-ui/core
 import { insureeLabel } from "../utils/utils";
 import HelpIcon from "@material-ui/icons/Help";
 import { formatMessage } from "@openimis/fe-core";
+import FileCopyIcon from "@material-ui/icons/FileCopy";
 
 const styles = (theme) => ({
   lockedPage: theme.page.locked,
@@ -75,6 +76,9 @@ class FamilyForm extends Component {
     family: this._newFamily(),
     newFamily: true,
     confirmedAction: null,
+    copyText: null,
+    isCopied: false,
+
     // isFormValid: true,
   };
 
@@ -180,7 +184,7 @@ class FamilyForm extends Component {
     if (!this.state.family.headInsuree.phone) return false;
     if (!this.state?.family?.headInsuree?.jsonExt?.BirthPlace) return false;
     if (!this.state?.family?.headInsuree?.jsonExt?.nationality) return false;
-    if (!this.state?.family?.headInsuree?.jsonExt?.nbKids || !0) return false;
+    // if (!this.state?.family?.headInsuree?.jsonExt?.nbKids) return false;
     if (!this.state?.family?.headInsuree?.jsonExt?.civilQuality) return false;
     if (!this.state?.family?.headInsuree?.jsonExt?.createdAt) return false;
     if (!this.state?.family?.headInsuree?.marital) return false;
@@ -202,6 +206,20 @@ class FamilyForm extends Component {
       { lockNew: !family.uuid }, // avoid duplicates
       (e) => this.props.save(family),
     );
+  };
+  handleCopyClick = (familyText) => {
+    // const { copyText } = this.state; // Assuming copyText is stored in component state
+
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(familyText)
+        .then(() => {
+          this.setState({ isCopied: true });
+        })
+        .catch((err) => {
+          console.error("Failed to copy text: ", err);
+        });
+    }
   };
 
   onEditedChanged = (family) => {
@@ -341,6 +359,31 @@ class FamilyForm extends Component {
         },
       );
     }
+
+    const getCopyLabel = () => {
+      const { headInsuree } = this.state.family;
+      const label = insureeLabel(this.state.family.headInsuree);
+      return (
+        <React.Fragment>
+          {label}
+          {!!headInsuree?.camuNumber || !!headInsuree?.chfId ? (
+            <IconButton
+              size="small"
+              onClick={() =>
+                this.handleCopyClick(
+                  !!headInsuree?.camuNumber ? headInsuree?.camuNumber : !!headInsuree?.chfId ? headInsuree?.chfId : "",
+                )
+              }
+              style={{ marginLeft: "4px" }}
+              color="inherit"
+            >
+              <FileCopyIcon />
+            </IconButton>
+          ) : null}
+          {this.state.isCopied ? "Copied!" : ""}
+        </React.Fragment>
+      );
+    };
     return (
       <div className={!!runningMutation ? classes.lockedPage : null}>
         <Helmet
@@ -351,11 +394,13 @@ class FamilyForm extends Component {
             { label: insureeLabel(this.state.family.headInsuree) },
           )}
         />
+
         <ProgressOrError progress={fetchingFamily} error={errorFamily} />
         {((!!fetchedFamily && !!family && family.uuid === family_uuid) || !family_uuid) && (
           <Form
             module="insuree"
             title="FamilyOverview.title"
+            // titleParams={{ label: getCopyLabel() }}
             titleParams={{ label: insureeLabel(this.state.family.headInsuree) }}
             edited_id={family_uuid}
             edited={family}

@@ -266,7 +266,7 @@ class InsureeForm extends Component {
     if (!this.state.insuree?.jsonExt?.createdAt) return false;
     if (!this.state.insuree?.jsonExt?.BirthPlace) return false;
     if (!this.state.insuree?.jsonExt?.nationality) return false;
-    if (!this.state.insuree?.jsonExt?.nbKids) return false;
+    // if (!this.state.insuree?.jsonExt?.nbKids) return false;
     if (!this.state.insuree?.jsonExt?.civilQuality) return false;
     if (!this.state.insuree.lastName) return false;
     if (!this.state.insuree.phone) return false;
@@ -471,7 +471,6 @@ class InsureeForm extends Component {
       documentsData,
       approverData,
     } = this.props;
-    console.log("formdata", this.props, "this.state.insuree", this.state.insuree);
     const { insuree, clientMutationId, payload, statusCheck, email } = this.state;
     if (!rights.includes(RIGHT_INSUREE)) return null;
     let runningMutation = !!insuree && !!clientMutationId;
