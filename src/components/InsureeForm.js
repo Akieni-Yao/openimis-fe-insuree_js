@@ -17,7 +17,7 @@ import {
   ProgressOrError,
   Helmet,
   FormattedMessage,
-  formatMessage
+  formatMessage,
 } from "@openimis/fe-core";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
@@ -40,6 +40,7 @@ import RejectDialog from "../dialogs/RejectDialog";
 import HelpIcon from "@material-ui/icons/Help";
 // import { approverCountCheck } from "../actions";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
+import FileCopyIcon from "@material-ui/icons/FileCopy";
 
 const styles = (theme) => ({
   page: theme.page,
@@ -86,40 +87,40 @@ const styles = (theme) => ({
     paddingRight: 20,
     paddingLeft: 20,
     paddingTop: 10,
-    paddingBootom: 10
+    paddingBootom: 10,
   },
   dialogText: {
     color: "#000000",
-    fontWeight: "Bold"
+    fontWeight: "Bold",
   },
   primaryHeading: {
-    font: 'normal normal medium 20px/22px Roboto',
-    color: '#333333'
+    font: "normal normal medium 20px/22px Roboto",
+    color: "#333333",
   },
   primaryButton: {
     backgroundColor: "#FFFFFF 0% 0% no-repeat padding-box",
-    border: '1px solid #999999',
+    border: "1px solid #999999",
     color: "#999999",
-    borderRadius: '4px',
+    borderRadius: "4px",
     // fontWeight: "bold",
     "&:hover": {
-      backgroundColor: '#FF0000',
-      border: '1px solid #FF0000',
-      color: '#FFFFFF'
+      backgroundColor: "#FF0000",
+      border: "1px solid #FF0000",
+      color: "#FFFFFF",
     },
-  },//theme.dialog.primaryButton,
+  }, //theme.dialog.primaryButton,
   secondaryButton: {
     backgroundColor: "#FFFFFF 0% 0% no-repeat padding-box",
-    border: '1px solid #999999',
+    border: "1px solid #999999",
     color: "#999999",
-    borderRadius: '4px',
+    borderRadius: "4px",
     // fontWeight: "bold",
     "&:hover": {
-      backgroundColor: '#FF0000',
-      border: '1px solid #FF0000',
-      color: '#FFFFFF'
+      backgroundColor: "#FF0000",
+      border: "1px solid #FF0000",
+      color: "#FFFFFF",
     },
-  }
+  },
 });
 
 const INSUREE_INSUREE_FORM_CONTRIBUTION_KEY = "insuree.InsureeForm";
@@ -137,6 +138,8 @@ class InsureeForm extends Component {
     email: true,
     success: false,
     successMessage: "",
+    copyText: null,
+    isCopied: false,
   };
 
   _newInsuree() {
@@ -407,7 +410,7 @@ class InsureeForm extends Component {
       // If the email was sent successfully, update the success state and message
       this.setState({
         success: true,
-        successMessage: 'Email_sent_successfully',
+        successMessage: "Email_sent_successfully",
       });
     } else {
       // If the email send was not successful, you can also set success to false here
@@ -429,12 +432,26 @@ class InsureeForm extends Component {
       this.displayPrintWindow(base64Data, contentType);
     }
     // console.log(decodeURI(data?.payload?.data?.sentNotification?.data), "decode data");
-  }
+  };
   cancel = () => {
     this.setState({
       success: false,
     });
-  }
+  };
+  handleCopyClick = (familyText) => {
+    // const { copyText } = this.state; // Assuming copyText is stored in component state
+
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(familyText)
+        .then(() => {
+          this.setState({ isCopied: true });
+        })
+        .catch((err) => {
+          console.error("Failed to copy text: ", err);
+        });
+    }
+  };
   render() {
     const {
       rights,
@@ -454,7 +471,7 @@ class InsureeForm extends Component {
       documentsData,
       approverData,
     } = this.props;
-
+    console.log("formdata", this.props, "this.state.insuree", this.state.insuree);
     const { insuree, clientMutationId, payload, statusCheck, email } = this.state;
     if (!rights.includes(RIGHT_INSUREE)) return null;
     let runningMutation = !!insuree && !!clientMutationId;
@@ -468,7 +485,28 @@ class InsureeForm extends Component {
         button: this.statusButton(insuree),
       },
     ];
-
+    const getCopyLabel = () => {
+      // const { insuree } = this.state;
+      const label = insureeLabel(insuree);
+      return (
+        <React.Fragment>
+          {label}
+          {!!insuree.camuNumber || !!insuree.chfId ? (
+            <IconButton
+              size="small"
+              onClick={() =>
+                this.handleCopyClick(!!insuree.camuNumber ? insuree.camuNumber : !!insuree.chfId ? insuree.chfId : "")
+              }
+              style={{ marginLeft: "4px" }}
+              color="inherit"
+            >
+              <FileCopyIcon />
+            </IconButton>
+          ) : null}
+          {this.state.isCopied ? "Copied!" : ""}
+        </React.Fragment>
+      );
+    };
     const allApprovedOrRejected =
       documentsData &&
       documentsData.every(
@@ -499,6 +537,7 @@ class InsureeForm extends Component {
             <Form
               module="insuree"
               title="Insuree.title"
+              // titleParams={{ label: getCopyLabel() }}
               titleParams={{ label: insureeLabel(this.state.insuree) }}
               edited_id={insuree_uuid}
               edited={this.state.insuree}
@@ -521,7 +560,7 @@ class InsureeForm extends Component {
               handleDialogOpen={this.handleDialogOpen}
               onValidation={this.onValidation}
               emailButton={this.emailButton}
-              email={insuree_uuid}
+              email={this.state.insuree?.camuNumber}
               printButton={this.printReport}
               approverData={approverData}
               success={this.state.success}
@@ -543,7 +582,7 @@ class InsureeForm extends Component {
                 <FormattedMessage
                   module="insuree"
                   id="success"
-                // values={this.state.successMessage}
+                  // values={this.state.successMessage}
                 />
               </DialogContentText>
             </DialogContent>
