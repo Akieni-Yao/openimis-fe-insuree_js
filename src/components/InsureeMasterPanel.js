@@ -41,6 +41,9 @@ const CAMU_ENROLMENT_TYPE = [
   "students",
   "vulnerable_Persons",
 ];
+const capitalizeFirstLetter = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
 const CAMU_CIVIL_QUALITY = ["Main Beneficiary", "Depedent Beneficiary spouse", "Depedent Beneficiary child"];
 class InsureeMasterPanel extends FormPanel {
   constructor(props) {
@@ -261,7 +264,7 @@ class InsureeMasterPanel extends FormPanel {
                   withNull
                 />
               </Grid>
-              <Grid item xs={3} className={classes.item}>
+              {/* <Grid item xs={3} className={classes.item} style={{ width: '0px', overflow: 'hidden' }}>
                 <PublishedComponent
                   pubRef="core.DatePicker"
                   module="insuree"
@@ -277,8 +280,8 @@ class InsureeMasterPanel extends FormPanel {
                   // readOnly={true}
                   readOnly={readOnly}
                 />
-              </Grid>
-              <Grid item xs={3} className={classes.item}>
+              </Grid> */}
+              {/* <Grid item xs={3} className={classes.item}>
                 <PublishedComponent
                   pubRef="location.RegionPicker"
                   withNull
@@ -289,7 +292,7 @@ class InsureeMasterPanel extends FormPanel {
                   readOnly={readOnly}
                   required
                 />
-              </Grid>
+              </Grid> */}
               <Grid item xs={12}>
                 <PublishedComponent
                   pubRef="location.DetailedLocation"
@@ -353,7 +356,7 @@ class InsureeMasterPanel extends FormPanel {
                   label="Insuree.lastName"
                   required={true}
                   readOnly={readOnly}
-                  value={!!edited && !!edited.lastName ? edited.lastName : ""}
+                  value={!!edited && !!edited.lastName ? edited.lastName.toUpperCase() : ""}
                   onChange={(v) => {
                     this.updateAttribute("lastName", v);
                   }}
@@ -365,7 +368,7 @@ class InsureeMasterPanel extends FormPanel {
                   label="Insuree.otherNames"
                   required={true}
                   readOnly={readOnly}
-                  value={!!edited && !!edited?.otherNames ? edited?.otherNames : ""}
+                  value={!!edited && !!edited?.otherNames ? capitalizeFirstLetter(edited?.otherNames) : ""}
                   onChange={(v) => {
                     this.updateAttribute("otherNames", v);
                   }}
@@ -433,7 +436,7 @@ class InsureeMasterPanel extends FormPanel {
                   <Grid item xs={2} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.CountryPicker"
-                      value={!!edited && !!edited.jsonExt ? edited?.jsonExt?.nationality : ""}
+                      value={!!edited && !!edited.jsonExt ? edited?.jsonExt?.nationality : "CD"}
                       module="insuree"
                       readOnly={readOnly}
                       withNull={true}

@@ -320,29 +320,36 @@ class InsureeForm extends Component {
       case "PRE_REGISTERED":
         selectedClass = this.props.classes.approvedBtn;
         docsStatus = "buttonStatus.preRegistered";
+        docsStatus = "buttonStatus.preRegistered";
         break;
       case "APPROVED":
         selectedClass = this.props.classes.approvedBtn;
+        docsStatus = "buttonStatus.approved";
         docsStatus = "buttonStatus.approved";
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
         docsStatus = "buttonStatus.rejected";
+        docsStatus = "buttonStatus.rejected";
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.rework";
         docsStatus = "buttonStatus.rework";
         break;
       case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingDocumentBiometric";
+        docsStatus = "buttonStatus.waitingDocumentBiometric";
         break;
       case "WAITING_FOR_APPROVAL":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingApproval";
+        docsStatus = "buttonStatus.waitingApproval";
         break;
       case "WAITING_FOR_QUEUE":
         selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingQueue";
         docsStatus = "buttonStatus.waitingQueue";
         break;
       default:
