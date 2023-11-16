@@ -400,8 +400,8 @@ class FamilyForm extends Component {
           <Form
             module="insuree"
             title="FamilyOverview.title"
-            // titleParams={{ label: getCopyLabel() }}
-            titleParams={{ label: insureeLabel(this.state.family.headInsuree) }}
+            titleParams={{ label: getCopyLabel() }}
+            // titleParams={{ label: insureeLabel(this.state.family.headInsuree) }}
             edited_id={family_uuid}
             edited={family}
             reset={this.state.reset}

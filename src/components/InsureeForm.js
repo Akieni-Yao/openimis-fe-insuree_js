@@ -536,8 +536,8 @@ class InsureeForm extends Component {
             <Form
               module="insuree"
               title="Insuree.title"
-              // titleParams={{ label: getCopyLabel() }}
-              titleParams={{ label: insureeLabel(this.state.insuree) }}
+              titleParams={{ label: getCopyLabel() }}
+              // titleParams={{ label: insureeLabel(this.state.insuree) }}
               edited_id={insuree_uuid}
               edited={this.state.insuree}
               reset={this.state.reset}
