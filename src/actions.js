@@ -711,3 +711,29 @@ export function printReport(mm, edited) {
   }}`;
   return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_REPORT_RESP", "INSUREE_MUTATION_ERR"], "success message");
 }
+const POLICYHOLDER_FULL_PROJECTION = (modulesManager) => [
+  "id",
+  "code",
+  "tradeName",
+  "locations" + modulesManager.getProjection("location.Location.FlatProjection"),
+  "address",
+  "phone",
+  "fax",
+  "email",
+  "contactName",
+  "legalForm",
+  "activityCode",
+  "accountancyAccount",
+  "bankAccount",
+  "paymentReference",
+  "dateValidFrom",
+  "dateValidTo",
+  "isDeleted",
+  "jsonExt",
+];
+
+export function fetchPolicyHolderFamily(modulesManager, familyUuid) {
+  let filter = !!familyUuid ? `familyUuid: "${familyUuid}"` : "";
+  const payload = formatPageQuery("policyHolderByFamily", [filter], POLICYHOLDER_FULL_PROJECTION(modulesManager));
+  return graphql(payload, "POLICYHOLDER_FAMILY");
+}

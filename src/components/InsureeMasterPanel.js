@@ -19,6 +19,7 @@ import { injectIntl } from "react-intl";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 // import { approverCountCheck } from "../actions";
+import moment from "moment";
 
 const styles = (theme) => ({
   paper: theme.paper.paper,
@@ -69,6 +70,9 @@ class InsureeMasterPanel extends FormPanel {
     if (!data["jsonExt"]?.dateValidFrom) {
       data["jsonExt"].dateValidFrom = new Date().toISOString().slice(0, 10);
     }
+    if (!data["jsonExt"]?.nbKids) {
+      data["jsonExt"].nbKids = 0;
+    }
     if (updates?.insureelocations) {
       data["jsonExt"].insureelocations = updates?.insureelocations;
     } else if (this.props.family?.location) {
@@ -112,6 +116,18 @@ class InsureeMasterPanel extends FormPanel {
     }
     return false;
   };
+  // checkAge = (date) => {
+  //   if (date) {
+  //     const eighteenYearsAgo = moment().subtract(18, "years");
+  //     const isEighteenOrOlder = moment(date).isSameOrBefore(eighteenYearsAgo);
+
+  //     if (isEighteenOrOlder) {
+  //       console.log("User is 18 or older");
+  //     } else {
+  //       console.log("User is under 18");
+  //     }
+  //   }
+  // };
   render() {
     const {
       intl,
@@ -123,6 +139,8 @@ class InsureeMasterPanel extends FormPanel {
       actions,
       edited_id,
     } = this.props;
+    const { data } = this.state;
+    console.log("editedFamily", data?.relationship, "edited.jsonExt", edited?.jsonExt);
     return (
       <Grid container>
         <Grid item xs={12}>
@@ -364,7 +382,10 @@ class InsureeMasterPanel extends FormPanel {
                       readOnly={readOnly}
                       required={true}
                       maxDate={new Date()}
-                      onChange={(v) => this.updateAttribute("dob", v)}
+                      onChange={(v) => {
+                        this.updateAttribute("dob", v);
+                        // this.checkAge(v);
+                      }}
                     />
                   </Grid>
                   <Grid item xs={2} className={classes.item}>
@@ -451,7 +472,17 @@ class InsureeMasterPanel extends FormPanel {
                       label="Family.civilQuality"
                       required={true}
                       readOnly={readOnly}
-                      value={!!edited && !!edited.jsonExt ? edited?.jsonExt?.civilQuality : null}
+                      value={
+                        !!edited && !!edited.jsonExt && !!edited?.jsonExt?.civilQuality
+                          ? edited?.jsonExt?.civilQuality
+                          : !!data?.relationship && data?.relationship.id == 8
+                          ? "Depedent Beneficiary spouse"
+                          : !!data?.relationship && data?.relationship.id == 4
+                          ? "Depedent Beneficiary child"
+                          : "Main Beneficiary"
+                        // ? edited?.family?.jsonExt?.civilQuality
+                        // : null
+                      }
                       onChange={(value) => this.updateExts({ civilQuality: value })}
                       constants={CAMU_CIVIL_QUALITY}
                       withNull

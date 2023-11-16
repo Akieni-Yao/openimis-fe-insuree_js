@@ -145,7 +145,6 @@ class PendingApproval extends PagedDataHandler {
   //   historyPush(this.props.modulesManager, this.props.history, "insuree.route.insuree", [i.uuid], newTab);
   // };
   onDoubleClick = (f, newTab = false) => {
-    console.log("familyClick", f);
     historyPush(this.props.modulesManager, this.props.history, "insuree.route.familyOverview", [f.uuid], newTab);
   };
 

@@ -44,6 +44,7 @@ import { insureeLabel, familyLabel } from "../utils/utils";
 import ChangeInsureeFamilyDialog from "./ChangeInsureeFamilyDialog";
 import RemoveInsureeFromFamilyDialog from "./RemoveInsureeFromFamilyDialog";
 import HelpIcon from "@material-ui/icons/Help";
+import PolicySummary from "./PolicySummary";
 
 const styles = (theme) => ({
   paper: theme.paper.paper,
@@ -51,19 +52,19 @@ const styles = (theme) => ({
   paperHeaderAction: theme.paper.action,
   tableTitle: theme.table.title,
   approvedBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderColor: "#00913E",
     color: "#00913E",
     borderRadius: "2rem",
   },
   rejectBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderColor: "##FF0000",
     color: "##FF0000",
     borderRadius: "2rem",
   },
   commonBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderColor: "#FF841C",
     color: "#FF841C",
     borderRadius: "2rem",
@@ -330,7 +331,7 @@ class FamilyInsureesOverview extends PagedDataHandler {
         return (
           <>
             <Button variant="outlined" className={selectedClass}>
-            {formatMessage(this.props.intl, "insuree", docsStatus)}
+              {formatMessage(this.props.intl, "insuree", docsStatus)}
             </Button>
             {i.status === "REWORK" || i.status === "REJECTED" ? (
               <Tooltip
@@ -420,6 +421,7 @@ class FamilyInsureesOverview extends PagedDataHandler {
       checkingCanAddInsuree,
       errorCanAddInsuree,
     } = this.props;
+    console.log("familyMembers", familyMembers);
     let actions =
       !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
         ? []
@@ -459,69 +461,74 @@ class FamilyInsureesOverview extends PagedDataHandler {
       });
     }
     return (
-      <Paper className={classes.paper}>
-        <EnquiryDialog
-          open={this.state.enquiryOpen}
-          chfid={this.state.chfid}
-          onClose={() => {
-            this.setState({ enquiryOpen: false, chfid: null });
-          }}
-        />
-        <ChangeInsureeFamilyDialog
-          family={family}
-          insuree={this.state.changeInsureeFamily}
-          onConfirm={this.changeInsureeFamily}
-          onCancel={(e) => this.setState({ changeInsureeFamily: null })}
-        />
-        <RemoveInsureeFromFamilyDialog
-          family={family}
-          insuree={this.state.removeInsuree}
-          onConfirm={this.removeInsuree}
-          onCancel={(e) => this.setState({ removeInsuree: null })}
-        />
-        <Grid container alignItems="center" direction="row" className={classes.paperHeader}>
-          <Grid item xs={8}>
-            <Typography className={classes.tableTitle}>
-              <FormattedMessage module="insuree" id="Family.insurees" values={{ count: pageInfo.totalCount }} />
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Grid container justify="flex-end">
-              {actions.map((a, idx) => {
-                return (
-                  <Grid item key={`form-action-${idx}`} className={classes.paperHeaderAction}>
-                    {withTooltip(a.button, a.tooltip)}
-                  </Grid>
-                );
-              })}
+      <>
+        <Paper className={classes.paper}>
+          <EnquiryDialog
+            open={this.state.enquiryOpen}
+            chfid={this.state.chfid}
+            onClose={() => {
+              this.setState({ enquiryOpen: false, chfid: null });
+            }}
+            family={family}
+          />
+
+          <ChangeInsureeFamilyDialog
+            family={family}
+            insuree={this.state.changeInsureeFamily}
+            onConfirm={this.changeInsureeFamily}
+            onCancel={(e) => this.setState({ changeInsureeFamily: null })}
+          />
+          <RemoveInsureeFromFamilyDialog
+            family={family}
+            insuree={this.state.removeInsuree}
+            onConfirm={this.removeInsuree}
+            onCancel={(e) => this.setState({ removeInsuree: null })}
+          />
+          <Grid container alignItems="center" direction="row" className={classes.paperHeader}>
+            <Grid item xs={8}>
+              <Typography className={classes.tableTitle}>
+                <FormattedMessage module="insuree" id="Family.insurees" values={{ count: pageInfo.totalCount }} />
+              </Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Grid container justify="flex-end">
+                {actions.map((a, idx) => {
+                  return (
+                    <Grid item key={`form-action-${idx}`} className={classes.paperHeaderAction}>
+                      {withTooltip(a.button, a.tooltip)}
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              <Divider />
             </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <Divider />
-          </Grid>
-        </Grid>
-        <Table
-          module="insuree"
-          headers={this.headers}
-          headerActions={this.headerActions}
-          itemFormatters={this.formatters}
-          items={(!!family && familyMembers) || []}
-          fetching={fetchingFamilyMembers}
-          error={errorFamilyMembers}
-          onDoubleClick={this.onDoubleClick}
-          withSelection={"single"}
-          onChangeSelection={this.onChangeSelection}
-          withPagination={true}
-          rowsPerPageOptions={this.rowsPerPageOptions}
-          defaultPageSize={this.defaultPageSize}
-          page={this.currentPage()}
-          pageSize={this.currentPageSize()}
-          count={pageInfo.totalCount}
-          onChangePage={this.onChangePage}
-          onChangeRowsPerPage={this.onChangeRowsPerPage}
-          rowLocked={this.rowLocked}
-        />
-      </Paper>
+          <Table
+            module="insuree"
+            headers={this.headers}
+            headerActions={this.headerActions}
+            itemFormatters={this.formatters}
+            items={(!!family && familyMembers) || []}
+            fetching={fetchingFamilyMembers}
+            error={errorFamilyMembers}
+            onDoubleClick={this.onDoubleClick}
+            withSelection={"single"}
+            onChangeSelection={this.onChangeSelection}
+            withPagination={true}
+            rowsPerPageOptions={this.rowsPerPageOptions}
+            defaultPageSize={this.defaultPageSize}
+            page={this.currentPage()}
+            pageSize={this.currentPageSize()}
+            count={pageInfo.totalCount}
+            onChangePage={this.onChangePage}
+            onChangeRowsPerPage={this.onChangeRowsPerPage}
+            rowLocked={this.rowLocked}
+          />
+        </Paper>
+        {/* <PolicySummary modulesManager={this.props.modulesManager} family={family} /> */}
+      </>
     );
   }
 }

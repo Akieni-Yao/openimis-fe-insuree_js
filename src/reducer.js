@@ -94,6 +94,10 @@ function reducer(
     fetchedCount: false,
     countData: null,
     errorCount: null,
+    fetchingPolicyHolder: false,
+    fetchedPolicyHolder: false,
+    policyHolder: null,
+    errorPolicyHolder: null,
   },
   action,
 ) {
@@ -646,6 +650,31 @@ function reducer(
             validationError: null,
           },
         },
+      };
+    case "POLICYHOLDER_FAMILY_REQ":
+      return {
+        ...state,
+        fetchingPolicyHolder: true,
+        fetchedPolicyHolder: false,
+        policyHolder: null,
+        errorPolicyHolder: null,
+      };
+    case "POLICYHOLDER_FAMILY_RESP":
+      let arrayRes=[]
+      arrayRes.push(parseData(action.payload.data.policyHolderByFamily).find((policyHolder) => !!policyHolder))
+      return {
+        ...state,
+        fetchingPolicyHolder: false,
+        fetchedPolicyHolder: true,
+        policyHolder:arrayRes,
+        // policyHolder: parseData(action.payload.data.policyHolderByFamily).find((policyHolder) => !!policyHolder),
+        errorPolicyHolder: formatGraphQLError(action.payload),
+      };
+    case "POLICYHOLDER_FAMILY_ERR":
+      return {
+        ...state,
+        fetchingPolicyHolder: false,
+        errorPolicyHolder: formatServerError(action.payload),
       };
     case "INSUREE_NUMBER_VALIDATION_FIELDS_RESP":
       return {
