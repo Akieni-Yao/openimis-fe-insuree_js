@@ -249,7 +249,7 @@ class InsureeDocuments extends PagedDataHandler {
   };
 
   formatters = [
-    (i) => i.documentName || "",
+    (i) => formatMessage(this.props.intl, "insuree", i.documentName)|| "",
     (i) => !!i.documentId && this.viewDocumentAction(i.documentId),
 
     (i) => {

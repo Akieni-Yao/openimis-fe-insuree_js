@@ -97,6 +97,7 @@ class InsureeSearcher extends Component {
       "insuree.insureeSummaries.validityFrom",
       filters.showHistory && "insuree.insureeSummaries.validityTo",
       "",
+      " "
     ];
     return h.filter(Boolean);
   };
