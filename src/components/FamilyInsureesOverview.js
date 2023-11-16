@@ -527,7 +527,7 @@ class FamilyInsureesOverview extends PagedDataHandler {
             rowLocked={this.rowLocked}
           />
         </Paper>
-        {/* <PolicySummary modulesManager={this.props.modulesManager} family={family} /> */}
+        <PolicySummary modulesManager={this.props.modulesManager} family={family} />
       </>
     );
   }

@@ -660,13 +660,22 @@ function reducer(
         errorPolicyHolder: null,
       };
     case "POLICYHOLDER_FAMILY_RESP":
-      let arrayRes=[]
-      arrayRes.push(parseData(action.payload.data.policyHolderByFamily).find((policyHolder) => !!policyHolder))
+      let arrayRes = [];
+      if (!!action.payload.data.policyHolderByFamily) {
+        const parsedData = parseData(action.payload.data.policyHolderByFamily);
+        const foundPolicyHolder = parsedData.find((policyHolder) => !!policyHolder);
+
+        if (foundPolicyHolder) {
+          arrayRes.push(foundPolicyHolder);
+        }
+      }
+      // !!action.payload.data.policyHolderByFamily &&
+      //   arrayRes.push(parseData(action.payload.data.policyHolderByFamily).find((policyHolder) => !!policyHolder));
       return {
         ...state,
         fetchingPolicyHolder: false,
         fetchedPolicyHolder: true,
-        policyHolder:arrayRes,
+        policyHolder: arrayRes,
         // policyHolder: parseData(action.payload.data.policyHolderByFamily).find((policyHolder) => !!policyHolder),
         errorPolicyHolder: formatGraphQLError(action.payload),
       };

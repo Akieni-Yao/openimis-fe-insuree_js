@@ -98,10 +98,10 @@ class PolicySummary extends PagedDataHandler {
       "policyHolder.dateValidTo",
     ];
     if (rights.includes(RIGHT_POLICYHOLDER_UPDATE)) {
-      result.push("policyHolder.emptyLabel");
+      result.push("policyHolder.edit");
     }
     if (rights.includes(RIGHT_POLICYHOLDER_DELETE)) {
-      result.push("policyHolder.emptyLabel");
+      result.push("policyHolder.delete");
     }
     return result;
   };
@@ -261,6 +261,7 @@ class PolicySummary extends PagedDataHandler {
   rowLocked = (i) => !!i.clientMutationId;
   render() {
     const { classes, policyHolder, fetchingPolicyHolder, errorPolicyHolder, pageInfo } = this.props;
+    console.log("policyholder", policyHolder);
     return (
       <Grid container>
         {/* {hasAvatarContribution && (
@@ -295,11 +296,11 @@ class PolicySummary extends PagedDataHandler {
             headers={this.headers()}
             headerActions={this.headerActions}
             itemFormatters={this.itemFormatters()}
-            items={policyHolder ? policyHolder : []}
+            items={!!policyHolder ? policyHolder : []}
             fetching={fetchingPolicyHolder}
             error={errorPolicyHolder}
             withSelection={"single"}
-            onChangeSelection={this.onChangeSelection}
+            // onChangeSelection={this.onChangeSelection}
             onDoubleClick={this.onDoubleClick}
             withPagination={false}
             rowsPerPageOptions={this.rowsPerPageOptions}

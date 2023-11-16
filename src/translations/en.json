@@ -458,5 +458,7 @@
  "insuree.PedingApproval.gender":"Gender",
  "insuree.PedingApproval.city":"City",
  "insuree.success":"Email sent successfully",
- "insuree.Family.policyHolder": "Policyholder"
+ "insuree.Family.policyHolder": "Policyholder",
+ "insuree.policyHolder.edit":"Edit",
+ "insuree.policyHolder.delete":"Delete"
 }
