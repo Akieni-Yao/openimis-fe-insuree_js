@@ -152,6 +152,7 @@
   "insuree.Family.payments": "Payments",
   "insuree.Family.title": "Family/Group {label}",
   "insuree.Insuree.title": "Insuree {label}",
+  "insuree.family.title": "Insuree {label}",
   "insuree.InsureeMasterPanel.title": "Insuree Details",
   "insuree.HeadInsureeMasterPanel.title": "Head Insuree Details",
   "insuree.InsureeFirstServicePointPanel.title": "First Service Point",

@@ -269,7 +269,7 @@ class PolicySummary extends PagedDataHandler {
             <Contributions readOnly photo={insuree.photo} contributionKey={INSUREE_SUMMARY_AVATAR_CONTRIBUTION_KEY} />
           </Box>
         )} */}
-        <Paper className={classes.paper}>
+        <Paper className={classes.paper} style={{ width: "100%" }}>
           <Grid container alignItems="center" direction="row" className={classes.paperHeader}>
             <Grid item xs={8}>
               <Typography className={classes.tableTitle}>
