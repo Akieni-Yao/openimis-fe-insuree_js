@@ -76,6 +76,16 @@ class InsureeMasterPanel extends FormPanel {
     if (!data["jsonExt"]?.nbKids) {
       data["jsonExt"].nbKids = 0;
     }
+    if (!updates.nationality) {
+      data["jsonExt"].nationality = "CD";
+    }
+    if (!updates?.civilQuality) {
+      !!data?.relationship && data?.relationship.id == 8
+        ? (data["jsonExt"].civilQuality = "Depedent Beneficiary spouse")
+        : !!data?.relationship && data?.relationship.id == 4
+        ? (data["jsonExt"].civilQuality = "Depedent Beneficiary child")
+        : (data["jsonExt"].civilQuality = "Main Beneficiary");
+    }
     if (updates?.insureelocations) {
       data["jsonExt"].insureelocations = updates?.insureelocations;
     } else if (this.props.family?.location) {
@@ -143,7 +153,6 @@ class InsureeMasterPanel extends FormPanel {
       edited_id,
     } = this.props;
     const { data } = this.state;
-    console.log("editedFamily", data?.relationship, "edited.jsonExt", edited?.jsonExt);
     return (
       <Grid container>
         <Grid item xs={12}>
@@ -436,7 +445,11 @@ class InsureeMasterPanel extends FormPanel {
                   <Grid item xs={2} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.CountryPicker"
-                      value={!!edited && !!edited.jsonExt ? edited?.jsonExt?.nationality : "CD"}
+                      value={
+                        !!edited && !!edited.jsonExt && edited?.jsonExt?.nationality
+                          ? edited?.jsonExt?.nationality
+                          : "CD"
+                      }
                       module="insuree"
                       readOnly={readOnly}
                       withNull={true}

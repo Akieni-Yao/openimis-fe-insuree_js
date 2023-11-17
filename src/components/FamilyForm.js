@@ -175,7 +175,7 @@ class FamilyForm extends Component {
   canSave = () => {
     // if (!this.state.family.location) return false;
     if (!this.state.family.headInsuree) return false;
-    if (!this.state.family.headInsuree?.jsonExt?.createdAt) return false;
+    // if (!this.state.family.headInsuree?.jsonExt?.createdAt) return false;
     // if (!this.state.family.headInsuree.chfId) return false;
     // if (!this.props.isChfIdValid) return false;
     if (!this.state.family?.jsonExt?.enrolmentType) return false;
@@ -185,8 +185,8 @@ class FamilyForm extends Component {
     if (!this.state?.family?.headInsuree?.jsonExt?.BirthPlace) return false;
     if (!this.state?.family?.headInsuree?.jsonExt?.nationality) return false;
     // if (!this.state?.family?.headInsuree?.jsonExt?.nbKids) return false;
-    if (!this.state?.family?.headInsuree?.jsonExt?.civilQuality) return false;
-    if (!this.state?.family?.headInsuree?.jsonExt?.createdAt) return false;
+    // if (!this.state?.family?.headInsuree?.jsonExt?.civilQuality) return false;
+    // if (!this.state?.family?.headInsuree?.jsonExt?.createdAt) return false;
     if (!this.state?.family?.headInsuree?.marital) return false;
     if (!this.state?.family?.headInsuree?.typeOfId) return false;
     if (!this.state?.family?.headInsuree?.passport) return false;
