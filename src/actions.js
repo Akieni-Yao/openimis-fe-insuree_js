@@ -348,10 +348,10 @@ function formatMail(edited) {
 }
 function formatPrint(edited) {
   let reportName = "";
-  if (edited?.camuNumber != null) {
+  if (!!edited?.camuNumber) {
     reportName = "enrollment_receipt";
   } else {
-    reportName = "pre_enrollment_receipt";
+    reportName = "enrollment_receipt_for_print";
   }
   const formatPrint = `uuid: "${edited?.uuid}",  isEmail: ${false},reportName: "${reportName}"`;
   return formatPrint;
