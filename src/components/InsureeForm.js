@@ -567,6 +567,8 @@ class InsureeForm extends Component {
               onValidation={this.onValidation}
               emailButton={this.emailButton}
               email={this.state.insuree?.camuNumber}
+              // emailCheck={this.state.insuree?.camuNumber}
+              print={insuree_uuid}
               printButton={this.printReport}
               approverData={approverData}
               success={this.state.success}

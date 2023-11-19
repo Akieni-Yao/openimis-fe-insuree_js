@@ -349,7 +349,7 @@ function formatMail(edited) {
 }
 function formatPrint(edited) {
   let reportName = "";
-  if (edited?.camuNumber != null) {
+  if (!!edited?.camuNumber) {
     reportName = "enrollment_receipt";
   } else {
     reportName = "enrollment_receipt_for_print";

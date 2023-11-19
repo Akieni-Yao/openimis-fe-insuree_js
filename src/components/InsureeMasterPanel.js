@@ -160,7 +160,10 @@ class InsureeMasterPanel extends FormPanel {
             <Grid container className={classes.tableTitle}>
               <Grid item xs={3} container alignItems="center" className={classes.item}>
                 <Typography variant="h5">
-                  <FormattedMessage module="insuree" id={title} values={titleParams} />
+                <FormattedMessage module="insuree" id={!!edited &&
+                    !!edited.family &&
+                    !!edited.family.headInsuree &&
+                    edited.family.headInsuree.id !== edited.id ?title:'family.title'} values={titleParams} />
                 </Typography>
               </Grid>
               <Grid item xs={9}>
@@ -464,7 +467,10 @@ class InsureeMasterPanel extends FormPanel {
                       label="Insuree.nbKids"
                       readOnly={readOnly}
                       type="number"
-                      required={true}
+                      required={!!edited &&
+                        !!edited.family &&
+                        !!edited.family.headInsuree &&
+                        edited.family.headInsuree.id !== edited.id ?false:true}
                       value={!!edited && !!edited.jsonExt && !!edited?.jsonExt?.nbKids ? edited?.jsonExt?.nbKids : "0"}
                       onChange={(v) => this.updateExts({ nbKids: v })}
                     />
