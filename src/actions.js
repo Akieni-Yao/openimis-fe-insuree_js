@@ -283,6 +283,7 @@ export function fetchInsureeSummaries(mm, filters) {
     "dob",
     "marital",
     "camuNumber",
+    // "status",
     "family{uuid,location" + mm.getProjection("location.Location.FlatProjection") + "}",
     "currentVillage" + mm.getProjection("location.Location.FlatProjection"),
   ];
@@ -351,9 +352,10 @@ function formatPrint(edited) {
   if (edited?.camuNumber != null) {
     reportName = "enrollment_receipt";
   } else {
-    reportName = "pre_enrollment_receipt";
+    reportName = "enrollment_receipt_for_print";
   }
-  const formatPrint = `uuid: "${edited?.uuid}",  isEmail: ${false},reportName: "${reportName}"`;
+
+  const formatPrint = `uuid: "${edited?.headInsuree?.uuid}",  isEmail: ${false},reportName: "${reportName}"`;
   return formatPrint;
 }
 // function formatExternalDocument(docs, tempCamu) {

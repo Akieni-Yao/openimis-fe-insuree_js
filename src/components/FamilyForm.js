@@ -19,7 +19,7 @@ import {
 import { RIGHT_FAMILY, RIGHT_FAMILY_EDIT } from "../constants";
 import FamilyMasterPanel from "./FamilyMasterPanel";
 
-import { fetchFamily, newFamily, createFamily, fetchFamilyMutation } from "../actions";
+import { fetchFamily, newFamily, createFamily, fetchFamilyMutation, printReport } from "../actions";
 import FamilyInsureesOverview from "./FamilyInsureesOverview";
 import HeadInsureeMasterPanel from "./HeadInsureeMasterPanel";
 import { Button, Tooltip, IconButton, Typography, Grid } from "@material-ui/core";
@@ -269,6 +269,34 @@ class FamilyForm extends Component {
     }
     return { selectedClass, docsStatus };
   };
+
+  displayPrintWindow = (base64Data, contentType) => {
+    const printWindow = window.open("", "Print Window", "width=600, height=400");
+    printWindow.document.open();
+
+    if (contentType === "pdf") {
+      // printWindow.print(`<embed type="application/pdf" width="100%" height="100%" src="data:application/pdf;base64,${base64Data}" />`);
+      printWindow.document.write(
+        `<embed type="application/pdf" width="100%" height="100%" src="data:application/pdf;base64,${base64Data}" />`,
+      );
+    } else {
+      printWindow.document.write(`<img src="data:image/png;base64,${base64Data}" />`);
+    }
+
+    printWindow.document.close();
+    // printWindow.print();
+  };
+
+  printReport = async (edited) => {
+    const data = await this.props.printReport(this.props.modulesManager, edited);
+    const base64Data = data?.payload?.data?.sentNotification?.data;
+
+    const contentType = "pdf";
+    if (base64Data) {
+      this.displayPrintWindow(base64Data, contentType);
+    }
+    console.log(decodeURI(data?.payload?.data?.sentNotification?.data), "decode data");
+  };
   render() {
     const {
       modulesManager,
@@ -288,7 +316,6 @@ class FamilyForm extends Component {
       back,
       mutation,
     } = this.props;
-    // console.log(state,"state")
     const { family, newFamily } = this.state;
     if (!rights.includes(RIGHT_FAMILY)) return null;
     let runningMutation = !!family && !!family.clientMutationId;
@@ -425,6 +452,8 @@ class FamilyForm extends Component {
             openDirty={save}
             user={this.props.state.core.user}
             // onValidation={this.onValidation}
+            printButton={this.printReport}
+            email={family_uuid}
           />
         )}
       </div>
@@ -448,7 +477,7 @@ const mapStateToProps = (state, props) => ({
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
-    { fetchFamilyMutation, fetchFamily, newFamily, createFamily, journalize, coreConfirm },
+    { fetchFamilyMutation, fetchFamily, newFamily, createFamily, journalize, coreConfirm, printReport },
     dispatch,
   );
 };

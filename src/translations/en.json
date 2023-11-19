@@ -152,6 +152,7 @@
   "insuree.Family.payments": "Payments",
   "insuree.Family.title": "Family/Group {label}",
   "insuree.Insuree.title": "Insuree {label}",
+  "insuree.family.title": "Insuree {label}",
   "insuree.InsureeMasterPanel.title": "Insuree Details",
   "insuree.HeadInsureeMasterPanel.title": "Head Insuree Details",
   "insuree.InsureeFirstServicePointPanel.title": "First Service Point",
@@ -167,6 +168,7 @@
   "insuree.insureeSummaries.gender": "Gender",
   "insuree.insureeSummaries.dob": "Birth Date",
   "insuree.insureeSummaries.id": "Id",
+  "insuree.insureeSummaries.status": "Status",
   "insuree.insureeSummaries.validityFrom": "Valid From",
   "insuree.insureeSummaries.validityTo": "Valid To",
   "insuree.insureeSummaries.openFamily": " ",
@@ -463,5 +465,14 @@
  "insuree.success":"Email sent successfully",
  "insuree.Family.policyHolder": "Policyholder",
  "insuree.policyHolder.edit":"Edit",
- "insuree.policyHolder.delete":"Delete"
+ "insuree.policyHolder.delete":"Delete",
+ "insuree.Insuree.status.null": " ",
+ "insuree.Insuree.status.PRE_REGISTERED": "Pre Registered",
+ "insuree.Insuree.status.APPROVED": "Approved",
+ "insuree.Insuree.status.REJECTED": "Rejected",
+ "insuree.Insuree.status.rework": "Rework",
+ "insuree.Insuree.status.WAITING_FOR_DOCUMENT_AND_BIOMETRIC": "Waiting for document and biometric",
+ "insuree.Insuree.status.WAITING_FOR_APPROVAL": "Waiting For Approval",
+ "insuree.Insuree.status.WAITING_FOR_QUEUE": "Waiting For Queue",
+ "insuree.Insuree.status.ACTIVE": "Active"
 }
