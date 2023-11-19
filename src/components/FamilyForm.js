@@ -453,7 +453,7 @@ class FamilyForm extends Component {
             user={this.props.state.core.user}
             // onValidation={this.onValidation}
             printButton={this.printReport}
-            email={family_uuid}
+            print={family_uuid}
           />
         )}
       </div>
