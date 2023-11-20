@@ -84,7 +84,7 @@ class PolicySummary extends PagedDataHandler {
   // hasAvatarContribution = modulesManager.getContribs(INSUREE_SUMMARY_AVATAR_CONTRIBUTION_KEY).length > 0;
   // hasExtContributions = modulesManager.getContribs(INSUREE_SUMMARY_EXT_CONTRIBUTION_KEY).length > 0;
   policyHolderPageLink = (policyHolder) => {
-    return `${this.props.modulesManager.getRef("policyHolder.route.policyHolder")}${"/" + decodeId(policyHolder.id)}`;
+    return `${this.props.modulesManager.getRef("policyHolder.route.policyHolder")}${"/" + decodeId(policyHolder.node.id)}`;
   };
 
   headers = () => {
@@ -127,7 +127,7 @@ class PolicySummary extends PagedDataHandler {
   onDoubleClick = (policyHolder, newTab = false) => {
     const { rights, modulesManager, history } = this.props;
     if (rights.includes(RIGHT_POLICYHOLDER_UPDATE) || rights.includes(RIGHT_PORTALPOLICYHOLDER_SEARCH)) {
-      historyPush(modulesManager, history, "policyHolder.route.policyHolder", [decodeId(policyHolder.id)], newTab);
+      historyPush(modulesManager, history, "policyHolder.route.policyHolder", [decodeId(policyHolder.node.id)], newTab);
     }
   };
 
@@ -153,26 +153,26 @@ class PolicySummary extends PagedDataHandler {
     const { intl, modulesManager, onDoubleClick, rights } = this.props;
     let result = [
       (policyHolder) =>
-        !!policyHolder.code && policyHolder.tradeName ? `${policyHolder.code} ${policyHolder.tradeName}` : "",
+        !!policyHolder.node.code && policyHolder.node.tradeName ? `${policyHolder.node.code} ${policyHolder.node.tradeName}` : "",
       (policyHolder) =>
-        !!policyHolder.locations
+        !!policyHolder.node.locations
           ? `
-          ${policyHolder.locations.parent.parent.parent.code} 
-          ${policyHolder.locations.parent.parent.parent.name}
-          ${policyHolder.locations.parent.parent.code} 
-          ${policyHolder.locations.parent.parent.name} 
-          ${policyHolder.locations.parent.code}
-          ${policyHolder.locations.parent.name}
-          ${policyHolder.locations.code}
-          ${policyHolder.locations.name}`
+          ${policyHolder.node.locations.parent.parent.parent.code} 
+          ${policyHolder.node.locations.parent.parent.parent.name}
+          ${policyHolder.node.locations.parent.parent.code} 
+          ${policyHolder.node.locations.parent.parent.name} 
+          ${policyHolder.node.locations.parent.code}
+          ${policyHolder.node.locations.parent.name}
+          ${policyHolder.node.locations.code}
+          ${policyHolder.node.locations.name}`
           : "",
       (policyHolder) =>
-        !!policyHolder.legalForm ? (
+        !!policyHolder.node.legalForm ? (
           <PublishedComponent
             pubRef="policyHolder.LegalFormPicker"
             module="policyHolder"
             label="legalForm"
-            value={policyHolder.legalForm}
+            value={policyHolder.node.legalForm}
             withLabel={false}
             readOnly
           />
@@ -180,12 +180,12 @@ class PolicySummary extends PagedDataHandler {
           ""
         ),
       (policyHolder) =>
-        !!policyHolder.activityCode ? (
+        !!policyHolder.node.activityCode ? (
           <PublishedComponent
             pubRef="policyHolder.ActivityCodePicker"
             module="policyHolder"
             label="activityCode"
-            value={policyHolder.activityCode}
+            value={policyHolder.node.activityCode}
             withLabel={false}
             readOnly
           />
@@ -193,9 +193,9 @@ class PolicySummary extends PagedDataHandler {
           ""
         ),
       (policyHolder) =>
-        !!policyHolder.dateValidFrom ? formatDateFromISO(modulesManager, intl, policyHolder.dateValidFrom) : "",
+        !!policyHolder.node.dateValidFrom ? formatDateFromISO(modulesManager, intl, policyHolder.node.dateValidFrom) : "",
       (policyHolder) =>
-        !!policyHolder.dateValidTo ? formatDateFromISO(modulesManager, intl, policyHolder.dateValidTo) : "",
+        !!policyHolder.node.dateValidTo ? formatDateFromISO(modulesManager, intl, policyHolder.node.dateValidTo) : "",
     ];
     if (rights.includes(RIGHT_POLICYHOLDER_UPDATE) || rights.includes(RIGHT_PORTALPOLICYHOLDER_SEARCH)) {
       result.push(
@@ -205,7 +205,7 @@ class PolicySummary extends PagedDataHandler {
               <IconButton
                 href={this.policyHolderPageLink(policyHolder)}
                 onClick={(e) => e.stopPropagation() && !policyHolder.clientMutationId && onDoubleClick(policyHolder)}
-                disabled={this.state.deleted.includes(policyHolder.id)}
+                disabled={this.state.deleted.includes(policyHolder.node.id)}
               >
                 <EditIcon />
               </IconButton>
