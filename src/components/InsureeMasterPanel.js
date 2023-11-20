@@ -451,7 +451,7 @@ class InsureeMasterPanel extends FormPanel {
                       value={
                         !!edited && !!edited.jsonExt && edited?.jsonExt?.nationality
                           ? edited?.jsonExt?.nationality
-                          : "CD"
+                          : "CG"
                       }
                       module="insuree"
                       readOnly={readOnly}
