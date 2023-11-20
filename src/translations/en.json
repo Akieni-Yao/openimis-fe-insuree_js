@@ -36,6 +36,7 @@
   "insuree.Insuree.photoOfficer": "Officer (Photo)",
   "insuree.Insuree.photoFilename": "File Name",
   "insuree.Insuree.email": "Email",
+  "Insuree.employee_number":"Employer Number",
   "insuree.Insuree.passport": "Identification No.",
   "insuree.Insuree.cardIssued": "Beneficiary Card",
   "insuree.Insuree.currentVillage.sameAsFamily": "Same Village as Family",

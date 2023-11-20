@@ -46,6 +46,9 @@ class FamilyPage extends Component {
         this.setState({ isOpenSnackbar: true });
         this.setState({ snackbarMsg: `Family Created with Temporary CAMU number` });
         this.setState({ camuNumberRes: createFamilyResult.families[0]?.family?.headInsuree?.chfId });
+        setTimeout(() => {
+          historyPush(this.props.modulesManager, this.props.history, "insuree.route.families");
+      }, 5000)
       }
     } else {
       const updateFamilyResult = await this.props.updateFamily(
@@ -63,6 +66,9 @@ class FamilyPage extends Component {
         this.setState({ isOpenSnackbar: true });
         this.setState({ snackbarMsg: `Family Created with Temporary CAMU number` });
         this.setState({ camuNumberRes: updateFamilyResult.families[0]?.family?.headInsuree?.chfId });
+        setTimeout(() => {
+          historyPush(this.props.modulesManager, this.props.history, "insuree.route.families");
+      }, 5000)
       }
     }
   };
