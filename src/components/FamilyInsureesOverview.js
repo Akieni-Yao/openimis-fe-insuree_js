@@ -38,6 +38,7 @@ import {
   setFamilyHead,
   changeFamily,
   checkCanAddInsuree,
+  printReport,
 } from "../actions";
 import { RIGHT_INSUREE_DELETE } from "../constants";
 import { insureeLabel, familyLabel } from "../utils/utils";
@@ -398,6 +399,8 @@ class FamilyInsureesOverview extends PagedDataHandler {
     });
   };
 
+
+
   checkCanAddInsuree = (action) => {
     this.setState(
       {
@@ -421,7 +424,6 @@ class FamilyInsureesOverview extends PagedDataHandler {
       checkingCanAddInsuree,
       errorCanAddInsuree,
     } = this.props;
-    console.log("familyMembers", familyMembers);
     let actions =
       !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
         ? []
@@ -561,6 +563,7 @@ const mapDispatchToProps = (dispatch) => {
       changeFamily,
       checkCanAddInsuree,
       coreAlert,
+      printReport,
     },
     dispatch,
   );

@@ -261,17 +261,11 @@ class PolicySummary extends PagedDataHandler {
   rowLocked = (i) => !!i.clientMutationId;
   render() {
     const { classes, policyHolder, fetchingPolicyHolder, errorPolicyHolder, pageInfo } = this.props;
-    console.log("policyholder", policyHolder);
     return (
-      <Grid container>
-        {/* {hasAvatarContribution && (
-          <Box mr={3}>
-            <Contributions readOnly photo={insuree.photo} contributionKey={INSUREE_SUMMARY_AVATAR_CONTRIBUTION_KEY} />
-          </Box>
-        )} */}
+      <Grid container alignItems="center" direction="row">
         <Paper className={classes.paper} style={{ width: "100%" }}>
           <Grid container alignItems="center" direction="row" className={classes.paperHeader}>
-            <Grid item xs={8}>
+            <Grid item xs={12}>
               <Typography className={classes.tableTitle}>
                 <FormattedMessage module="insuree" id="Family.policyHolder" values={{ count: 0 }} />
               </Typography>

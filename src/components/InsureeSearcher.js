@@ -2,7 +2,7 @@ import React, { Component, Fragment } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { injectIntl } from "react-intl";
-import { Grid, IconButton, Tooltip } from "@material-ui/core";
+import { Grid, IconButton, Tooltip, Button, Typography } from "@material-ui/core";
 import { Search as SearchIcon, People as PeopleIcon, Tab as TabIcon, Delete as DeleteIcon } from "@material-ui/icons";
 import {
   withModulesManager,
@@ -17,17 +17,43 @@ import {
   PublishedComponent,
 } from "@openimis/fe-core";
 import EnquiryDialog from "./EnquiryDialog";
-import {
-  RIGHT_INSUREE_DELETE,
-  INSUREE_MARITAL_STATUS
-} from "../constants";
+import { RIGHT_INSUREE_DELETE, INSUREE_MARITAL_STATUS } from "../constants";
 import { fetchInsureeSummaries, deleteInsuree } from "../actions";
-
+import { withTheme, withStyles } from "@material-ui/core/styles";
 import InsureeFilter from "./InsureeFilter";
 import { insureeLabel } from "../utils/utils";
 
 const INSUREE_SEARCHER_CONTRIBUTION_KEY = "insuree.InsureeSearcher";
-
+const styles = (theme) => ({
+  paper: theme.paper.paper,
+  paperHeader: theme.paper.header,
+  paperHeaderAction: theme.paper.action,
+  tableTitle: theme.table.title,
+  approvedBtn: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#00913E",
+    color: "#00913E",
+    borderRadius: "2rem",
+  },
+  rejectBtn: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "##FF0000",
+    color: "##FF0000",
+    borderRadius: "2rem",
+  },
+  commonBtn: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#FF841C",
+    color: "#FF841C",
+    borderRadius: "2rem",
+  },
+  noBtnClasses: {
+    visibility: "hidden",
+  },
+  customWidth: {
+    maxWidth: 500,
+  },
+});
 class InsureeSearcher extends Component {
   state = {
     open: false,
@@ -92,12 +118,14 @@ class InsureeSearcher extends Component {
       "insuree.insureeSummaries.gender",
       "insuree.insureeSummaries.email",
       "insuree.insureeSummaries.phone",
+      "insuree.insureeSummaries.status",
       "insuree.insureeSummaries.dob",
       ...Array.from(Array(this.locationLevels)).map((_, i) => `location.locationType.${i}`),
       "insuree.insureeSummaries.validityFrom",
       filters.showHistory && "insuree.insureeSummaries.validityTo",
+
       "",
-      " "
+      " ",
     ];
     return h.filter(Boolean);
   };
@@ -150,6 +178,46 @@ class InsureeSearcher extends Component {
     this.setState({ confirmedAction }, confirm);
   };
 
+  getStatusClass = (status) => {
+    let selectedClass = null;
+    let docsStatus = null;
+
+    switch (status) {
+      case "PRE_REGISTERED":
+        selectedClass = this.props.classes.approvedBtn;
+        docsStatus = "buttonStatus.preRegistered";
+        break;
+      case "APPROVED":
+        selectedClass = this.props.classes.approvedBtn;
+        docsStatus = "buttonStatus.approved";
+        break;
+      case "REJECTED":
+        selectedClass = this.props.classes.rejectBtn;
+        docsStatus = "buttonStatus.rejected";
+        break;
+      case "REWORK":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.rework";
+        break;
+      case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingDocumentBiometric";
+        break;
+      case "WAITING_FOR_APPROVAL":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingApproval";
+        break;
+      case "WAITING_FOR_QUEUE":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingQueue";
+        break;
+      default:
+        selectedClass = this.props.classes.noBtnClasses;
+        break;
+    }
+    return { selectedClass, docsStatus };
+  };
+
   itemFormatters = (filters) => {
     var formatters = [
       (insuree) => insuree.chfId,
@@ -173,6 +241,31 @@ class InsureeSearcher extends Component {
       ),
       (insuree) => insuree.email,
       (insuree) => insuree.phone,
+      (insuree) => {
+        if (insuree.status !== null) {
+          const { selectedClass, docsStatus } = this.getStatusClass(insuree.status);
+          return (
+            <>
+              <Typography variant="outlined">{formatMessage(this.props.intl, "insuree", docsStatus)}</Typography>
+              {insuree.status === "REWORK" || insuree.status === "REJECTED" ? (
+                <Tooltip
+                  placement="right"
+                  arrow
+                  classes={{ tooltip: this.props.classes.customWidth }}
+                  title={i.statusComment}
+                >
+                  <IconButton>
+                    <HelpIcon />
+                  </IconButton>
+                </Tooltip>
+              ) : null}
+            </>
+          );
+        } else {
+          return null;
+        }
+      },
+      ,
       (insuree) => formatDateFromISO(this.props.modulesManager, this.props.intl, insuree.dob),
     ];
     for (var i = 0; i < this.locationLevels; i++) {
@@ -185,7 +278,7 @@ class InsureeSearcher extends Component {
     formatters.push(
       (insuree) => formatDateFromISO(this.props.modulesManager, this.props.intl, insuree.validityFrom),
       filters.showHistory &&
-      ((insuree) => formatDateFromISO(this.props.modulesManager, this.props.intl, insuree.validityTo)),
+        ((insuree) => formatDateFromISO(this.props.modulesManager, this.props.intl, insuree.validityTo)),
       (insuree) => (
         <Grid container wrap="nowrap" spacing="2">
           <Grid item>
@@ -308,5 +401,5 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 export default withModulesManager(
-  withHistory(connect(mapStateToProps, mapDispatchToProps)(injectIntl(InsureeSearcher))),
+  withHistory(connect(mapStateToProps, mapDispatchToProps)(injectIntl(withTheme(withStyles(styles)(InsureeSearcher))))),
 );

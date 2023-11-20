@@ -283,7 +283,7 @@ export function fetchInsureeSummaries(mm, filters) {
     "dob",
     "marital",
     "camuNumber",
-    // "status",
+    "status",
     "family{uuid,location" + mm.getProjection("location.Location.FlatProjection") + "}",
     "currentVillage" + mm.getProjection("location.Location.FlatProjection"),
   ];
