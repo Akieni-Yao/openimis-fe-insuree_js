@@ -77,7 +77,7 @@ class InsureeMasterPanel extends FormPanel {
       data["jsonExt"].nbKids = 0;
     }
     if (!updates.nationality) {
-      data["jsonExt"].nationality = "CD";
+      data["jsonExt"].nationality = "CG";
     }
     if (!updates?.civilQuality) {
       !!data?.relationship && data?.relationship.id == 8
@@ -557,7 +557,7 @@ class InsureeMasterPanel extends FormPanel {
                       onChange={(v) => this.updateAttribute("profession", { id: v })}
                     /> */}
                   </Grid>
-                  {/* <Grid item xs={4} className={classes.item}>
+                  <Grid item xs={4} className={classes.item}>
                     <TextInput
                       module="insuree"
                       label="Insuree.employee_number"
@@ -570,7 +570,7 @@ class InsureeMasterPanel extends FormPanel {
                       onChange={(v) => this.updateExts({ employeeNumber: v })}
 
                     />
-                  </Grid> */}
+                  </Grid>
                   <Grid item xs={3} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.EducationPicker"
