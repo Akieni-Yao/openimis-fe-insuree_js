@@ -19,6 +19,7 @@ import {
 import { PublishedComponent, FormattedMessage } from "@openimis/fe-core";
 import CloseIcon from "@material-ui/icons/Close";
 import Draggable from "react-draggable";
+import { useDispatch, useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -72,6 +73,8 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
   const [showRejectComment, setShowRejectComment] = useState(false);
   const [blobURL, setBlobURL] = useState(null);
   const classes = useStyles();
+  const approverDetails = useSelector((store) => store.insuree.approverData);
+  let userId = localStorage.getItem("userId");
   const handleApprove = () => {
     approved({ documentId: documentImage, newStatus: "APPROVED", comments: null });
     onClose();
@@ -198,7 +201,7 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
             <iframe title="PDF Viewer" src={blobURL} width="100%" height="100%"></iframe>
           </DialogContent>
           <Divider />
-          {!showRejectComment && (
+          {!showRejectComment && approverDetails == userId ? (
             <DialogActions style={{ margin: "20px 20px" }}>
               <Button onClick={handleApprove} variant="contained" color="primary">
                 {/* Verify */}
@@ -209,7 +212,7 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
                 <FormattedMessage module="insuree" id="Insuree.reject" />
               </Button>
             </DialogActions>
-          )}
+          ) : null}
           {showRejectComment && (
             <Grid style={{ margin: "10px 40px" }}>
               <PublishedComponent

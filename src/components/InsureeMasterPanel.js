@@ -386,7 +386,7 @@ class InsureeMasterPanel extends FormPanel {
                   }}
                 />
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={10}>
                 <Grid container>
                   <Grid item xs={3} className={classes.item}>
                     <PublishedComponent
@@ -403,7 +403,7 @@ class InsureeMasterPanel extends FormPanel {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={2} className={classes.item}>
+                  <Grid item xs={3} className={classes.item}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -420,7 +420,7 @@ class InsureeMasterPanel extends FormPanel {
                     />
                   </Grid>
 
-                  <Grid item xs={2} className={classes.item}>
+                  <Grid item xs={3} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.InsureeGenderPicker"
                       value={!!edited && !!edited.gender ? edited?.gender?.code : ""}
@@ -433,7 +433,7 @@ class InsureeMasterPanel extends FormPanel {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={2} className={classes.item}>
+                  <Grid item xs={3} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.InsureeMaritalStatusPicker"
                       value={!!edited && !!edited?.marital ? edited?.marital : ""}
@@ -445,7 +445,7 @@ class InsureeMasterPanel extends FormPanel {
                       onChange={(v) => this.updateAttribute("marital", v)}
                     />
                   </Grid>
-                  <Grid item xs={2} className={classes.item}>
+                  <Grid item xs={3} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.CountryPicker"
                       value={
@@ -461,7 +461,7 @@ class InsureeMasterPanel extends FormPanel {
                       onChange={(v) => this.updateExts({ nationality: v })}
                     />
                   </Grid>
-                  <Grid item xs={2} className={classes.item}>
+                  <Grid item xs={3} className={classes.item}>
                     <TextInput
                       module="insuree"
                       label="Insuree.nbKids"
@@ -557,7 +557,7 @@ class InsureeMasterPanel extends FormPanel {
                       onChange={(v) => this.updateAttribute("profession", { id: v })}
                     /> */}
                   </Grid>
-                  {/* <Grid item xs={4} className={classes.item}>
+                  {/* <Grid item xs={3} className={classes.item}>
                     <TextInput
                       module="insuree"
                       label="Insuree.employee_number"
@@ -570,7 +570,65 @@ class InsureeMasterPanel extends FormPanel {
                       onChange={(v) => this.updateExts({ employeeNumber: v })}
 
                     />
+                  </Grid>
+                  <Grid item xs={3} className={classes.item}>
+                    <PublishedComponent
+                      pubRef="insuree.EducationPicker"
+                      module="insuree"
+                      value={!!edited && !!edited.education ? edited?.education?.id : ""}
+                      readOnly={readOnly}
+                      withNull={true}
+                      // nullLabel={formatMessage(intl, "insuree", "insuree.Education.none")}
+                      onChange={(v) => this.updateAttribute("education", { id: v })}
+                    />
+                  </Grid>
+                  <Grid item xs={3} className={classes.item}>
+                    <PublishedComponent
+                      pubRef="insuree.IdentificationTypePicker"
+                      module="insuree"
+                      value={!!edited && !!edited.typeOfId ? edited?.typeOfId?.code : null}
+                      readOnly={readOnly}
+                      withNull={true}
+                      required={true}
+                      nullLabel={formatMessage(intl, "insuree", "IdentificationType.none")}
+                      onChange={(v) => this.updateAttribute("typeOfId", { code: v })}
+                    />
+                  </Grid>
+                  <Grid item xs={3} className={classes.item}>
+                    <TextInput
+                      module="insuree"
+                      label="Insuree.passport"
+                      required={true}
+                      readOnly={readOnly}
+                      value={!!edited && !!edited.passport ? edited?.passport : ""}
+                      onChange={(v) => this.updateAttribute("passport", !!v ? v : null)}
+                    />
                   </Grid> */}
+                </Grid>
+              </Grid>
+              <Grid item xs={2} className={classes.item}>
+                <PublishedComponent
+                  pubRef="insuree.Avatar"
+                  photo={!!edited?.photoUrl ? edited?.photoUrl : null}
+                  readOnly={readOnly}
+                  withMeta={true}
+                  onChange={(v) => this.updateAttribute("photo", !!v ? v : null)}
+                />
+              </Grid>
+              <Grid item xs={3} className={classes.item}>
+                    <TextInput
+                      module="insuree"
+                      label="Insuree.employee_number"
+                      required={false}
+                      readOnly={readOnly}
+                      value={!!edited && !!edited?.jsonExt?.employeeNumber ? edited?.jsonExt?.employeeNumber : ""}
+                      // onChange={(v) => {
+                      //   this.updateExts("employee_number", v);
+                      // }}
+                      onChange={(v) => this.updateExts({ employeeNumber: v })}
+
+                    />
+                  </Grid>
                   <Grid item xs={3} className={classes.item}>
                     <PublishedComponent
                       pubRef="insuree.EducationPicker"
@@ -604,17 +662,6 @@ class InsureeMasterPanel extends FormPanel {
                       onChange={(v) => this.updateAttribute("passport", !!v ? v : null)}
                     />
                   </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={4} className={classes.item}>
-                <PublishedComponent
-                  pubRef="insuree.Avatar"
-                  photo={!!edited?.photoUrl ? edited?.photoUrl : null}
-                  readOnly={readOnly}
-                  withMeta={true}
-                  onChange={(v) => this.updateAttribute("photo", !!v ? v : null)}
-                />
-              </Grid>
 
               <Contributions
                 {...this.props}
