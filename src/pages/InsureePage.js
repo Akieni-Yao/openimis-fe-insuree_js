@@ -38,6 +38,9 @@ class InsureePage extends Component {
         this.setState({ isOpenSnackbar: true });
         this.setState({ snackbarMsg: `Insuree Created with Temporary CAMU number` });
         this.setState({ camuNumberRes: response?.insurees[0].insuree.chfId });
+        setTimeout(() => {
+          this.props.history.goBack();
+        }, 2000)
       }
     } else {
       const response = await this.props.updateInsuree(
@@ -51,9 +54,9 @@ class InsureePage extends Component {
       if (!response.error) {
         this.setState({ isOpenSnackbar: true });
         this.setState({
-          snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${
-            insuree.status == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
-          } `,
+          snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${insuree.status == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+            } `,
+
           // camuNumberRes: response?.insurees[0].insuree.camuNumber
           //   ? response?.insurees[0].insuree.camuNumber
           //   : response?.insurees[0].insuree.chfId,
@@ -77,6 +80,9 @@ class InsureePage extends Component {
             ? response?.insurees[0].insuree.camuNumber
             : response?.insurees[0].insuree.chfId,
         });
+        setTimeout(() => {
+          this.props.history.goBack();
+        }, 2000)
       }
     }
   };

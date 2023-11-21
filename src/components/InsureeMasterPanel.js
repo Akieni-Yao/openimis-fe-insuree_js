@@ -77,7 +77,7 @@ class InsureeMasterPanel extends FormPanel {
       data["jsonExt"].nbKids = 0;
     }
     if (!updates.nationality) {
-      data["jsonExt"].nationality = "CD";
+      data["jsonExt"].nationality = "CG";
     }
     if (!updates?.civilQuality) {
       !!data?.relationship && data?.relationship.id == 8
@@ -451,7 +451,7 @@ class InsureeMasterPanel extends FormPanel {
                       value={
                         !!edited && !!edited.jsonExt && edited?.jsonExt?.nationality
                           ? edited?.jsonExt?.nationality
-                          : "CD"
+                          : "CG"
                       }
                       module="insuree"
                       readOnly={readOnly}
