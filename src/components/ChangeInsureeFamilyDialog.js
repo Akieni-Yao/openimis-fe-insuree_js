@@ -19,7 +19,9 @@ class ChangeInsureeFamilyDialog extends Component {
     super(props);
     this.canCancel = props.modulesManager.getConf("fe-insuree", "canCancelPoliciesOnChangeInsureeFamily", true);
     this.canKeep = props.modulesManager.getConf("fe-insuree", "canKeepPoliciesOnChangeInsureeFamily", true);
+   
   }
+
 
   render() {
     const { classes, family, insuree, onCancel, onConfirm } = this.props;
@@ -39,6 +41,7 @@ class ChangeInsureeFamilyDialog extends Component {
               id="changeInsureeFamilyDialog.message"
               values={{ insuree: insureeLabel(insuree), family: familyLabel(family) }}
             />
+         
           </DialogContentText>
         </DialogContent>
         <DialogActions>

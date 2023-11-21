@@ -42,13 +42,15 @@ class FamilyMasterPanel extends FormPanel {
     if (data["jsonExt"] === undefined) {
       data["jsonExt"] = updates;
     } else {
-      data["jsonExt"] = { ...data["jsonExt"], ...updates };
+      data["jsonExt"] = { ...updates };
     }
     this.props.onEditedChanged(data);
+    console.log('data', data["jsonExt"])
   };
 
   headSummary = () => {
     const { classes, edited } = this.props;
+
     return (
       <Fragment>
         <Grid item xs={3} className={classes.item}>
@@ -109,6 +111,7 @@ class FamilyMasterPanel extends FormPanel {
 
   render() {
     const { intl, classes, edited, openFamilyButton = false, readOnly, overview } = this.props;
+    console.log('editedfamily',edited);
     return (
       <Fragment>
         <Grid container className={classes.tableTitle}>
@@ -157,11 +160,22 @@ class FamilyMasterPanel extends FormPanel {
               label="Family.enrolmentType"
               required
               readOnly={readOnly}
+              // value={
+              //   !!edited && edited?.ext
+              //     ? // ? edited.ext.enrolmentType
+              //       edited?.ext?.enrolmentType
+              //     : // : edited?.jsonExt?.enrolmentType
+              //       // edited?.jsonExt?.enrolmentType
+              //       null
+              // }
               value={
                 !!edited && edited?.ext
-                  ? // ? edited?.jsonExt?.enrolmentType
+                  ?
                     edited?.ext?.enrolmentType
-                  : edited?.jsonExt?.enrolmentType
+                  : 
+                  !!edited && (edited?.jsonExt).length
+                  ? JSON.parse(edited?.jsonExt)?.enrolmentType
+                  : null
                 // edited?.jsonExt?.enrolmentType
                 // null
               }
@@ -177,6 +191,7 @@ class FamilyMasterPanel extends FormPanel {
               multiline
               rows={2}
               readOnly={readOnly}
+              required={true}
               value={!edited ? "" : edited.address}
               onChange={(v) => this.updateAttribute("address", v)}
             />

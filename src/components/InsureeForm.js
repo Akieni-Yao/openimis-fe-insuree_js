@@ -16,7 +16,11 @@ import {
   parseData,
   ProgressOrError,
   Helmet,
+  FormattedMessage,
+  formatMessage,
 } from "@openimis/fe-core";
+import Snackbar from "@material-ui/core/Snackbar";
+import Alert from "@material-ui/lab/Alert";
 import {
   fetchInsureeFull,
   fetchFamily,
@@ -25,6 +29,8 @@ import {
   fetchInsureeDocuments,
   updateExternalDocuments,
   sendEmail,
+  printReport,
+  approverInsureeComparison,
 } from "../actions";
 import { RIGHT_INSUREE } from "../constants";
 import { insureeLabel } from "../utils/utils";
@@ -32,26 +38,29 @@ import FamilyDisplayPanel from "./FamilyDisplayPanel";
 import InsureeMasterPanel from "../components/InsureeMasterPanel";
 import RejectDialog from "../dialogs/RejectDialog";
 import HelpIcon from "@material-ui/icons/Help";
+// import { approverCountCheck } from "../actions";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@material-ui/core";
+import FileCopyIcon from "@material-ui/icons/FileCopy";
 
 const styles = (theme) => ({
   page: theme.page,
   lockedPage: theme.page.locked,
   approvedBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     marginRight: "5px",
     borderColor: "#00913E",
     color: "#00913E",
     borderRadius: "2rem",
   },
   rejectBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     marginRight: "5px",
     borderColor: "##FF0000",
     color: "##FF0000",
     borderRadius: "2rem",
   },
   commonBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     marginRight: "5px",
     borderColor: "#FF841C",
     color: "#FF841C",
@@ -70,7 +79,47 @@ const styles = (theme) => ({
   },
   spanPadding: {
     paddingTop: theme.spacing(1),
-    marginRight: '5px'
+    marginRight: "5px",
+  },
+  dialogBg: {
+    backgroundColor: "#FFFFFF",
+    width: 300,
+    paddingRight: 20,
+    paddingLeft: 20,
+    paddingTop: 10,
+    paddingBootom: 10,
+  },
+  dialogText: {
+    color: "#000000",
+    fontWeight: "Bold",
+  },
+  primaryHeading: {
+    font: "normal normal medium 20px/22px Roboto",
+    color: "#333333",
+  },
+  primaryButton: {
+    backgroundColor: "#FFFFFF 0% 0% no-repeat padding-box",
+    border: "1px solid #999999",
+    color: "#999999",
+    borderRadius: "4px",
+    // fontWeight: "bold",
+    "&:hover": {
+      backgroundColor: "#FF0000",
+      border: "1px solid #FF0000",
+      color: "#FFFFFF",
+    },
+  }, //theme.dialog.primaryButton,
+  secondaryButton: {
+    backgroundColor: "#FFFFFF 0% 0% no-repeat padding-box",
+    border: "1px solid #999999",
+    color: "#999999",
+    borderRadius: "4px",
+    // fontWeight: "bold",
+    "&:hover": {
+      backgroundColor: "#FF0000",
+      border: "1px solid #FF0000",
+      color: "#FFFFFF",
+    },
   },
 });
 
@@ -87,6 +136,10 @@ class InsureeForm extends Component {
     payload: null,
     isFormValid: true,
     email: true,
+    success: false,
+    successMessage: "",
+    copyText: null,
+    isCopied: false,
   };
 
   _newInsuree() {
@@ -107,6 +160,10 @@ class InsureeForm extends Component {
       let insuree = { ...this.state.insuree };
       insuree.family = { ...this.props.family };
       this.setState({ insuree });
+    }
+
+    if (!!this.props.insuree_uuid) {
+      this.props.approverInsureeComparison(this.props.modulesManager, this.props.insuree_uuid);
     }
   }
 
@@ -206,9 +263,17 @@ class InsureeForm extends Component {
     // if (!this.props.isInsureeNumberValid) return false;
     // if (!this.state.insuree.chfId) return false;
     if (!this.state.insuree?.jsonExt?.insureeEnrolmentType) return false;
-    if (!this.state.insuree?.jsonExt?.createdAt) return false;
+    // if (!this.state.insuree?.jsonExt?.createdAt) return false;
+    if (!this.state.insuree?.jsonExt?.BirthPlace) return false;
+    // if (!this.state.insuree?.jsonExt?.nationality) return false;
+    // if (!this.state.insuree?.jsonExt?.nbKids) return false;
+    // if (!this.state.insuree?.jsonExt?.civilQuality) return false;
     if (!this.state.insuree.lastName) return false;
+    if (!this.state.insuree.phone) return false;
     if (!this.state.insuree.otherNames) return false;
+    if (!this.state.insuree.marital) return false;
+    if (!this.state.insuree.typeOfId) return false;
+    if (!this.state.insuree.passport) return false;
     if (!this.state.insuree.dob) return false;
     if (!this.state.insuree.gender || !this.state.insuree.gender?.code) return false;
     // if (!this.state.isFormValid == true) return false;
@@ -225,10 +290,11 @@ class InsureeForm extends Component {
     );
   };
   _approveorreject = (insuree) => {
-    // this.props.updateExternalDocuments(this.props.modulesManager, this.props.documentsData, insuree.chfId);
+    // if (insuree.status !== "APPROVED")
+    //   this.props.updateExternalDocuments(this.props.modulesManager, this.props.documentsData, insuree.chfId);
     this.setState(
       { lockNew: true }, // avoid duplicates
-      (e) => this.props.save(insuree),
+      (e) => this.props.save({ ...insuree, documentData: this.props.documentsData }),
     );
     this.handleDialogClose();
   };
@@ -243,6 +309,7 @@ class InsureeForm extends Component {
   };
 
   onEditedChanged = (insuree) => {
+    console.log('onEditedChangedinsu',(insuree))
     this.setState({ insuree, newInsuree: false });
   };
 
@@ -253,31 +320,38 @@ class InsureeForm extends Component {
     switch (status) {
       case "PRE_REGISTERED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Pre Registered";
+        docsStatus = "buttonStatus.preRegistered";
+        docsStatus = "buttonStatus.preRegistered";
         break;
       case "APPROVED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Approved";
+        docsStatus = "buttonStatus.approved";
+        docsStatus = "buttonStatus.approved";
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
-        docsStatus = "Rejected";
+        docsStatus = "buttonStatus.rejected";
+        docsStatus = "buttonStatus.rejected";
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Rework";
+        docsStatus = "buttonStatus.rework";
+        docsStatus = "buttonStatus.rework";
         break;
       case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting for document and biometric";
+        docsStatus = "buttonStatus.waitingDocumentBiometric";
+        docsStatus = "buttonStatus.waitingDocumentBiometric";
         break;
       case "WAITING_FOR_APPROVAL":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting For Approval";
+        docsStatus = "buttonStatus.waitingApproval";
+        docsStatus = "buttonStatus.waitingApproval";
         break;
       case "WAITING_FOR_QUEUE":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting For Queue";
+        docsStatus = "buttonStatus.waitingQueue";
+        docsStatus = "buttonStatus.waitingQueue";
         break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
@@ -290,10 +364,10 @@ class InsureeForm extends Component {
     return (
       <Grid className={this.props.classes.margin2}>
         <Typography component="span" className={this.props.classes.spanPadding}>
-          STATUS : 
+          STATUS :
         </Typography>
         <Button className={selectedClass} variant="outlined">
-          {docsStatus}
+          {formatMessage(this.props.intl, "insuree", docsStatus)}
         </Button>
         {data.status == "REWORK" || data.status == "REJECTED" ? (
           <Tooltip
@@ -320,8 +394,71 @@ class InsureeForm extends Component {
       </Grid>
     );
   };
-  emailButton = (edited) => {
-    this.props.sendEmail(this.props.modulesManager, edited);
+  displayPrintWindow = (base64Data, contentType) => {
+    const printWindow = window.open("", "Print Window", "width=600, height=400");
+    printWindow.document.open();
+
+    if (contentType === "pdf") {
+      // printWindow.print(`<embed type="application/pdf" width="100%" height="100%" src="data:application/pdf;base64,${base64Data}" />`);
+      printWindow.document.write(
+        `<embed type="application/pdf" width="100%" height="100%" src="data:application/pdf;base64,${base64Data}" />`,
+      );
+    } else {
+      printWindow.document.write(`<img src="data:image/png;base64,${base64Data}" />`);
+    }
+
+    printWindow.document.close();
+    // printWindow.print();
+  };
+  emailButton = async (edited) => {
+    // console.log(edited, "edited")
+    const message = await this.props.sendEmail(this.props.modulesManager, edited);
+    // console.log("message", message?.payload?.data?.sentNotification?.message)
+    if (!!message?.payload?.data?.sentNotification?.data) {
+      // If the email was sent successfully, update the success state and message
+      this.setState({
+        success: true,
+        successMessage: "Email_sent_successfully",
+      });
+    } else {
+      // If the email send was not successful, you can also set success to false here
+      // and provide an appropriate error message.
+      this.setState({
+        success: false,
+        successMessage: "Email sending failed",
+      });
+    }
+  };
+  printReport = async (edited) => {
+    // console.log(edited, "edited")
+    const data = await this.props.printReport(this.props.modulesManager, edited);
+    // console.log(data,"base64Data")
+    const base64Data = data?.payload?.data?.sentNotification?.data;
+
+    const contentType = "pdf";
+    if (base64Data) {
+      this.displayPrintWindow(base64Data, contentType);
+    }
+    // console.log(decodeURI(data?.payload?.data?.sentNotification?.data), "decode data");
+  };
+  cancel = () => {
+    this.setState({
+      success: false,
+    });
+  };
+  handleCopyClick = (familyText) => {
+    // const { copyText } = this.state; // Assuming copyText is stored in component state
+
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(familyText)
+        .then(() => {
+          this.setState({ isCopied: true });
+        })
+        .catch((err) => {
+          console.error("Failed to copy text: ", err);
+        });
+    }
   };
   render() {
     const {
@@ -340,9 +477,10 @@ class InsureeForm extends Component {
       add,
       save,
       documentsData,
+      approverData,
     } = this.props;
     const { insuree, clientMutationId, payload, statusCheck, email } = this.state;
-
+    console.log('insuree',insuree);
     if (!rights.includes(RIGHT_INSUREE)) return null;
     let runningMutation = !!insuree && !!clientMutationId;
     let actions = [
@@ -355,19 +493,44 @@ class InsureeForm extends Component {
         button: this.statusButton(insuree),
       },
     ];
+    const getCopyLabel = () => {
+      // const { insuree } = this.state;
+      const label = insureeLabel(insuree);
+      return (
+        <React.Fragment>
+          {label}
+          {!!insuree.camuNumber || !!insuree.chfId ? (
+            <IconButton
+              size="small"
+              onClick={() =>
+                this.handleCopyClick(!!insuree.camuNumber ? insuree.camuNumber : !!insuree.chfId ? insuree.chfId : "")
+              }
+              style={{ marginLeft: "4px" }}
+              color="inherit"
+            >
+              <FileCopyIcon />
+            </IconButton>
+          ) : null}
+          {this.state.isCopied ? "Copied!" : ""}
+        </React.Fragment>
+      );
+    };
     const allApprovedOrRejected =
       documentsData &&
       documentsData.every(
         (document) => document.documentStatus === "APPROVED" || document.documentStatus === "REJECTED",
       );
     const hasReject =
-      (allApprovedOrRejected && documentsData.some((document) => document.documentStatus === "REJECTED")) ||
-      (allApprovedOrRejected && !this.state.insuree.biometricsIsMaster);
+      documentsData && documentsData.length > 0
+        ? (allApprovedOrRejected && documentsData.some((document) => document.documentStatus === "REJECTED")) ||
+          (allApprovedOrRejected && !this.state.insuree.biometricsIsMaster)
+        : false;
     const allApproved =
       documentsData && documentsData.length > 0
         ? documentsData.every((document) => document.documentStatus === "APPROVED") &&
           this.state.insuree.biometricsIsMaster
         : false;
+
     return (
       <div className={runningMutation ? classes.lockedPage : null}>
         <Helmet
@@ -382,7 +545,8 @@ class InsureeForm extends Component {
             <Form
               module="insuree"
               title="Insuree.title"
-              titleParams={{ label: insureeLabel(this.state.insuree) }}
+              titleParams={{ label: getCopyLabel() }}
+              // titleParams={{ label: insureeLabel(this.state.insuree) }}
               edited_id={insuree_uuid}
               edited={this.state.insuree}
               reset={this.state.reset}
@@ -403,9 +567,13 @@ class InsureeForm extends Component {
               approveorreject={this._approveorreject}
               handleDialogOpen={this.handleDialogOpen}
               onValidation={this.onValidation}
-              // emailButton={this.emailButton}
-              // email={insuree_uuid}
-              print={true}
+              emailButton={this.emailButton}
+              email={this.state.insuree?.camuNumber}
+              // emailCheck={this.state.insuree?.camuNumber}
+              print={this.state.insuree?.camuNumber}
+              printButton={this.printReport}
+              approverData={approverData}
+              success={this.state.success}
             />
           )}
         <RejectDialog
@@ -417,6 +585,24 @@ class InsureeForm extends Component {
           classes={classes}
           edited={this.state.insuree}
         />
+        {this.state.success && (
+          <Dialog open={this.state.success} onClose={this.cancel} maxWidth="md">
+            <DialogContent className={classes.dialogBg}>
+              <DialogContentText className={classes.primaryHeading}>
+                <FormattedMessage
+                  module="insuree"
+                  id="success"
+                  // values={this.state.successMessage}
+                />
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions className={classes.dialogBg}>
+              <Button onClick={this.cancel} className={classes.secondaryButton}>
+                <FormattedMessage module="core" id="cancel" />
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
       </div>
     );
   }
@@ -436,6 +622,7 @@ const mapStateToProps = (state, props) => ({
   mutation: state.insuree.mutation,
   isInsureeNumberValid: state.insuree?.validationFields?.insureeNumber?.isValid,
   documentsData: state.insuree.documentsData,
+  approverData: state.insuree.approverData,
 });
 
 export default withHistory(
@@ -449,6 +636,9 @@ export default withHistory(
       fetchInsureeDocuments,
       updateExternalDocuments,
       sendEmail,
+      printReport,
+      approverInsureeComparison,
+      // approverCountCheck,
     })(injectIntl(withTheme(withStyles(styles)(InsureeForm)))),
   ),
 );

@@ -27,10 +27,27 @@ const FAMILY_FULL_PROJECTION = (mm) => [
   "status",
   FAMILY_HEAD_PROJECTION,
   "location" + mm.getProjection("location.Location.FlatProjection"),
-  "clientMutationId",
   "jsonExt",
 ];
 
+const PENDING_APPROVAL_PROJECTION =
+  "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code},camuNumber,status}";
+
+const PENDING_FULL_PROJECTION = (mm) => [
+  "id",
+  "uuid",
+  "poverty",
+  "confirmationNo",
+  "confirmationType{code}",
+  "familyType{code}",
+  "address",
+  "validityFrom",
+  "validityTo",
+  "status",
+  PENDING_APPROVAL_PROJECTION,
+  "location" + mm.getProjection("location.Location.FlatProjection"),
+  "jsonExt",
+];
 export const FAMILY_PICKER_PROJECTION = ["id", "uuid", "headInsuree{id chfId uuid lastName otherNames}"];
 
 const INSUREE_FULL_PROJECTION = (mm) => [
@@ -66,6 +83,7 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
   "jsonExt",
   "camuNumber",
+  "createdBy",
 ];
 
 export const INSUREE_PICKER_PROJECTION = ["id", "uuid", "chfId", "lastName", "otherNames"];
@@ -101,6 +119,7 @@ export function fetchInsuree(mm, chfid) {
       "biometricsIsMaster",
       "healthFacility" + mm.getProjection("location.HealthFacilityPicker.projection"),
       "jsonExt",
+      "createdBy",
     ],
   );
   return graphql(payload, "INSUREE_INSUREE");
@@ -140,12 +159,7 @@ export function fetchFamilySummaries(mm, filters) {
 }
 export function fetchPendingForApproval(mm, familyUuid, headInsureeChfId) {
   let filters = [];
-  // if (!!familyUuid) {
-  //   filters.push(`uuid: "${familyUuid}"`, "showHistory: true");
-  // } else {
-  //   filters.push(`headInsuree_ChfId: "${headInsureeChfId}"`);
-  // }
-  const payload = formatPageQuery("approverFamilies", filters, FAMILY_FULL_PROJECTION(mm));
+  const payload = formatPageQuery("approverFamilies", filters, PENDING_FULL_PROJECTION(mm));
   return graphql(payload, "INSUREE_PENDINGAPPROVAL");
 }
 
@@ -269,6 +283,7 @@ export function fetchInsureeSummaries(mm, filters) {
     "dob",
     "marital",
     "camuNumber",
+    "status",
     "family{uuid,location" + mm.getProjection("location.Location.FlatProjection") + "}",
     "currentVillage" + mm.getProjection("location.Location.FlatProjection"),
   ];
@@ -313,7 +328,7 @@ function formatExternalDocument(docs, tempCamu) {
     ${result.documentUpdates
       .map(
         (update) =>
-          `{ documentId: "${update.documentId}", status: "${update.status}", comments: "${update.comments}" }`,
+          `{ documentId: "${update.documentId}", status: "${update.status}", comments: "${update.comments}" },`,
       )
       .join("\n")}
     ]
@@ -324,13 +339,24 @@ function formatExternalDocument(docs, tempCamu) {
 function formatMail(edited) {
   console.log(edited, "format");
   let reportName = "";
-  if (edited?.camuNumber != null) {
+  if (!!edited?.camuNumber) {
     reportName = "enrollment_receipt";
   } else {
     reportName = "pre_enrollment_receipt";
   }
   const formatMail = `uuid: "${edited?.uuid}",  isEmail: ${true},reportName: "${reportName}"`;
   return formatMail;
+}
+function formatPrint(edited) {
+  let reportName = "";
+  if (!!edited?.camuNumber) {
+    reportName = "enrollment_receipt";
+  } else {
+    reportName = "enrollment_receipt_for_print";
+  }
+
+  const formatPrint = `uuid: "${edited?.headInsuree?.uuid}",  isEmail: ${false},reportName: "${reportName}"`;
+  return formatPrint;
 }
 // function formatExternalDocument(docs, tempCamu) {
 //   const newarray = docs.map((doc) => ({
@@ -383,6 +409,7 @@ export function formatInsureeGQL(mm, insuree) {
 }
 
 export function formatFamilyGQL(mm, family) {
+  console.log("Famllly",family)
   let headInsuree = family.headInsuree;
   headInsuree["head"] = true;
   return `
@@ -398,7 +425,7 @@ export function formatFamilyGQL(mm, family) {
         : ""
     }
     ${!!family.confirmationNo ? `confirmationNo: "${formatGQLString(family.confirmationNo)}"` : ""}
-    ${!!family.jsonExt ? `jsonExt: ${formatJsonField(family.jsonExt)}` : ""}
+    ${!!family.jsonExt ? `jsonExt: ${formatJsonField(family.jsonExt?.enrolmentType?family.jsonExt: JSON.parse(family.jsonExt))}` : ""}
     ${!!family.contribution ? `contribution: ${formatJsonField(family.contribution)}` : ""}
   `;
 }
@@ -632,12 +659,13 @@ export function updateInsureeDocument(mm, insuree) {
 }
 
 export function updateExternalDocuments(mm, docs, tempCamu) {
-  let mutation = `mutation 
+  console.log("docs", docs);
+  let mutation = `mutation UpdateStatusInExternalEndpoint {
   updateStatusInExternalEndpoint(${formatExternalDocument(docs, tempCamu)}) {
     success
     message
     responses
-  }`;
+  }}`;
   return graphql(
     mutation,
     ["INSUREE_MUTATION_REQ", "INSUREE_UPDATE_EXTERNAL_DOCUMENT_RESP", "INSUREE_MUTATION_ERR"],
@@ -649,10 +677,66 @@ export function sendEmail(mm, edited) {
     sentNotification(${formatMail(edited)}) {
     success
     message
+    data
   }}`;
   return graphql(
     mutation,
     ["INSUREE_MUTATION_REQ", "INSUREE_SEND_EMAIL_RESP", "INSUREE_MUTATION_ERR"],
-    "success message responses",
+    "success message",
   );
+}
+export function approverInsureeComparison(mm, edited) {
+  let mutation = `query ApproverInsureeComparison {
+    approverInsureeComparison(uuid: "${edited}") {
+        approverUuid
+    }
+}`;
+  return graphql(mutation, "INSUREE_APPROVER");
+}
+
+export function taskGroupCreator(edited) {
+  let mutation = `query TaskGroupByInsureeCreator {
+    taskGroupByInsureeCreator(creatorUuid: "${edited}") {
+        id
+        uuid
+        name
+    }
+}`;
+  return graphql(mutation, "INSUREE_CREATEDBY");
+}
+
+export function printReport(mm, edited) {
+  let mutation = `mutation SendNotification{
+    sentNotification(${formatPrint(edited)}) {
+    success
+    message
+    data
+  }}`;
+  return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_REPORT_RESP", "INSUREE_MUTATION_ERR"], "success message");
+}
+const POLICYHOLDER_FULL_PROJECTION = (modulesManager) => [
+  "id",
+  "code",
+  "tradeName",
+  "locations" + modulesManager.getProjection("location.Location.FlatProjection"),
+  "address",
+  "phone",
+  "fax",
+  "email",
+  "contactName",
+  "legalForm",
+  "activityCode",
+  "accountancyAccount",
+  "bankAccount",
+  "paymentReference",
+  "dateValidFrom",
+  "dateValidTo",
+  "isDeleted",
+  "jsonExt",
+];
+
+export function fetchPolicyHolderFamily(modulesManager, familyUuid) {
+  let filter = !!familyUuid ? `familyUuid: "${familyUuid}"` : "";
+  const payload = formatPageQuery("policyHolderByFamily", [filter], POLICYHOLDER_FULL_PROJECTION(modulesManager));
+  return graphql(payload, "POLICYHOLDER_FAMILY");
 }

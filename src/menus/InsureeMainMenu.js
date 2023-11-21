@@ -1,30 +1,34 @@
 import React, { Component } from "react";
 import { injectIntl } from "react-intl";
 import { connect } from "react-redux";
-import { AssignmentInd, GroupAdd, People, Person } from "@material-ui/icons";
+import { AssignmentInd, GroupAdd, People, Person, ListAlt } from "@material-ui/icons";
 import HistoryIcon from "@material-ui/icons/History";
-import { formatMessage, MainMenuContribution, withModulesManager } from "@openimis/fe-core";
-import { RIGHT_FAMILY, RIGHT_FAMILY_ADD, RIGHT_INSUREE } from "../constants";
+import { formatMessage, MainMenuContribution, withModulesManager, FormattedMessage } from "@openimis/fe-core";
+import { RIGHT_FAMILY, RIGHT_FAMILY_ADD, RIGHT_INSUREE, RIGHT_POLICY } from "../constants";
 
 const INSUREE_MAIN_MENU_CONTRIBUTION_KEY = "insuree.MainMenu";
 
 class InsureeMainMenu extends Component {
   render() {
-    const { modulesManager, rights } = this.props;
+    const { modulesManager, rights, insureeCount } = this.props;
+    const ROUTE_POLICY_POLICIES = "policy/policies";
+    const ROUTE_POLICY_POLICY = "policy/policy";
+
     let entries = [];
-    if (rights.includes(RIGHT_INSUREE)) {
+    // if (rights.includes(RIGHT_FAMILY_ADD)) {
+    //   entries.push({
+    //     text: formatMessage(this.props.intl, "insuree", "menu.addFamilyOrGroup"),
+    //     icon: <GroupAdd />,
+    //     route: "/" + modulesManager.getRef("insuree.route.family"),
+    //     withDivider: true,
+    //   });
+    // }
+    if (rights.includes(RIGHT_INSUREE) && insureeCount) {
       entries.push({
         text: formatMessage(this.props.intl, "insuree", "menu.pendingApproval"),
         icon: <HistoryIcon />,
         route: "/" + modulesManager.getRef("insuree.route.pendingApproval"),
         withDivider: true,
-      });
-    }
-    if (rights.includes(RIGHT_FAMILY_ADD)) {
-      entries.push({
-        text: formatMessage(this.props.intl, "insuree", "menu.addFamilyOrGroup"),
-        icon: <GroupAdd />,
-        route: "/" + modulesManager.getRef("insuree.route.family"),
       });
     }
     if (rights.includes(RIGHT_FAMILY)) {
@@ -41,7 +45,13 @@ class InsureeMainMenu extends Component {
         route: "/" + modulesManager.getRef("insuree.route.insurees"),
       });
     }
-
+    if (rights.includes(RIGHT_POLICY)) {
+      entries.push({
+        text: <FormattedMessage module="policy" id="menu.policies" />,
+        icon: <ListAlt />,
+        route: "/" + ROUTE_POLICY_POLICIES,
+      });
+    }
     // entries.push(
     //   ...this.props.modulesManager
     //     .getContribs(INSUREE_MAIN_MENU_CONTRIBUTION_KEY)
@@ -62,6 +72,7 @@ class InsureeMainMenu extends Component {
 
 const mapStateToProps = (state) => ({
   rights: !!state.core && !!state.core.user && !!state.core.user.i_user ? state.core.user.i_user.rights : [],
+  insureeCount: state.insuree.countData,
 });
 
 export default withModulesManager(injectIntl(connect(mapStateToProps)(InsureeMainMenu)));

@@ -151,7 +151,7 @@ class InsureeDocuments extends PagedDataHandler {
     );
   };
   handleExternalNavigation = () => {
-    window.open("https://abis.akieni.com/public/enrollment/index.html#/enroll/applicant-detail", "_blank");
+    window.open(process.env.REACT_APP_ABIS_URL, "_blank");
   };
   approved = async (docData) => {
     const response = await this.props.updateInsureeDocument(docData);
@@ -249,7 +249,7 @@ class InsureeDocuments extends PagedDataHandler {
   };
 
   formatters = [
-    (i) => i.documentName || "",
+    (i) => formatMessage(this.props.intl, "insuree", i.documentName)|| "",
     (i) => !!i.documentId && this.viewDocumentAction(i.documentId),
 
     (i) => {
@@ -321,7 +321,7 @@ class InsureeDocuments extends PagedDataHandler {
             {
               button: (
                 <Button onClick={this.handleExternalNavigation} variant="contained" color="primary">
-                  Collect Biometric
+                  {formatMessage(intl, "insuree", "Insuree.CollectBiometric")}
                 </Button>
               ),
             },
@@ -457,9 +457,9 @@ class InsureeDocuments extends PagedDataHandler {
                     {`  ${
                       edited?.biometricsStatus
                         ? edited.biometricsIsMaster
-                          ? "Master record found"
-                          : "Duplicate record found"
-                        : "Biometric Detail is not provided"
+                          ? formatMessage(this.props.intl, "insuree", "Insuree.biometricStatus.masterRecordFound")
+                          : formatMessage(this.props.intl, "insuree", "Insuree.biometricStatus.duplicateRecordFound")
+                        : formatMessage(this.props.intl, "insuree", "Insuree.biometricStatus.detailNotProvided")
                     }`}
                   </Typography>
                 </Grid>

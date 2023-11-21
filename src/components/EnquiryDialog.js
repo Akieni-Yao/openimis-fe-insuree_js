@@ -15,6 +15,7 @@ import {
   withHistory,
 } from "@openimis/fe-core";
 import InsureeSummary from "./InsureeSummary";
+import PolicySummary from "./PolicySummary";
 
 const useStyles = makeStyles(() => ({
   summary: {
@@ -23,7 +24,9 @@ const useStyles = makeStyles(() => ({
 }));
 
 const EnquiryDialog = (props) => {
-  const { intl, modulesManager, fetchInsuree, fetching, fetched, insuree, error, onClose, open, chfid, match } = props;
+  const { intl, modulesManager, fetchInsuree, fetching, fetched, insuree, error, onClose, open, chfid, match, family } =
+    props;
+  console.log("overview", family);
   const classes = useStyles();
   const prevMatchUrl = useRef(null);
 
@@ -39,7 +42,6 @@ const EnquiryDialog = (props) => {
     if (!!match?.url) {
       prevMatchUrl.current = match.url;
     }
-
   }, [open, chfid, match?.url]);
 
   return (
@@ -57,6 +59,7 @@ const EnquiryDialog = (props) => {
         {!fetching && insuree && (
           <Fragment>
             <InsureeSummary modulesManager={modulesManager} insuree={insuree} className={classes.summary} />
+
             <Contributions contributionKey="insuree.EnquiryDialog" insuree={insuree} />
           </Fragment>
         )}

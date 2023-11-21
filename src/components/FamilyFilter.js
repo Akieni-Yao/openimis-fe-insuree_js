@@ -10,6 +10,7 @@ import {
   PublishedComponent,
   ControlledField,
   TextInput,
+  ConstantBasedPicker,
 } from "@openimis/fe-core";
 
 const styles = (theme) => ({
@@ -23,7 +24,15 @@ const styles = (theme) => ({
   },
   paperDivider: theme.paper.divider,
 });
-
+const FAMILY_STATUS_TYPE = [
+  "PRE_REGISTERED",
+  "APPROVED",
+  "WAITING_FOR_DOCUMENT_AND_BIOMETRIC",
+  "WAITING_FOR_APPROVAL",
+  "WAITING_FOR_QUEUE",
+  "ACTIVE",
+  "REJECTED",
+];
 class FamilyFilter extends Component {
   state = {
     showHistory: false,
@@ -334,6 +343,31 @@ class FamilyFilter extends Component {
             </Grid>
           }
         />
+        {/* <ControlledField
+          module="insuree"
+          id="Insuree.status"
+          field={
+            <Grid item xs={2} className={classes.item}>
+              <ConstantBasedPicker
+                module="insuree"
+                label="Insuree.status"
+                readOnly={false}
+                value={this._filterValue("status")}
+                onChange={(v) =>
+                  onChangeFilters([
+                    {
+                      id: "status",
+                      value: v,
+                      filter: v === null ? null : `status: ${v}`,
+                    },
+                  ])
+                }
+                constants={FAMILY_STATUS_TYPE}
+                withNull
+              />
+            </Grid>
+          }
+        /> */}
         <ControlledField
           module="insuree"
           id="FamilyFilter.confirmationNo"
@@ -356,7 +390,7 @@ class FamilyFilter extends Component {
               />
             </Grid>
           }
-        /> 
+        />
         <ControlledField
           module="insuree"
           id="PolicyFilter.officer"

@@ -44,6 +44,7 @@ import InsureePendingEnrollmentReport from "./reports/InsureePendingEnrollmentRe
 import RejectCommentPicker from "./pickers/RejectCommentPicker";
 import ReviewerPicker from "./pickers/ReviwerPicker";
 import PendingApproval from "./components/PendingApproval";
+import PolicySummary from "./components/PolicySummary";
 
 const ROUTE_INSUREE_FAMILIES = "insuree/families";
 const ROUTE_INSUREE_FAMILY_OVERVIEW = "insuree/families/familyOverview";
@@ -139,6 +140,7 @@ const DEFAULT_CONFIG = {
 
     { key: "insuree.Avatar", ref: InsureeAvatar },
     { key: "insuree.Summary", ref: InsureeSummary },
+    { key: "policyHolder.Summary", ref: PolicySummary },
     { key: "insuree.InsureeFirstServicePointDisplay", ref: InsureeFirstServicePointDisplay },
     { key: "insuree.InsureeFirstServicePointPanel", ref: InsureeFirstServicePointPanel },
     { key: "insuree.InsureeAddress", ref: InsureeAddress },

@@ -74,6 +74,30 @@ function reducer(
     fetchedPendingApproval: false,
     PendingApproval: null,
     errorPendingApproval: null,
+    fetchingApprover: false,
+    fetchedApprover: false,
+    approverData: null,
+    errorApprover: null,
+    fetchingCreatedBy: false,
+    fetchedCreatedBy: false,
+    createdByData: null,
+    errorCreatedBy: null,
+    fetchingCreatedBy: false,
+    fetchedCreatedBy: false,
+    createdByData: null,
+    errorCreatedBy: null,
+    fetchingApprover: false,
+    fetchedApprover: false,
+    approverData: null,
+    errorApprover: null,
+    fetchingCount: false,
+    fetchedCount: false,
+    countData: null,
+    errorCount: null,
+    fetchingPolicyHolder: false,
+    fetchedPolicyHolder: false,
+    policyHolder: null,
+    errorPolicyHolder: null,
   },
   action,
 ) {
@@ -87,6 +111,7 @@ function reducer(
         errorInsuree: null,
       };
     case "INSUREE_INSUREE_RESP":
+      console.log('reducer',parseData(action.payload.data.insurees));
       return {
         ...state,
         fetchingInsuree: false,
@@ -338,6 +363,7 @@ function reducer(
       };
     case "INSUREE_FAMILY_OVERVIEW_RESP":
       var families = parseData(action.payload.data.families);
+      console.log('reducerfamil',parseData(action.payload.data.families));
       return {
         ...state,
         fetchingFamily: false,
@@ -484,6 +510,29 @@ function reducer(
         fetchingPendingApproval: false,
         errorPendingApproval: formatServerError(action.payload),
       };
+    case "INSUREE_CREATEDBY_REQ":
+      return {
+        ...state,
+        fetchingCreatedBy: true,
+        fetchedCreatedBy: false,
+        createdByData: null,
+        errorCreatedBy: null,
+      };
+    case "INSUREE_CREATEDBY_RESP":
+      var families = parseData(action.payload.data.approverFamilies);
+      return {
+        ...state,
+        fetchingCreatedBy: false,
+        fetchedCreatedBy: true,
+        createdByData: !!families && families.length > 0 ? families : null,
+        errorCreatedBy: formatGraphQLError(action.payload),
+      };
+    case "INSUREE_CREATEDBY_ERR":
+      return {
+        ...state,
+        fetchingCreatedBy: false,
+        errorCreatedBy: formatServerError(action.payload),
+      };
     case "INSUREE_DOCUMENTS_REQ":
       return {
         ...state,
@@ -491,6 +540,22 @@ function reducer(
         fetchedDocuments: false,
         documentsData: null,
         errorDocument: null,
+      };
+    case "INSUREE_REPORT_RESP":
+      return {
+        ...state,
+        fetchingReport: false,
+        fetchedReport: true,
+        reportData: action.payload.data.sentNotification?.data,
+        errorreport: formatGraphQLError(action.payload),
+      };
+    case "INSUREE_SEND_EMAIL_RESP":
+      return {
+        ...state,
+        fetchingEmail: false,
+        fetchedEmail: true,
+        EmailData: action.payload.data.sentNotification?.data,
+        errorrEmail: formatGraphQLError(action.payload),
       };
     case "INSUREE_DOCUMENTS_RESP":
       return {
@@ -506,6 +571,75 @@ function reducer(
         fetchingDocuments: false,
         errorDocument: formatServerError(action.payload),
       };
+    case "INSUREE_CREATEDBY_REQ":
+      return {
+        ...state,
+        fetchingCreatedBy: true,
+        fetchedCreatedBy: false,
+        createdByData: null,
+        errorCreatedBy: null,
+      };
+    case "INSUREE_CREATEDBY_RESP":
+      var families = parseData(action.payload.data.approverFamilies);
+      return {
+        ...state,
+        fetchingCreatedBy: false,
+        fetchedCreatedBy: true,
+        createdByData: !!families && families.length > 0 ? families : null,
+        errorCreatedBy: formatGraphQLError(action.payload),
+      };
+    case "INSUREE_CREATEDBY_ERR":
+      return {
+        ...state,
+        fetchingCreatedBy: false,
+        errorCreatedBy: formatServerError(action.payload),
+      };
+    case "INSUREE_APPROVER_REQ":
+      return {
+        ...state,
+        fetchingApprover: true,
+        fetchedApprover: false,
+        approverData: null,
+        errorApprover: null,
+      };
+    case "INSUREE_APPROVER_RESP":
+      return {
+        ...state,
+        fetchingApprover: false,
+        fetchedApprover: true,
+        approverData: action.payload.data.approverInsureeComparison.approverUuid,
+        errorApprover: formatGraphQLError(action.payload),
+      };
+    case "INSUREE_APPROVER_ERR":
+      return {
+        ...state,
+        fetchingApprover: false,
+        errorApprover: formatServerError(action.payload),
+      };
+    case "INSUREE_COUNT_REQ":
+      return {
+        ...state,
+        fetchingCount: true,
+        fetchedCount: false,
+        countData: null,
+        errorCount: null,
+      };
+    case "INSUREE_COUNT_RESP":
+      console.log("RESPONSE", action.payload.approverFamiliesCount.approverFamiliesCount);
+      return {
+        ...state,
+        fetchingCount: false,
+        fetchedCount: true,
+        countData: action.payload.approverFamiliesCount.approverFamiliesCount,
+        errorCount: formatGraphQLError(action.payload),
+      };
+    case "INSUREE_COUNT_ERR":
+      return {
+        ...state,
+        fetchingCount: false,
+        errorCount: formatServerError(action.payload),
+      };
+
     case "INSUREE_NUMBER_VALIDATION_FIELDS_REQ":
       return {
         ...state,
@@ -518,6 +652,42 @@ function reducer(
             validationError: null,
           },
         },
+      };
+    case "POLICYHOLDER_FAMILY_REQ":
+      return {
+        ...state,
+        fetchingPolicyHolder: true,
+        fetchedPolicyHolder: false,
+        policyHolder: null,
+        errorPolicyHolder: null,
+      };
+    case "POLICYHOLDER_FAMILY_RESP":
+      // let arrayRes = [];
+      // if (!!action.payload.data.policyHolderByFamily) {
+      //   const parsedData = (action.payload.data.policyHolderByFamily.edges);
+      //   const foundPolicyHolder = parsedData.find((policyHolder) => !!policyHolder);
+
+      //   if (foundPolicyHolder) {
+      //     arrayRes.push(foundPolicyHolder);
+      //   }
+      // }
+
+      // !!action.payload.data.policyHolderByFamily &&
+      //   arrayRes.push(parseData(action.payload.data.policyHolderByFamily).find((policyHolder) => !!policyHolder));
+      return {
+        ...state,
+        fetchingPolicyHolder: false,
+        fetchedPolicyHolder: true,
+        // policyHolder: arrayRes,
+        policyHolder: action.payload.data.policyHolderByFamily.edges,
+        // policyHolder: (action.payload.data.policyHolderByFamily).find((policyHolder) => !!policyHolder.edges.node),
+        errorPolicyHolder: formatGraphQLError(action.payload),
+      };
+    case "POLICYHOLDER_FAMILY_ERR":
+      return {
+        ...state,
+        fetchingPolicyHolder: false,
+        errorPolicyHolder: formatServerError(action.payload),
       };
     case "INSUREE_NUMBER_VALIDATION_FIELDS_RESP":
       return {
@@ -601,8 +771,10 @@ function reducer(
       return dispatchMutationResp(state, "setFamilyHead", action);
     case "INSUREE_CHANGE_FAMILY_HEAD_RESP":
       return dispatchMutationResp(state, "changeInsureeFamily", action);
-    case "INSUREE_SEND_EMAIL_RESP":
-      return dispatchMutationResp(state, "sentNotification", action);
+    // case "INSUREE_SEND_EMAIL_RESP":
+    //   return dispatchMutationResp(state, "sentNotification", action);
+    // case "INSUREE_PRINT_REPORT_RESP":
+    //   return dispatchMutationResp(state, "sentNotification", action);
     default:
       return state;
   }

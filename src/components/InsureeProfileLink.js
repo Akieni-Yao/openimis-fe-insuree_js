@@ -17,7 +17,7 @@ class InsureeProfileLink extends Component {
     return (
       <Grid item xs={12} className={classes.lnk}>
         <Link href={`${process.env.PUBLIC_URL || ""}/insuree/profile?nshid=${insuree.chfId}`}>
-          <FormattedMessage module="insuree" id="link.profile" />
+          {/* <FormattedMessage module="insuree" id="link.profile" /> */}
         </Link>
       </Grid>
     );

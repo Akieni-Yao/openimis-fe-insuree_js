@@ -19,29 +19,31 @@ import {
 import { RIGHT_FAMILY, RIGHT_FAMILY_EDIT } from "../constants";
 import FamilyMasterPanel from "./FamilyMasterPanel";
 
-import { fetchFamily, newFamily, createFamily, fetchFamilyMutation } from "../actions";
+import { fetchFamily, newFamily, createFamily, fetchFamilyMutation, printReport } from "../actions";
 import FamilyInsureesOverview from "./FamilyInsureesOverview";
 import HeadInsureeMasterPanel from "./HeadInsureeMasterPanel";
 import { Button, Tooltip, IconButton, Typography, Grid } from "@material-ui/core";
 import { insureeLabel } from "../utils/utils";
 import HelpIcon from "@material-ui/icons/Help";
+import { formatMessage } from "@openimis/fe-core";
+import FileCopyIcon from "@material-ui/icons/FileCopy";
 
 const styles = (theme) => ({
   lockedPage: theme.page.locked,
   approvedBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderColor: "#00913E",
     color: "#00913E",
     borderRadius: "2rem",
   },
   rejectBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderColor: "##FF0000",
     color: "##FF0000",
     borderRadius: "2rem",
   },
   commonBtn: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderColor: "#FF841C",
     color: "#FF841C",
     borderRadius: "2rem",
@@ -59,7 +61,7 @@ const styles = (theme) => ({
   },
   spanPadding: {
     paddingTop: theme.spacing(1),
-    marginRight: '5px'
+    marginRight: "5px",
   },
 });
 
@@ -74,6 +76,9 @@ class FamilyForm extends Component {
     family: this._newFamily(),
     newFamily: true,
     confirmedAction: null,
+    copyText: null,
+    isCopied: false,
+
     // isFormValid: true,
   };
 
@@ -155,6 +160,13 @@ class FamilyForm extends Component {
       );
     }
   };
+  doesInsureeChange = () => {
+    const { insuree } = this.props;
+    if (_.isEqual(insuree, this.state.insuree)) {
+      return false;
+    }
+    return true;
+  };
   // onValidation = (isFormValid) => {
   //   if (this.state.isFormValid !== isFormValid) {
   //     this.setState({ isFormValid });
@@ -163,12 +175,23 @@ class FamilyForm extends Component {
   canSave = () => {
     // if (!this.state.family.location) return false;
     if (!this.state.family.headInsuree) return false;
+    // if (!this.state.family.headInsuree?.jsonExt?.createdAt) return false;
     // if (!this.state.family.headInsuree.chfId) return false;
     // if (!this.props.isChfIdValid) return false;
     if (!this.state.family?.jsonExt?.enrolmentType) return false;
     if (!this.state.family.headInsuree.lastName) return false;
     if (!this.state.family.headInsuree.otherNames) return false;
+    if (!this.state.family.headInsuree.phone) return false;
+    if (!this.state?.family?.headInsuree?.jsonExt?.BirthPlace) return false;
+    if (!this.state?.family?.headInsuree?.jsonExt?.nationality) return false;
+    // if (!this.state?.family?.headInsuree?.jsonExt?.nbKids) return false;
+    // if (!this.state?.family?.headInsuree?.jsonExt?.civilQuality) return false;
+    // if (!this.state?.family?.headInsuree?.jsonExt?.createdAt) return false;
+    if (!this.state?.family?.headInsuree?.marital) return false;
+    if (!this.state?.family?.headInsuree?.typeOfId) return false;
+    if (!this.state?.family?.headInsuree?.passport) return false;
     if (!this.state.family.headInsuree.dob) return false;
+    if (!this.state.family?.address) return false;
     if (!this.state.family.headInsuree.gender || !this.state.family?.headInsuree.gender?.code) return false;
     if (
       !!this.state.family.headInsuree.photo &&
@@ -178,14 +201,36 @@ class FamilyForm extends Component {
     return true;
   };
 
+  updateCanSave = () => {
+      const { family } = this.props;
+      if (_.isEqual(family, this.state.family)) {
+        return false;
+      }
+      return true;
+  };
   _save = (family) => {
     this.setState(
       { lockNew: !family.uuid }, // avoid duplicates
       (e) => this.props.save(family),
     );
   };
+  handleCopyClick = (familyText) => {
+    // const { copyText } = this.state; // Assuming copyText is stored in component state
+
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(familyText)
+        .then(() => {
+          this.setState({ isCopied: true });
+        })
+        .catch((err) => {
+          console.error("Failed to copy text: ", err);
+        });
+    }
+  };
 
   onEditedChanged = (family) => {
+    console.log('onEditedChanged',(family))
     this.setState({ family, newFamily: false });
   };
 
@@ -200,37 +245,65 @@ class FamilyForm extends Component {
     switch (status) {
       case "PRE_REGISTERED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Pre Registered";
+        docsStatus = "buttonStatus.preRegistered";
         break;
       case "APPROVED":
         selectedClass = this.props.classes.approvedBtn;
-        docsStatus = "Active";
+        docsStatus = "buttonStatus.approved";
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
-        docsStatus = "Rejected";
+        docsStatus = "buttonStatus.rejected";
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Rework";
+        docsStatus = "buttonStatus.rework";
         break;
       case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting for document and biometric";
+        docsStatus = "buttonStatus.waitingDocumentBiometric";
         break;
       case "WAITING_FOR_APPROVAL":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting For Approval";
+        docsStatus = "buttonStatus.waitingApproval";
         break;
       case "WAITING_FOR_QUEUE":
         selectedClass = this.props.classes.commonBtn;
-        docsStatus = "Waiting For Queue";
+        docsStatus = "buttonStatus.waitingQueue";
         break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
         break;
     }
     return { selectedClass, docsStatus };
+  };
+
+  displayPrintWindow = (base64Data, contentType) => {
+    const printWindow = window.open("", "Print Window", "width=600, height=400");
+    printWindow.document.open();
+
+    if (contentType === "pdf") {
+      // printWindow.print(`<embed type="application/pdf" width="100%" height="100%" src="data:application/pdf;base64,${base64Data}" />`);
+      printWindow.document.write(
+        `<embed type="application/pdf" width="100%" height="100%" src="data:application/pdf;base64,${base64Data}" />`,
+      );
+    } else {
+      printWindow.document.write(`<img src="data:image/png;base64,${base64Data}" />`);
+    }
+
+    printWindow.document.close();
+    // printWindow.print();
+  };
+
+  printReport = async (edited) => {
+    const data = await this.props.printReport(this.props.modulesManager, edited);
+    const base64Data = data?.payload?.data?.sentNotification?.data;
+
+    const contentType = "pdf";
+    if (base64Data) {
+      this.displayPrintWindow(base64Data, contentType);
+    }
+    console.log(decodeURI(data?.payload?.data?.sentNotification?.data), "decode data");
   };
   render() {
     const {
@@ -252,6 +325,15 @@ class FamilyForm extends Component {
       mutation,
     } = this.props;
     const { family, newFamily } = this.state;
+    const editedFamily={...family}
+    // editedFamily.jsonExt = JSON.parse(family.jsonExt);
+    if (editedFamily.jsonExt && editedFamily.jsonExt.enrolmentType) {
+      editedFamily.jsonExt = { enrolmentType: editedFamily.jsonExt.enrolmentType };
+    }
+    // editedFamily.jsonExt = JSON.stringify(editedFamily.jsonExt);
+
+    // console.log('family', JSON.parse(family.jsonExt)[0]);
+    //  editedFamily.jsonExt=JSON.parse(family.jsonExt)
     if (!rights.includes(RIGHT_FAMILY)) return null;
     let runningMutation = !!family && !!family.clientMutationId;
     let contributedMutations = modulesManager.getContribs(INSUREE_FAMILY_OVERVIEW_CONTRIBUTED_MUTATIONS_KEY);
@@ -269,7 +351,7 @@ class FamilyForm extends Component {
               STATUS :
             </Typography>
             <Button variant="outlined" className={selectedClass}>
-              {docsStatus}
+              {formatMessage(this.props.intl, "insuree", docsStatus)}
             </Button>
             {family.status === "REWORK" || family.status === "REJECTED" ? (
               <Tooltip
@@ -321,6 +403,31 @@ class FamilyForm extends Component {
         },
       );
     }
+
+    const getCopyLabel = () => {
+      const { headInsuree } = this.state.family;
+      const label = insureeLabel(this.state.family.headInsuree);
+      return (
+        <React.Fragment>
+          {label}
+          {!!headInsuree?.camuNumber || !!headInsuree?.chfId ? (
+            <IconButton
+              size="small"
+              onClick={() =>
+                this.handleCopyClick(
+                  !!headInsuree?.camuNumber ? headInsuree?.camuNumber : !!headInsuree?.chfId ? headInsuree?.chfId : "",
+                )
+              }
+              style={{ marginLeft: "4px" }}
+              color="inherit"
+            >
+              <FileCopyIcon />
+            </IconButton>
+          ) : null}
+          {this.state.isCopied ? "Copied!" : ""}
+        </React.Fragment>
+      );
+    };
     return (
       <div className={!!runningMutation ? classes.lockedPage : null}>
         <Helmet
@@ -331,12 +438,14 @@ class FamilyForm extends Component {
             { label: insureeLabel(this.state.family.headInsuree) },
           )}
         />
+
         <ProgressOrError progress={fetchingFamily} error={errorFamily} />
         {((!!fetchedFamily && !!family && family.uuid === family_uuid) || !family_uuid) && (
           <Form
             module="insuree"
             title="FamilyOverview.title"
-            titleParams={{ label: insureeLabel(this.state.family.headInsuree) }}
+            titleParams={{ label: getCopyLabel() }}
+            // titleParams={{ label: insureeLabel(this.state.family.headInsuree) }}
             edited_id={family_uuid}
             edited={family}
             reset={this.state.reset}
@@ -354,11 +463,14 @@ class FamilyForm extends Component {
             family={family}
             insuree={insuree}
             onEditedChanged={this.onEditedChanged}
-            canSave={this.canSave}
+            canSave={!!family_uuid ? this.updateCanSave : this.canSave}
             save={!!save ? this._save : null}
             onActionToConfirm={this.onActionToConfirm}
             openDirty={save}
+            user={this.props.state.core.user}
             // onValidation={this.onValidation}
+            printButton={this.printReport}
+            print={family_uuid}
           />
         )}
       </div>
@@ -382,7 +494,7 @@ const mapStateToProps = (state, props) => ({
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
-    { fetchFamilyMutation, fetchFamily, newFamily, createFamily, journalize, coreConfirm },
+    { fetchFamilyMutation, fetchFamily, newFamily, createFamily, journalize, coreConfirm, printReport },
     dispatch,
   );
 };

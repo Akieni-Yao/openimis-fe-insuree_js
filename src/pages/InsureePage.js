@@ -5,7 +5,7 @@ import { bindActionCreators } from "redux";
 import { withTheme, withStyles } from "@material-ui/core/styles";
 import { formatMessageWithValues, withModulesManager, withHistory, historyPush } from "@openimis/fe-core";
 import InsureeForm from "../components/InsureeForm";
-import { createInsuree, updateInsuree } from "../actions";
+import { createInsuree, updateInsuree, updateExternalDocuments } from "../actions";
 import { RIGHT_INSUREE, RIGHT_INSUREE_ADD, RIGHT_INSUREE_EDIT } from "../constants";
 import CommonSnackbar from "../components/CommonSnackbar";
 
@@ -19,6 +19,7 @@ class InsureePage extends Component {
     camuNumberRes: null,
     statusInsuree: null,
     snackbarMsg: null,
+    checkRejectedDocument: false,
   };
   add = () => {
     historyPush(this.props.modulesManager, this.props.history, "insuree.route.insuree");
@@ -53,7 +54,24 @@ class InsureePage extends Component {
           snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${
             insuree.status == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
           } `,
+          // camuNumberRes: response?.insurees[0].insuree.camuNumber
+          //   ? response?.insurees[0].insuree.camuNumber
+          //   : response?.insurees[0].insuree.chfId,
         });
+        const allApprovedOrRejected =
+          insuree.documentData &&
+          insuree.documentData.every(
+            (document) => document.documentStatus === "APPROVED" || document.documentStatus === "REJECTED",
+          );
+        const hasReject =
+          allApprovedOrRejected && insuree.documentData.some((document) => document.documentStatus === "REJECTED");
+
+        if (!!hasReject) {
+          console.log("hiinter", insuree);
+
+          // if (insuree.status !== "APPROVED" && (insuree.status == "REWORK" || insuree.status == "REJECTED")) {
+          this.props.updateExternalDocuments(this.props.modulesManager, insuree?.documentData, insuree?.chfId);
+        }
         this.setState({
           camuNumberRes: response?.insurees[0].insuree.camuNumber
             ? response?.insurees[0].insuree.camuNumber
@@ -62,7 +80,10 @@ class InsureePage extends Component {
       }
     }
   };
-
+  // handleCheckRejected = (hasReeject) => {
+  //   // Update the name in the component's state
+  //   this.setState({ checkRejectedDocument: hasReeject });
+  // };
   render() {
     const { classes, modulesManager, history, rights, insuree_uuid, family_uuid } = this.props;
     if (!rights.includes(RIGHT_INSUREE)) return null;
@@ -96,7 +117,7 @@ const mapStateToProps = (state, props) => ({
 });
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ createInsuree, updateInsuree }, dispatch);
+  return bindActionCreators({ createInsuree, updateInsuree, updateExternalDocuments }, dispatch);
 };
 
 export default withHistory(

@@ -29,8 +29,8 @@ const useStyles = makeStyles((theme) => ({
     width: "50%",
     height: "100vh",
     maxHeight: "100vh",
-    top: 2,
-    right: 0,
+    top: 0,
+    right: 75,
     bottom: 0,
     borderRadius: 0,
     borderTopLeftRadius: 0,
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
   closeButton: {
     position: "absolute",
     top: 0,
-    right: 15,
+    right: 5,
   },
   backdrop: {
     pointerEvents: "none",
@@ -92,14 +92,19 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
   };
 
   const loginCnss = () => {
-    const loginUrl = "https://dms.akieni.com/backend/cnss/oauth/token";
-
+    const loginUrl = `${process.env.REACT_APP_GED_URL}/oauth/token`;
+    const username = process.env.REACT_APP_USERNAME;
+    const password = process.env.REACT_APP_PASSWORD;
+    const base64CredentialsLog = process.env.REACT_APP_BASE64_CREDENTIALS;
     const loginData = new URLSearchParams();
-    loginData.append("username", "ankit.kumar");
-    loginData.append("password", "Ankit@11");
+    loginData.append("username", username);
+    // loginData.append("username", "ankit.kumar");
+    loginData.append("password", password);
+    // loginData.append("password", "Ankit@11");
     loginData.append("grant_type", "password");
     loginData.append("scope", "read");
 
+    // const base64Credentials = btoa(base64CredentialsLog);
     const base64Credentials = btoa("kiyas:Y@123$%^23*");
 
     fetch(loginUrl, {
@@ -125,7 +130,7 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
       });
   };
   const documentViewAPI = (token) => {
-    const apiUrl = "https://dms.akieni.com/backend/cnss/documents/get";
+    const apiUrl = `${process.env.REACT_APP_GED_URL}/documents/get`;
 
     const headers = {
       "Authorization": `Bearer ${token}`,

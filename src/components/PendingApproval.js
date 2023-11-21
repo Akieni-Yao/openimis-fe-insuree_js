@@ -36,6 +36,7 @@ import {
   fetchInsureeDocuments,
   updateInsureeDocument,
   fetchPendingForApproval,
+  fetchInsureeSummaries,
 } from "../actions";
 import { DisabledBiometric, InvalidBiometric, ValidBiometric } from "../SvgIndex";
 import DocumentViewDialog from "../dialogs/DocumentViewDialogs";
@@ -100,11 +101,15 @@ class PendingApproval extends PagedDataHandler {
       [5, 10, 20],
     );
     this.defaultPageSize = props.modulesManager.getConf("fe-insuree", "familyInsureesOverview.defaultPageSize", 5);
+    this.locationLevels = this.props.modulesManager.getConf("fe-location", "location.Location.MaxLevels", 4);
   }
-
+  onDoubleClick = (f, newTab = false) => {
+    historyPush(this.props.modulesManager, this.props.history, "insuree/insurees/familyOverview", [f.uuid], newTab);
+  };
   componentDidMount() {
     this.setState({ orderBy: null }, (e) => this.onChangeRowsPerPage(this.defaultPageSize));
-    this.props.fetchPendingForApproval(this.props.modulesManager, this.props.family_uuid);
+    this.props.fetchPendingForApproval(this.props.modulesManager);
+
     const moduleName = "insuree";
     const { module } = this.props;
     if (module !== moduleName) this.props.clearCurrentPaginationPage();
@@ -124,26 +129,6 @@ class PendingApproval extends PagedDataHandler {
     if (!pathname.includes(urlPath)) this.props.clearCurrentPaginationPage();
   };
 
-  adjustButtonZIndex = () => {
-    const buttonElements = document.querySelectorAll('div[title="Save changes"], div[title="Create new"]');
-    if (this.state.documentViewOpen) {
-      if (buttonElements.length > 0) {
-        buttonElements.forEach((element) => {
-          if (element.style) {
-            element.style.zIndex = "1000";
-          }
-        });
-      }
-    } else {
-      if (buttonElements.length > 0) {
-        buttonElements.forEach((element) => {
-          if (element.style) {
-            element.style.zIndex = "2000";
-          }
-        });
-      }
-    }
-  };
   queryPrms = () => {
     let prms = [];
     if (!!this.state.orderBy) {
@@ -157,53 +142,42 @@ class PendingApproval extends PagedDataHandler {
   };
 
   // onDoubleClick = (i, newTab = false) => {
+  //   historyPush(this.props.modulesManager, this.props.history, "insuree.route.insuree", [i.uuid], newTab);
+  // };
+  onDoubleClick = (f, newTab = false) => {
+    historyPush(this.props.modulesManager, this.props.history, "insuree.route.familyOverview", [f.uuid], newTab);
+  };
 
+  // onDoubleClick = (f, newTab = false) => {
+  //   console.log("checkf", f);
   //   historyPush(
   //     this.props.modulesManager,
   //     this.props.history,
-  //     "insuree.route.insuree",
-  //     [i.uuid, this.props.PendingApproval.uuid],
+  //     "insuree.route.familyOverview",
+  //     [f.headInsuree.uuid],
   //     newTab,
   //   );
+  //   // historyPush(this.props.modulesManager, this.props.history, "insuree.route.family");
   // };
-  onDoubleClick = (f, newTab = false) => {
-    console.log("checkf", f);
-    historyPush(
-      this.props.modulesManager,
-      this.props.history,
-      "insuree.route.familyOverview",
-      [f.headInsuree.uuid],
-      newTab,
-    );
-    // historyPush(this.props.modulesManager, this.props.history, "insuree.route.family");
-  };
 
-  handleExternalNavigation = () => {
-    window.open("https://abis.akieni.com/public/enrollment/index.html#/enroll/applicant-detail", "_blank");
-  };
-  approved = async (docData) => {
-    const response = await this.props.updateInsureeDocument(docData);
-    setTimeout(() => {
-      this.props.fetchInsureeDocuments(this.props?.edited?.chfId);
-    }, 2000);
-  };
-  rejectDoc = async (docData) => {
-    const response = await this.props.updateInsureeDocument(docData);
-    setTimeout(() => {
-      this.props.fetchInsureeDocuments(this.props?.edited?.chfId);
-    }, 1000);
-  };
   onChangeSelection = (i) => {
     this.props.selectFamilyMember(i[0] || null);
   };
 
-  headers = [
-    "PedingApproval.tempCamuNo",
-    "PedingApproval.firstName",
-    "PedingApproval.lastName",
-    "PedingApproval.gender",
-    "PedingApproval.city",
-  ];
+  headers = () => {
+    var h = [
+      "PedingApproval.tempCamuNo",
+      "PedingApproval.lastName",
+      "PedingApproval.firstName",
+      "PedingApproval.gender",
+    ];
+    // "PedingApproval.city",
+    // ...Array.from(Array(this.locationLevels)).map((_, i) => `location.locationType.${i}`),
+    for (var i = 0; i < this.locationLevels; i++) {
+      h.push(`location.locationType.${i}`);
+    }
+    return h;
+  };
 
   sorter = (attr, asc = true) => [
     () =>
@@ -295,44 +269,31 @@ class PendingApproval extends PagedDataHandler {
     }
     return !!loc ? loc.name : "";
   };
-  formatters = [
-    (i) => i.headInsuree.chfId || "",
-    (i) => i.headInsuree.otherNames,
+  formatters = () => {
+    var row = [
+      (family) => family.headInsuree.chfId || "",
+      (family) => family.headInsuree.otherNames,
 
-    (i) => i.headInsuree.lastName,
-    (i) => (
-      <PublishedComponent
-        pubRef="insuree.InsureeGenderPicker"
-        withLabel={false}
-        readOnly={true}
-        value={!!i.headInsuree.gender ? i.headInsuree.gender.code : null}
-      />
-    ),
-  ];
-  // itemFormatters = () => {
-  //   var formatters = [
-  //     (i) => i.headInsuree.chfId || "",
-  //     (i) => i.headInsuree.otherNames,
+      (family) => family.headInsuree.lastName,
+      (family) => (
+        <PublishedComponent
+          pubRef="insuree.InsureeGenderPicker"
+          withLabel={false}
+          readOnly={true}
+          value={!!family.headInsuree.gender ? family.headInsuree.gender.code : null}
+        />
+      ),
+    ];
 
-  //     (i) => i.headInsuree.lastName,
-  //     (i) => (
-  //       <PublishedComponent
-  //         pubRef="insuree.InsureeGenderPicker"
-  //         withLabel={false}
-  //         readOnly={true}
-  //         value={!!i.headInsuree.gender ? i.headInsuree.gender.code : null}
-  //       />
-  //     ),
-  //   ];
-  //   for (var i = 0; i < this.locationLevels; i++) {
-  //     // need a fixed variable to refer to as parentLocation argument
-  //     let j = i + 0;
-  //     formatters.push((i) => {
-  //       console.log("familloc", i);
-  //     }, this.parentLocation(i.currentVillage || (!!i.family && i.family.location), j));
-  //   }
-  //   return formatters;
-  // };
+    for (var i = 0; i < this.locationLevels; i++) {
+      // need a fixed variable to refer to as parentLocation argument
+      let j = i + 0;
+      row.push((family) => {
+        return this.parentLocation(family.location, j);
+      });
+    }
+    return row;
+  };
 
   addNewInsuree = () =>
     historyPush(this.props.modulesManager, this.props.history, "insuree.route.insuree", [
@@ -355,8 +316,10 @@ class PendingApproval extends PagedDataHandler {
       edited,
       documentDetails,
       PendingApproval,
+      insurees,
+      fetchingInsurees,
+      errorInsurees,
     } = this.props;
-    // console.log("itemFormatters", this.itemFormatters());
     let actions =
       !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
         ? []
@@ -379,18 +342,18 @@ class PendingApproval extends PagedDataHandler {
         tooltip: formatMessage(intl, "insuree", "familyCheckCanAdd"),
       });
     }
-    let bioActions =
-      !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
-        ? []
-        : [
-            {
-              button: (
-                <Button onClick={this.handleExternalNavigation} variant="contained" color="primary">
-                  Collect Biometric
-                </Button>
-              ),
-            },
-          ];
+    // let bioActions =
+    //   !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
+    //     ? []
+    //     : [
+    //         {
+    //           button: (
+    //             <Button onClick={this.handleExternalNavigation} variant="contained" color="primary">
+    //               Collect Biometric
+    //             </Button>
+    //           ),
+    //         },
+    //       ];
     if (!!checkingCanAddInsuree || !!errorCanAddInsuree) {
       actions.push({
         button: (
@@ -429,12 +392,12 @@ class PendingApproval extends PagedDataHandler {
             {/* {documentDetails?.length > 0 && !fetchingDocuments ? ( */}
             <Table
               module="insuree"
-              headers={this.headers}
+              headers={this.headers()}
               headerActions={this.headerActions}
-              itemFormatters={this.formatters}
+              itemFormatters={this.formatters()}
               items={PendingApproval}
-              fetching={fetchingDocuments}
-              error={errorDocuments}
+              fetching={fetchingInsurees}
+              error={errorInsurees}
               onDoubleClick={this.onDoubleClick}
               withSelection={"single"}
               onChangeSelection={this.onChangeSelection}
@@ -471,16 +434,6 @@ class PendingApproval extends PagedDataHandler {
             ) : null} */}
           </Paper>
         </Grid>
-
-        {!!this.state.documentViewOpen && (
-          <DocumentViewDialog
-            open={this.state.documentViewOpen}
-            onClose={this.onDocumentViewClose}
-            documentImage={this.state.documentId}
-            approved={this.approved}
-            rejectDoc={this.rejectDoc}
-          />
-        )}
       </Grid>
     );
   }
@@ -504,6 +457,10 @@ const mapStateToProps = (state) => ({
   documentDetails: state.insuree.documentsData,
   family: state.insuree.family,
   PendingApproval: state.insuree.PendingApproval,
+  insurees: state.insuree.insurees,
+  insureesPageInfo: state.insuree.insureesPageInfo,
+  fetchingInsurees: state.insuree.fetchingInsurees,
+  fetchedInsurees: state.insuree.fetchedInsurees,
 });
 
 const mapDispatchToProps = (dispatch) => {
@@ -521,6 +478,7 @@ const mapDispatchToProps = (dispatch) => {
       updateInsureeDocument,
       fetchPendingForApproval,
       clearCurrentPaginationPage,
+      fetchInsureeSummaries,
     },
     dispatch,
   );
