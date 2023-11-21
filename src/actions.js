@@ -739,3 +739,9 @@ export function fetchPolicyHolderFamily(modulesManager, familyUuid) {
   const payload = formatPageQuery("policyHolderByFamily", [filter], POLICYHOLDER_FULL_PROJECTION(modulesManager));
   return graphql(payload, "POLICYHOLDER_FAMILY");
 }
+
+export function fetchPolicyHolderInsuree(modulesManager, insureeUuid) {
+  let filter = !!insureeUuid ? `insureeUuid: "${insureeUuid}"` : "";
+  const payload = formatPageQuery("policyHolderByInsuree", [filter], POLICYHOLDER_FULL_PROJECTION(modulesManager));
+  return graphql(payload, "POLICYHOLDER_INSUREE");
+}
