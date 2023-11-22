@@ -1,7 +1,6 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { injectIntl } from "react-intl";
-import { makeStyles } from "@material-ui/core/styles";
-import { Grid, Box, Typography, Divider, Paper, IconButton, Tooltip } from "@material-ui/core";
+import { Grid, Typography, Divider, Paper, IconButton, Tooltip } from "@material-ui/core";
 import {
   Table,
   PagedDataHandler,
@@ -12,27 +11,18 @@ import {
   FormattedMessage,
   formatSorter,
   sort,
-  withTooltip,
   historyPush,
   withHistory,
-  coreConfirm,
-  journalize,
-  Contributions,
   decodeId,
   PublishedComponent,
 } from "@openimis/fe-core";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { fetchPolicyHolderFamily } from "../actions";
+import { fetchPolicyHolderFamily, fetchPolicyHolderInsuree } from "../actions";
 import { withTheme, withStyles } from "@material-ui/core/styles";
 import { RIGHT_POLICYHOLDER_UPDATE, RIGHT_POLICYHOLDER_DELETE, RIGHT_PORTALPOLICYHOLDER_SEARCH } from "../constants";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-
-const INSUREE_SUMMARY_AVATAR_CONTRIBUTION_KEY = "insuree.InsureeSummaryAvatar";
-const INSUREE_SUMMARY_CORE_CONTRIBUTION_KEY = "insuree.InsureeSummaryCore";
-const INSUREE_SUMMARY_EXT_CONTRIBUTION_KEY = "insuree.InsureeSummaryExt";
-const INSUREE_SUMMARY_CONTRIBUTION_KEY = "insuree.InsureeSummary";
 
 const styles = (theme) => ({
   paper: theme.paper.paper,
@@ -81,10 +71,10 @@ class PolicySummary extends PagedDataHandler {
     };
   }
 
-  // hasAvatarContribution = modulesManager.getContribs(INSUREE_SUMMARY_AVATAR_CONTRIBUTION_KEY).length > 0;
-  // hasExtContributions = modulesManager.getContribs(INSUREE_SUMMARY_EXT_CONTRIBUTION_KEY).length > 0;
   policyHolderPageLink = (policyHolder) => {
-    return `${this.props.modulesManager.getRef("policyHolder.route.policyHolder")}${"/" + decodeId(policyHolder.node.id)}`;
+    return `${this.props.modulesManager.getRef("policyHolder.route.policyHolder")}${
+      "/" + decodeId(policyHolder.node.id)
+    }`;
   };
 
   headers = () => {
@@ -118,6 +108,10 @@ class PolicySummary extends PagedDataHandler {
   };
   componentDidMount() {
     // this.setState({ orderBy: null }, (e) => this.onChangeRowsPerPage(this.defaultPageSize));
+    console.log("this.props", this.props);
+    if (!!this.props.edited_id) {
+      this.props.fetchPolicyHolderInsuree(this.props.modulesManager, this.props.edited_id);
+    }
     if (!!this.props.family && !!this.props.family?.uuid) {
       this.props.fetchPolicyHolderFamily(this.props.modulesManager, this.props.family.uuid);
     }
@@ -153,7 +147,9 @@ class PolicySummary extends PagedDataHandler {
     const { intl, modulesManager, onDoubleClick, rights } = this.props;
     let result = [
       (policyHolder) =>
-        !!policyHolder.node.code && policyHolder.node.tradeName ? `${policyHolder.node.code} ${policyHolder.node.tradeName}` : "",
+        !!policyHolder.node.code && policyHolder.node.tradeName
+          ? `${policyHolder.node.code} ${policyHolder.node.tradeName}`
+          : "",
       (policyHolder) =>
         !!policyHolder.node.locations
           ? `
@@ -193,7 +189,9 @@ class PolicySummary extends PagedDataHandler {
           ""
         ),
       (policyHolder) =>
-        !!policyHolder.node.dateValidFrom ? formatDateFromISO(modulesManager, intl, policyHolder.node.dateValidFrom) : "",
+        !!policyHolder.node.dateValidFrom
+          ? formatDateFromISO(modulesManager, intl, policyHolder.node.dateValidFrom)
+          : "",
       (policyHolder) =>
         !!policyHolder.node.dateValidTo ? formatDateFromISO(modulesManager, intl, policyHolder.node.dateValidTo) : "",
     ];
@@ -260,7 +258,16 @@ class PolicySummary extends PagedDataHandler {
   };
   rowLocked = (i) => !!i.clientMutationId;
   render() {
-    const { classes, policyHolder, fetchingPolicyHolder, errorPolicyHolder, pageInfo } = this.props;
+    const {
+      classes,
+      policyHolder,
+      fetchingPolicyHolder,
+      errorPolicyHolder,
+      pageInfo,
+      policyHolderInsuree,
+      fetchingPolicyHolderInsuree,
+      errorPolicyHolderInsuree,
+    } = this.props;
     return (
       <Grid container alignItems="center" direction="row">
         <Paper className={classes.paper} style={{ width: "100%" }}>
@@ -270,17 +277,7 @@ class PolicySummary extends PagedDataHandler {
                 <FormattedMessage module="insuree" id="Family.policyHolder" values={{ count: 0 }} />
               </Typography>
             </Grid>
-            {/* <Grid item xs={4}>
-            <Grid container justify="flex-end">
-              {actions.map((a, idx) => {
-                return (
-                  <Grid item key={`form-action-${idx}`} className={classes.paperHeaderAction}>
-                    {withTooltip(a.button, a.tooltip)}
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Grid> */}
+
             <Grid item xs={12}>
               <Divider />
             </Grid>
@@ -290,9 +287,17 @@ class PolicySummary extends PagedDataHandler {
             headers={this.headers()}
             headerActions={this.headerActions}
             itemFormatters={this.itemFormatters()}
-            items={!!policyHolder ? policyHolder : []}
-            fetching={fetchingPolicyHolder}
-            error={errorPolicyHolder}
+            items={!!policyHolder ? policyHolder : !!policyHolderInsuree ? policyHolderInsuree : []}
+            // fetching={
+            //   !!fetchingPolicyHolder
+            //     ? fetchingPolicyHolder
+            //     : 
+            //      fetchingPolicyHolderInsuree
+                
+            // }
+            error={
+              !!errorPolicyHolder ? errorPolicyHolder : !!errorPolicyHolderInsuree ? errorPolicyHolderInsuree : null
+            }
             withSelection={"single"}
             // onChangeSelection={this.onChangeSelection}
             onDoubleClick={this.onDoubleClick}
@@ -306,9 +311,6 @@ class PolicySummary extends PagedDataHandler {
             onChangeRowsPerPage={this.onChangeRowsPerPage}
             rowLocked={this.rowLocked}
           />
-          {/* <Grid item xs={12}>
-          <Contributions contributionKey={INSUREE_SUMMARY_CONTRIBUTION_KEY} insuree={insuree} />
-        </Grid> */}
         </Paper>
       </Grid>
     );
@@ -318,11 +320,14 @@ const mapStateToProps = (state) => ({
   policyHolder: state.insuree.policyHolder,
   fetchingPolicyHolder: state.insuree.fetchingPolicyHolder,
   errorPolicyHolder: state.insuree.errorPolicyHolder,
+  policyHolderInsuree: state.insuree.policyHolderInsuree,
+  fetchingPolicyHolderInsuree: state.insuree.fetchingPolicyHolderInsuree,
+  errorPolicyHolderInsuree: state.insuree.errorPolicyHolderInsuree,
   rights: !!state.core && !!state.core.user && !!state.core.user.i_user ? state.core.user.i_user.rights : [],
 });
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ fetchPolicyHolderFamily }, dispatch);
+  return bindActionCreators({ fetchPolicyHolderFamily, fetchPolicyHolderInsuree }, dispatch);
 };
 export default withHistory(
   withModulesManager(

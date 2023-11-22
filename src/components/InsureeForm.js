@@ -411,9 +411,7 @@ class InsureeForm extends Component {
     // printWindow.print();
   };
   emailButton = async (edited) => {
-    // console.log(edited, "edited")
     const message = await this.props.sendEmail(this.props.modulesManager, edited);
-    // console.log("message", message?.payload?.data?.sentNotification?.message)
     if (!!message?.payload?.data?.sentNotification?.data) {
       // If the email was sent successfully, update the success state and message
       this.setState({
@@ -430,16 +428,14 @@ class InsureeForm extends Component {
     }
   };
   printReport = async (edited) => {
-    // console.log(edited, "edited")
     const data = await this.props.printReport(this.props.modulesManager, edited);
-    // console.log(data,"base64Data")
     const base64Data = data?.payload?.data?.sentNotification?.data;
 
     const contentType = "pdf";
     if (base64Data) {
       this.displayPrintWindow(base64Data, contentType);
     }
-    // console.log(decodeURI(data?.payload?.data?.sentNotification?.data), "decode data");
+
   };
   cancel = () => {
     this.setState({

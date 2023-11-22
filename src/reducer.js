@@ -98,6 +98,10 @@ function reducer(
     fetchedPolicyHolder: false,
     policyHolder: null,
     errorPolicyHolder: null,
+    fetchingPolicyHolderInsuree: false,
+    fetchedPolicyHolderInsuree: false,
+    policyHolderInsuree: null,
+    errorPolicyHolderInsuree: null,
   },
   action,
 ) {
@@ -684,6 +688,29 @@ function reducer(
         errorPolicyHolder: formatGraphQLError(action.payload),
       };
     case "POLICYHOLDER_FAMILY_ERR":
+      return {
+        ...state,
+        fetchingPolicyHolder: false,
+        errorPolicyHolder: formatServerError(action.payload),
+      };
+    case "POLICYHOLDER_INSUREE_REQ":
+      return {
+        ...state,
+        fetchingPolicyHolderInsuree: true,
+        fetchedPolicyHolderInsuree: false,
+        policyHolderInsuree: null,
+        errorPolicyHolderInsuree: null,
+      };
+    case "POLICYHOLDER_INSUREE_RESP":
+     
+      return {
+        ...state,
+        fetchingPolicyHolder: false,
+        fetchedPolicyHolder: true,
+        policyHolder: action.payload.data.policyHolderByInsuree.edges,
+        errorPolicyHolder: formatGraphQLError(action.payload),
+      };
+    case "POLICYHOLDER_INSUREE_ERR":
       return {
         ...state,
         fetchingPolicyHolder: false,

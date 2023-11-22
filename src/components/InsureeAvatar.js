@@ -31,10 +31,8 @@ const InsureeAvatar = (props) => {
       fetch(originalURL)
         .then((response) => response.blob())
         .then((blob) => {
-          
           const pngBlob = new Blob([blob], { type: "image/png" });
 
-          
           const pngImageUrl = URL.createObjectURL(pngBlob);
           setPngImage(pngImageUrl);
         })
@@ -42,6 +40,34 @@ const InsureeAvatar = (props) => {
           console.error("Error downloading image: ", error);
         });
     }
+
+    // const data = new URLSearchParams();
+    // data.append("grant_type", "password");
+    // data.append("client_id", process.env.REACT_APP_ABIS_CLIENT_ID);
+    // data.append("client_secret", process.env.REACT_APP_ABIS_CLIENT_SECRET);
+    // data.append("username", process.env.REACT_APP_ABIS_USERNAME);
+    // data.append("password", process.env.REACT_APP_ABIS_PASSWORD);
+    // // Make the request
+    // const base64Credentials = btoa(
+    //   `${process.env.REACT_APP_ABIS_CLIENT_ID}${process.env.REACT_APP_ABIS_CLIENT_SECRET}`,
+    // );
+    // const headers = {
+    //   "Content-Type": "application/x-www-form-urlencoded",
+    //   "Authorization": `Basic ${base64Credentials}`,
+    // };
+    // fetch(process.env.REACT_APP_ABIS_AUTH_URL, {
+    //   method: "POST",
+    //   headers: headers,
+    //   body: data,
+    // })
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     const accessToken = data.access_token;
+    //     console.log("Access Token:", data);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching token:", error);
+    //   });
   }, [photo]);
 
   const getUrl = (photo) => {
@@ -81,9 +107,9 @@ const InsureeAvatar = (props) => {
           <input type="file" className={classes.hiddenInput} onChange={onFileSelect} accept="image/*" />
         </IconButton>
       </div>
-      {withMeta && (
+      {/* {withMeta && (
         <Grid container direction="column" item>
-          {/* <Grid item className={classes.item}>
+          <Grid item className={classes.item}>
             <PublishedComponent
               pubRef="core.DatePicker"
               value={photo?.date}
@@ -93,7 +119,7 @@ const InsureeAvatar = (props) => {
               required={isRequired}
               onChange={(date) => onChange({ ...photo, date })}
             />
-          </Grid> */}
+          </Grid>
           <Grid item className={classes.item}>
             <PublishedComponent
               pubRef="insuree.InsureeOfficerPicker"
@@ -106,7 +132,7 @@ const InsureeAvatar = (props) => {
             />
           </Grid>
         </Grid>
-      )}
+      )} */}
     </Grid>
   );
 };
