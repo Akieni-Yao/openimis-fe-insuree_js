@@ -283,13 +283,13 @@ class InsureeForm extends Component {
     return true;
   };
 
-  _save = (insuree) => {
-    const { edited } = this.props;
+  _save = (insureeData) => {
+    const { insuree } = this.state;
     const CheckHead =
-      !!edited && !!edited.family && !!edited.family.headInsuree && edited.family.headInsuree.id !== edited.id;
+      !!insuree && !!insuree.family && !!insuree.family.headInsuree && insuree.family.headInsuree.id !== insuree.id;
     this.setState(
       { lockNew: true }, // avoid duplicates
-      (e) => this.props.save({ ...insuree, checkHead: CheckHead, family_uuid: this.props.family_uuid }),
+      (e) => this.props.save({ ...insureeData, checkHead: CheckHead, family_uuid: this.props.family_uuid }),
     );
   };
   _approveorreject = (insuree) => {
@@ -478,7 +478,7 @@ class InsureeForm extends Component {
       approverData,
     } = this.props;
     const { insuree, clientMutationId, payload, statusCheck, email } = this.state;
- 
+    
     if (!rights.includes(RIGHT_INSUREE)) return null;
     let runningMutation = !!insuree && !!clientMutationId;
     let actions = [
