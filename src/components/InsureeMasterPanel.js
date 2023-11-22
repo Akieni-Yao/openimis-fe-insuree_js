@@ -43,7 +43,7 @@ const CAMU_ENROLMENT_TYPE = [
   "vulnerable_Persons",
 ];
 const capitalizeFirstLetter = (str) => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 const CAMU_CIVIL_QUALITY = ["Main Beneficiary", "Depedent Beneficiary spouse", "Depedent Beneficiary child"];
 class InsureeMasterPanel extends FormPanel {
@@ -391,7 +391,7 @@ class InsureeMasterPanel extends FormPanel {
                   readOnly={readOnly}
                   value={!!edited && !!edited?.otherNames ? capitalizeFirstLetter(edited?.otherNames) : ""}
                   onChange={(v) => {
-                    this.updateAttribute("otherNames", v);
+                    this.updateAttribute("otherNames", capitalizeFirstLetter(v));
                   }}
                 />
               </Grid>
