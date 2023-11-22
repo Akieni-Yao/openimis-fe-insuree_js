@@ -150,7 +150,7 @@ export function fetchFamilySummaries(mm, filters) {
     "validityFrom",
     "validityTo",
     "status",
-
+    // "jsonExt",
     "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone, dob,camuNumber}",
     "location" + mm.getProjection("location.Location.FlatProjection"),
   ];
@@ -337,7 +337,6 @@ function formatExternalDocument(docs, tempCamu) {
   return formattedResult;
 }
 function formatMail(edited) {
-  console.log(edited, "format");
   let reportName = "";
   if (!!edited?.camuNumber) {
     reportName = "enrollment_receipt";
@@ -377,7 +376,8 @@ export function formatInsureeGQL(mm, insuree) {
     ${!!insuree.chfId ? `chfId: "${formatGQLString(insuree.chfId)}"` : ""}
     ${!!insuree.lastName ? `lastName: "${formatGQLString(insuree.lastName)}"` : ""}
     ${!!insuree.otherNames ? `otherNames: "${formatGQLString(insuree.otherNames)}"` : ""}
-    ${!!insuree.gender && !!insuree.gender.code ? `genderId: "${insuree.gender.code}"` : ""}
+   
+    ${!!insuree.gender && !!insuree.gender.code ? `genderId: "${insuree.gender.code}"` : "M"}
     ${!!insuree.dob ? `dob: "${insuree.dob}"` : ""}
     head: ${!!insuree.head}
     ${!!insuree.marital ? `marital: "${insuree.marital}"` : ""}
@@ -409,7 +409,6 @@ export function formatInsureeGQL(mm, insuree) {
 }
 
 export function formatFamilyGQL(mm, family) {
-  console.log("Famllly",family)
   let headInsuree = family.headInsuree;
   headInsuree["head"] = true;
   return `
@@ -425,7 +424,11 @@ export function formatFamilyGQL(mm, family) {
         : ""
     }
     ${!!family.confirmationNo ? `confirmationNo: "${formatGQLString(family.confirmationNo)}"` : ""}
-    ${!!family.jsonExt ? `jsonExt: ${formatJsonField(family.jsonExt?.enrolmentType?family.jsonExt: JSON.parse(family.jsonExt))}` : ""}
+    ${
+      !!family.jsonExt
+        ? `jsonExt: ${formatJsonField(family.jsonExt?.enrolmentType ? family.jsonExt : JSON.parse(family.jsonExt))}`
+        : ""
+    }
     ${!!family.contribution ? `contribution: ${formatJsonField(family.contribution)}` : ""}
   `;
 }
@@ -659,7 +662,6 @@ export function updateInsureeDocument(mm, insuree) {
 }
 
 export function updateExternalDocuments(mm, docs, tempCamu) {
-  console.log("docs", docs);
   let mutation = `mutation UpdateStatusInExternalEndpoint {
   updateStatusInExternalEndpoint(${formatExternalDocument(docs, tempCamu)}) {
     success

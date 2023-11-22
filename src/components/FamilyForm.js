@@ -325,15 +325,10 @@ class FamilyForm extends Component {
       mutation,
     } = this.props;
     const { family, newFamily } = this.state;
-    const editedFamily={...family}
-    // editedFamily.jsonExt = JSON.parse(family.jsonExt);
-    if (editedFamily.jsonExt && editedFamily.jsonExt.enrolmentType) {
-      editedFamily.jsonExt = { enrolmentType: editedFamily.jsonExt.enrolmentType };
-    }
-    // editedFamily.jsonExt = JSON.stringify(editedFamily.jsonExt);
+   
 
-    // console.log('family', JSON.parse(family.jsonExt)[0]);
-    //  editedFamily.jsonExt=JSON.parse(family.jsonExt)
+    console.log('familyinsuree', insuree);
+
     if (!rights.includes(RIGHT_FAMILY)) return null;
     let runningMutation = !!family && !!family.clientMutationId;
     let contributedMutations = modulesManager.getContribs(INSUREE_FAMILY_OVERVIEW_CONTRIBUTED_MUTATIONS_KEY);

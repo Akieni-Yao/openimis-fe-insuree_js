@@ -45,7 +45,7 @@ class FamilyMasterPanel extends FormPanel {
       data["jsonExt"] = { ...updates };
     }
     this.props.onEditedChanged(data);
-    console.log('data', data["jsonExt"])
+    console.log("data", data["jsonExt"]);
   };
 
   headSummary = () => {
@@ -111,7 +111,6 @@ class FamilyMasterPanel extends FormPanel {
 
   render() {
     const { intl, classes, edited, openFamilyButton = false, readOnly, overview } = this.props;
-    console.log('editedfamily',edited);
     return (
       <Fragment>
         <Grid container className={classes.tableTitle}>
@@ -170,10 +169,8 @@ class FamilyMasterPanel extends FormPanel {
               // }
               value={
                 !!edited && edited?.ext
-                  ?
-                    edited?.ext?.enrolmentType
-                  : 
-                  !!edited && (edited?.jsonExt).length
+                  ? edited?.ext?.enrolmentType
+                  : !!edited && edited?.jsonExt?.length
                   ? JSON.parse(edited?.jsonExt)?.enrolmentType
                   : null
                 // edited?.jsonExt?.enrolmentType

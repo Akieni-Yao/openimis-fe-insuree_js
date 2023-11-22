@@ -48,7 +48,7 @@ class FamilyPage extends Component {
         this.setState({ camuNumberRes: createFamilyResult.families[0]?.family?.headInsuree?.chfId });
         setTimeout(() => {
           historyPush(this.props.modulesManager, this.props.history, "insuree.route.families");
-      }, 5000)
+        }, 5000);
       }
     } else {
       // debugger;
@@ -58,6 +58,7 @@ class FamilyPage extends Component {
         formatMessageWithValues(this.props.intl, "insuree", "UpdateFamily.mutationLabel", {
           label: familyLabel(family),
         }),
+        "families {family{id uuid headInsuree { id chfId}}}",
       );
       if (
         updateFamilyResult &&
@@ -69,7 +70,7 @@ class FamilyPage extends Component {
         this.setState({ camuNumberRes: updateFamilyResult.families[0]?.family?.headInsuree?.chfId });
         setTimeout(() => {
           historyPush(this.props.modulesManager, this.props.history, "insuree.route.families");
-      }, 5000)
+        }, 5000);
       }
     }
   };

@@ -154,7 +154,6 @@ class InsureeMasterPanel extends FormPanel {
       edited_id,
     } = this.props;
     const { data } = this.state;
-    console.log("edited",edited)
     return (
       <Grid container>
         <Grid item xs={12}>

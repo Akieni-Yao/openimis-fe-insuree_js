@@ -5,9 +5,10 @@ import { bindActionCreators } from "redux";
 import { withTheme, withStyles } from "@material-ui/core/styles";
 import { formatMessageWithValues, withModulesManager, withHistory, historyPush } from "@openimis/fe-core";
 import InsureeForm from "../components/InsureeForm";
-import { createInsuree, updateInsuree, updateExternalDocuments } from "../actions";
+import { createInsuree, updateInsuree, updateExternalDocuments, updateFamily } from "../actions";
 import { RIGHT_INSUREE, RIGHT_INSUREE_ADD, RIGHT_INSUREE_EDIT } from "../constants";
 import CommonSnackbar from "../components/CommonSnackbar";
+import { familyLabel } from "../utils/utils";
 
 const styles = (theme) => ({
   page: theme.page,
@@ -50,8 +51,57 @@ class InsureePage extends Component {
           label: !!insuree.chfId ? insuree.chfId : "",
         }),
       );
+      const {
+        uuid,
+        chfId,
+        lastName,
+        otherNames,
+        gender,
+        dob,
+        head,
+        jsonExt,
+        phone,
+        cardIssued,
+        status,
+        checkHead,
+        family_uuid,
+        marital,
+        passport,
+        typeOfId,
+      } = insuree;
+      let payload = {};
+      if (!checkHead) {
+        payload.headInsuree = {
+          uuid: uuid,
+          chfId: chfId,
+          lastName: lastName,
+          otherNames: otherNames,
+          dob: dob,
+          head: head,
+          jsonExt: jsonExt, // Assuming jsonExt is an object
+          phone: phone,
+          cardIssued: cardIssued,
+          status: status,
+          gender: gender,
+          marital: marital,
+          passport: passport,
+          typeOfId: typeOfId,
+        };
+        payload.location = jsonExt.insureelocations;
+        payload.address = jsonExt.insureeaddress;
+        payload.uuid = family_uuid;
+        payload.jsonExt = { enrolmentType: jsonExt.insureeEnrolmentType };
+      }
+      const updateFamilyResult = await this.props.updateFamily(
+        this.props.modulesManager,
+        payload,
+        formatMessageWithValues(this.props.intl, "insuree", "UpdateFamily.mutationLabel", {
+          label: familyLabel(payload),
+        }),
+      );
+      console.log("checkFamilyResult", updateFamilyResult);
       this.setState({ statusInsuree: insuree.status });
-      if (!response.error) {
+      if (!response.error && updateFamilyResult) {
         this.setState({ isOpenSnackbar: true });
         this.setState({
           snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${insuree.status == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
@@ -123,7 +173,7 @@ const mapStateToProps = (state, props) => ({
 });
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ createInsuree, updateInsuree, updateExternalDocuments }, dispatch);
+  return bindActionCreators({ createInsuree, updateInsuree, updateExternalDocuments, updateFamily }, dispatch);
 };
 
 export default withHistory(
