@@ -92,16 +92,16 @@ class InsureePage extends Component {
         payload.uuid = family_uuid;
         payload.jsonExt = { enrolmentType: jsonExt.insureeEnrolmentType };
       }
+      if (!checkHead){
       const updateFamilyResult = await this.props.updateFamily(
         this.props.modulesManager,
         payload,
         formatMessageWithValues(this.props.intl, "insuree", "UpdateFamily.mutationLabel", {
           label: familyLabel(payload),
         }),
-      );
-      console.log("checkFamilyResult", updateFamilyResult);
+      );}
       this.setState({ statusInsuree: insuree.status });
-      if (!response.error && updateFamilyResult) {
+      if (!response.error ) {
         this.setState({ isOpenSnackbar: true });
         this.setState({
           snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${insuree.status == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
@@ -120,8 +120,6 @@ class InsureePage extends Component {
           allApprovedOrRejected && insuree.documentData.some((document) => document.documentStatus === "REJECTED");
 
         if (!!hasReject) {
-          console.log("hiinter", insuree);
-
           // if (insuree.status !== "APPROVED" && (insuree.status == "REWORK" || insuree.status == "REJECTED")) {
           this.props.updateExternalDocuments(this.props.modulesManager, insuree?.documentData, insuree?.chfId);
         }
