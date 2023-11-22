@@ -327,7 +327,6 @@ class FamilyForm extends Component {
     const { family, newFamily } = this.state;
    
 
-    console.log('familyinsuree', insuree);
 
     if (!rights.includes(RIGHT_FAMILY)) return null;
     let runningMutation = !!family && !!family.clientMutationId;

@@ -51,7 +51,7 @@ class FamilyPage extends Component {
         }, 5000);
       }
     } else {
-      // debugger;
+      console.log("checkFamiliesPayload",family);
       const updateFamilyResult = await this.props.updateFamily(
         this.props.modulesManager,
         family,
@@ -60,6 +60,7 @@ class FamilyPage extends Component {
         }),
         "families {family{id uuid headInsuree { id chfId}}}",
       );
+      
       if (
         updateFamilyResult &&
         updateFamilyResult.status === 2 &&

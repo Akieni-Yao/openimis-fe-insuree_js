@@ -12,7 +12,7 @@ import {
 } from "@openimis/fe-core";
 
 const FAMILY_HEAD_PROJECTION =
-  "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code},camuNumber,status}";
+  "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code},camuNumber,status,jsonExt}";
 
 const FAMILY_FULL_PROJECTION = (mm) => [
   "id",
@@ -151,7 +151,7 @@ export function fetchFamilySummaries(mm, filters) {
     "validityTo",
     "status",
     // "jsonExt",
-    "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone, dob,camuNumber}",
+    "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone, dob,camuNumber,jsonExt}",
     "location" + mm.getProjection("location.Location.FlatProjection"),
   ];
   const payload = formatPageQueryWithCount("families", filters, projections);
@@ -404,7 +404,7 @@ export function formatInsureeGQL(mm, insuree) {
     }
     ${!!insuree.status ? `status: "${insuree.status}"` : ""}
     ${!!insuree.statusComment ? `statusComment: "${insuree.statusComment}"` : ""}
-    ${!!insuree.jsonExt ? `jsonExt: ${formatJsonField(insuree.jsonExt)}` : ""}
+    ${!!insuree.jsonExt ? `jsonExt: ${formatJsonField(insuree.jsonExt.civilQuality?insuree.jsonExt:JSON.parse(insuree.jsonExt))}` : ""}
   `;
 }
 
@@ -451,7 +451,7 @@ export function createFamily(mm, family, clientMutationLabel, additionalRequest 
 export function updateFamily(mm, family, clientMutationLabel, additionalRequest = "") {
   let mutation = formatMutation("updateFamily", formatFamilyGQL(mm, family), clientMutationLabel);
   var requestedDateTime = new Date();
-  return graphqlMutationLegacy(
+  return  graphqlMutationLegacy(
     mutation.payload,
     ["INSUREE_MUTATION_REQ", "INSUREE_UPDATE_FAMILY_RESP", "INSUREE_MUTATION_ERR"],
     {
