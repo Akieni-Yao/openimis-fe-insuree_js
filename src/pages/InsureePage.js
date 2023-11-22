@@ -68,6 +68,9 @@ class InsureePage extends Component {
         marital,
         passport,
         typeOfId,
+        email,
+        education,
+        profession
       } = insuree;
       let payload = {};
       if (!checkHead) {
@@ -86,6 +89,9 @@ class InsureePage extends Component {
           marital: marital,
           passport: passport,
           typeOfId: typeOfId,
+          email:email,
+          education:education,
+          profession:profession
         };
         payload.location = jsonExt.insureelocations;
         payload.address = jsonExt.insureeaddress;
