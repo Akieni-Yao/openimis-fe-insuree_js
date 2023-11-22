@@ -51,7 +51,6 @@ class FamilyPage extends Component {
         }, 5000);
       }
     } else {
-      console.log("checkFamiliesPayload",family);
       const updateFamilyResult = await this.props.updateFamily(
         this.props.modulesManager,
         family,
