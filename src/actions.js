@@ -12,7 +12,7 @@ import {
 } from "@openimis/fe-core";
 
 const FAMILY_HEAD_PROJECTION =
-  "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code}, education{id},profession{id},passport,camuNumber,status,marital,typeOfId{code},jsonExt}";
+  "headInsuree{id,uuid,chfId,lastName,otherNames,email,phone,dob,gender{code}, education{id},profession,passport,camuNumber,status,marital,typeOfId{code},jsonExt}";
 
 const FAMILY_FULL_PROJECTION = (mm) => [
   "id",
@@ -69,7 +69,7 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   `photo{id,uuid,date,folder,filename,officerId,photo}`,
   "gender{code}",
   "education{id}",
-  "profession{id}",
+  "profession",
   "marital",
   "cardIssued",
   "currentVillage" + mm.getProjection("location.Location.FlatProjection"),
@@ -392,7 +392,7 @@ export function formatInsureeGQL(mm, insuree) {
     }
     ${!!insuree.photo ? `photo:${formatInsureePhoto(insuree.photo)}` : ""}
     cardIssued:${!!insuree.cardIssued}
-    ${!!insuree.profession && !!insuree.profession ? `professionId: ${insuree.profession}` : ""}
+    ${!!insuree.profession && !!insuree.profession ? `profession:"${insuree.profession}"` : ""}
     ${!!insuree.education && !!insuree.education.id ? `educationId: ${insuree.education.id}` : ""}
     ${!!insuree.typeOfId && !!insuree.typeOfId.code ? `typeOfIdId: "${insuree.typeOfId.code}"` : ""}
     ${!!insuree.family && !!insuree.family.id ? `familyId: ${decodeId(insuree.family.id)}` : ""}

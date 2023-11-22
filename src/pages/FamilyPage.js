@@ -44,7 +44,9 @@ class FamilyPage extends Component {
         createFamilyResult.families[0]?.family?.headInsuree?.id
       ) {
         this.setState({ isOpenSnackbar: true });
-        this.setState({ snackbarMsg: `Family Created with Temporary CAMU number` });
+        this.setState({
+          snackbarMsg: `Family Created with Temporary CAMU number`,
+        });
         this.setState({ camuNumberRes: createFamilyResult.families[0]?.family?.headInsuree?.chfId });
         setTimeout(() => {
           historyPush(this.props.modulesManager, this.props.history, "insuree.route.families");
@@ -57,17 +59,25 @@ class FamilyPage extends Component {
         formatMessageWithValues(this.props.intl, "insuree", "UpdateFamily.mutationLabel", {
           label: familyLabel(family),
         }),
-        "families {family{id uuid headInsuree { id chfId}}}",
+        "families {family{id uuid headInsuree { id chfId camuNumber}}}",
       );
-      
+
       if (
         updateFamilyResult &&
         updateFamilyResult.status === 2 &&
         updateFamilyResult.families[0]?.family?.headInsuree?.chfId
       ) {
         this.setState({ isOpenSnackbar: true });
-        this.setState({ snackbarMsg: `Family Created with Temporary CAMU number` });
-        this.setState({ camuNumberRes: updateFamilyResult.families[0]?.family?.headInsuree?.chfId });
+        this.setState({
+          snackbarMsg: `Family Updated with ${
+            updateFamilyResult.families[0]?.family?.headInsuree?.camuNumber ? "CAMU number" : "Temporary CAMU number"
+          }`,
+        });
+        this.setState({
+          camuNumberRes: updateFamilyResult.families[0]?.family?.headInsuree?.camuNumber
+            ? updateFamilyResult.families[0]?.family?.headInsuree?.camuNumber
+            : updateFamilyResult.families[0]?.family?.headInsuree?.chfId,
+        });
         setTimeout(() => {
           historyPush(this.props.modulesManager, this.props.history, "insuree.route.families");
         }, 5000);

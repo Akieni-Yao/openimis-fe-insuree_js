@@ -87,12 +87,12 @@ class PolicySummary extends PagedDataHandler {
       "policyHolder.dateValidFrom",
       "policyHolder.dateValidTo",
     ];
-    if (rights.includes(RIGHT_POLICYHOLDER_UPDATE)) {
-      result.push("policyHolder.edit");
-    }
-    if (rights.includes(RIGHT_POLICYHOLDER_DELETE)) {
-      result.push("policyHolder.delete");
-    }
+    // if (rights.includes(RIGHT_POLICYHOLDER_UPDATE)) {
+    //   result.push("policyHolder.edit");
+    // }
+    // if (rights.includes(RIGHT_POLICYHOLDER_DELETE)) {
+    //   result.push("policyHolder.delete");
+    // }
     return result;
   };
   queryPrms = () => {
@@ -108,7 +108,6 @@ class PolicySummary extends PagedDataHandler {
   };
   componentDidMount() {
     // this.setState({ orderBy: null }, (e) => this.onChangeRowsPerPage(this.defaultPageSize));
-    console.log("this.props", this.props);
     if (!!this.props.edited_id) {
       this.props.fetchPolicyHolderInsuree(this.props.modulesManager, this.props.edited_id);
     }
@@ -195,37 +194,37 @@ class PolicySummary extends PagedDataHandler {
       (policyHolder) =>
         !!policyHolder.node.dateValidTo ? formatDateFromISO(modulesManager, intl, policyHolder.node.dateValidTo) : "",
     ];
-    if (rights.includes(RIGHT_POLICYHOLDER_UPDATE) || rights.includes(RIGHT_PORTALPOLICYHOLDER_SEARCH)) {
-      result.push(
-        (policyHolder) =>
-          !this.isDeletedFilterEnabled(policyHolder) && (
-            <Tooltip title={formatMessage(intl, "policyHolder", "editButton.tooltip")}>
-              <IconButton
-                href={this.policyHolderPageLink(policyHolder)}
-                onClick={(e) => e.stopPropagation() && !policyHolder.clientMutationId && onDoubleClick(policyHolder)}
-                disabled={this.state.deleted.includes(policyHolder.node.id)}
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-          ),
-      );
-    }
-    if (rights.includes(RIGHT_POLICYHOLDER_DELETE)) {
-      result.push(
-        (policyHolder) =>
-          !this.isDeletedFilterEnabled(policyHolder) && (
-            <Tooltip title={formatMessage(intl, "policyHolder", "deleteButton.tooltip")}>
-              <IconButton
-                onClick={() => this.onDelete(policyHolder)}
-                disabled={this.state.deleted.includes(policyHolder.id)}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          ),
-      );
-    }
+    // if (rights.includes(RIGHT_POLICYHOLDER_UPDATE) || rights.includes(RIGHT_PORTALPOLICYHOLDER_SEARCH)) {
+    //   result.push(
+    //     (policyHolder) =>
+    //       !this.isDeletedFilterEnabled(policyHolder) && (
+    //         <Tooltip title={formatMessage(intl, "policyHolder", "editButton.tooltip")}>
+    //           <IconButton
+    //             href={this.policyHolderPageLink(policyHolder)}
+    //             onClick={(e) => e.stopPropagation() && !policyHolder.clientMutationId && onDoubleClick(policyHolder)}
+    //             disabled={this.state.deleted.includes(policyHolder.node.id)}
+    //           >
+    //             <EditIcon />
+    //           </IconButton>
+    //         </Tooltip>
+    //       ),
+    //   );
+    // }
+    // if (rights.includes(RIGHT_POLICYHOLDER_DELETE)) {
+    //   result.push(
+    //     (policyHolder) =>
+    //       !this.isDeletedFilterEnabled(policyHolder) && (
+    //         <Tooltip title={formatMessage(intl, "policyHolder", "deleteButton.tooltip")}>
+    //           <IconButton
+    //             onClick={() => this.onDelete(policyHolder)}
+    //             disabled={this.state.deleted.includes(policyHolder.id)}
+    //           >
+    //             <DeleteIcon />
+    //           </IconButton>
+    //         </Tooltip>
+    //       ),
+    //   );
+    // }
     return result;
   };
   onDelete = (policyHolder) => {
