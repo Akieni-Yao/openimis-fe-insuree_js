@@ -71,6 +71,7 @@ class InsureeMasterPanel extends FormPanel {
     } else {
       data["jsonExt"] = { ...data["jsonExt"], ...updates };
     }
+    data["jsonExt"].createdAt=""
     if (!data["jsonExt"]?.dateValidFrom) {
       data["jsonExt"].dateValidFrom = new Date().toISOString().slice(0, 10);
     }
