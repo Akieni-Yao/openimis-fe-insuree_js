@@ -78,15 +78,30 @@ class InsureeMasterPanel extends FormPanel {
     if (!data["jsonExt"]?.nbKids) {
       data["jsonExt"].nbKids = 0;
     }
-    if (!updates.nationality) {
+    // if (!updates.nationality) {
+    //   data["jsonExt"].nationality = "CG";
+    // }
+    // if (!updates?.civilQuality) {
+    //   !!data?.relationship && data?.relationship.id == 8
+    //     ? (data["jsonExt"].civilQuality = "Depedent Beneficiary spouse")
+    //     : !!data?.relationship && data?.relationship.id == 4
+    //     ? (data["jsonExt"].civilQuality = "Depedent Beneficiary child")
+    //     : (data["jsonExt"].civilQuality = "Main Beneficiary");
+    // }
+    if (updates.nationality) {
+      data["jsonExt"].nationality = updates.nationality;
+    } else if (!data["jsonExt"].nationality) {
       data["jsonExt"].nationality = "CG";
     }
-    if (!updates?.civilQuality) {
-      !!data?.relationship && data?.relationship.id == 8
-        ? (data["jsonExt"].civilQuality = "Depedent Beneficiary spouse")
-        : !!data?.relationship && data?.relationship.id == 4
-        ? (data["jsonExt"].civilQuality = "Depedent Beneficiary child")
-        : (data["jsonExt"].civilQuality = "Main Beneficiary");
+    if (updates.civilQuality) {
+      data["jsonExt"].civilQuality = updates.civilQuality;
+    } else if (data.relationship) {
+      data["jsonExt"].civilQuality =
+        data.relationship.id === 8
+          ? "Dependent Beneficiary spouse"
+          : data.relationship.id === 4
+          ? "Dependent Beneficiary child"
+          : "Main Beneficiary";
     }
     if (updates?.insureelocations) {
       data["jsonExt"].insureelocations = updates?.insureelocations;
