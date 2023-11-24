@@ -71,38 +71,38 @@ class InsureeMasterPanel extends FormPanel {
     } else {
       data["jsonExt"] = { ...data["jsonExt"], ...updates };
     }
-    data["jsonExt"].createdAt=""
+    data["jsonExt"].createdAt = ""
     if (!data["jsonExt"]?.dateValidFrom) {
       data["jsonExt"].dateValidFrom = new Date().toISOString().slice(0, 10);
     }
     if (!data["jsonExt"]?.nbKids) {
       data["jsonExt"].nbKids = 0;
     }
-    // if (!updates.nationality) {
-    //   data["jsonExt"].nationality = "CG";
-    // }
-    // if (!updates?.civilQuality) {
-    //   !!data?.relationship && data?.relationship.id == 8
-    //     ? (data["jsonExt"].civilQuality = "Depedent Beneficiary spouse")
-    //     : !!data?.relationship && data?.relationship.id == 4
-    //     ? (data["jsonExt"].civilQuality = "Depedent Beneficiary child")
-    //     : (data["jsonExt"].civilQuality = "Main Beneficiary");
-    // }
-    if (updates.nationality) {
-      data["jsonExt"].nationality = updates.nationality;
-    } else if (!data["jsonExt"].nationality) {
+    if (!updates.nationality) {
       data["jsonExt"].nationality = "CG";
     }
-    if (updates.civilQuality) {
-      data["jsonExt"].civilQuality = updates.civilQuality;
-    } else if (data.relationship) {
-      data["jsonExt"].civilQuality =
-        data.relationship.id === 8
-          ? "Dependent Beneficiary spouse"
-          : data.relationship.id === 4
-          ? "Dependent Beneficiary child"
-          : "Main Beneficiary";
+    if (!updates?.civilQuality) {
+      !!data?.relationship && data?.relationship.id == 8
+        ? (data["jsonExt"].civilQuality = "Depedent Beneficiary spouse")
+        : !!data?.relationship && data?.relationship.id == 4
+          ? (data["jsonExt"].civilQuality = "Depedent Beneficiary child")
+          : (data["jsonExt"].civilQuality = "Main Beneficiary");
     }
+    // if (updates.nationality) {
+    //   data["jsonExt"].nationality = updates.nationality;
+    // } else if (!data["jsonExt"].nationality) {
+    //   data["jsonExt"].nationality = "CG";
+    // }
+    // if (updates.civilQuality) {
+    //   data["jsonExt"].civilQuality = updates.civilQuality;
+    // } else if (data.relationship) {
+    //   data["jsonExt"].civilQuality =
+    //     data.relationship.id === 8
+    //       ? "Dependent Beneficiary spouse"
+    //       : data.relationship.id === 4
+    //       ? "Dependent Beneficiary child"
+    //       : "Main Beneficiary";
+    // }
     if (updates?.insureelocations) {
       data["jsonExt"].insureelocations = updates?.insureelocations;
     } else if (this.props.family?.location) {
@@ -181,9 +181,9 @@ class InsureeMasterPanel extends FormPanel {
                     module="insuree"
                     id={
                       !!edited &&
-                      !!edited.family &&
-                      !!edited.family.headInsuree &&
-                      edited.family.headInsuree.id !== edited.id
+                        !!edited.family &&
+                        !!edited.family.headInsuree &&
+                        edited.family.headInsuree.id !== edited.id
                         ? title
                         : "family.title"
                     }
@@ -255,7 +255,7 @@ class InsureeMasterPanel extends FormPanel {
                   inputProps={{ maxLength: MAX_MAIN_ACTIVITY_LENGTH }}
                   value={!!edited && !!edited.jsonExt ? edited.jsonExt?.insureeniu : ""}
                   onChange={(v) => this.updateExts({ insureeniu: v })}
-                  // readOnly={isPolicyHolderPortalUser}
+                // readOnly={isPolicyHolderPortalUser}
                 />
               </Grid>
               <Grid item xs={3} className={classes.item}>
@@ -279,10 +279,10 @@ class InsureeMasterPanel extends FormPanel {
                   label="Family.enrolmentType"
                   readOnly={
                     !!edited &&
-                    !!edited.family &&
-                    !!edited.family.headInsuree &&
-                    edited.family.headInsuree.id !== edited.id &&
-                    edited_id == null
+                      !!edited.family &&
+                      !!edited.family.headInsuree &&
+                      edited.family.headInsuree.id !== edited.id &&
+                      edited_id == null
                       ? readOnly
                       : true
                   }
@@ -292,8 +292,8 @@ class InsureeMasterPanel extends FormPanel {
                     edited_id
                       ? edited?.jsonExt?.insureeEnrolmentType
                       : edited?.family?.jsonExt?.enrolmentType
-                      ? edited?.family?.jsonExt?.enrolmentType
-                      : this.props?.family?.jsonExt?.enrolmentType
+                        ? edited?.family?.jsonExt?.enrolmentType
+                        : this.props?.family?.jsonExt?.enrolmentType
                   }
                   // value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeEnrolmentType : null}
                   onChange={(value) => this.updateExts({ insureeEnrolmentType: value })}
@@ -348,8 +348,8 @@ class InsureeMasterPanel extends FormPanel {
                     edited_id
                       ? edited?.jsonExt?.insureelocations
                       : edited?.family?.location
-                      ? edited?.family?.location
-                      : this.props?.family?.location
+                        ? edited?.family?.location
+                        : this.props?.family?.location
                   }
                   // value={!edited?.jsonExt?.insureelocations ? "" : edited?.jsonExt?.insureelocations}
                   onChange={(v) => this.updateExts({ insureelocations: v })}
@@ -378,8 +378,8 @@ class InsureeMasterPanel extends FormPanel {
                     edited_id
                       ? edited?.jsonExt?.insureeaddress
                       : edited?.family?.address
-                      ? edited?.family?.address
-                      : this.props?.family?.address
+                        ? edited?.family?.address
+                        : this.props?.family?.address
                   }
                   // readOnly={readOnly}
                   // value={!edited && !edited?.jsonExt?.insureeaddress ? "" : edited?.jsonExt?.insureeaddress}
@@ -494,9 +494,9 @@ class InsureeMasterPanel extends FormPanel {
                       type="number"
                       required={
                         !!edited &&
-                        !!edited.family &&
-                        !!edited.family.headInsuree &&
-                        edited.family.headInsuree.id !== edited.id
+                          !!edited.family &&
+                          !!edited.family.headInsuree &&
+                          edited.family.headInsuree.id !== edited.id
                           ? false
                           : true
                       }
@@ -527,10 +527,10 @@ class InsureeMasterPanel extends FormPanel {
                         !!edited && !!edited.jsonExt && !!edited?.jsonExt?.civilQuality
                           ? edited?.jsonExt?.civilQuality
                           : !!data?.relationship && data?.relationship.id == 8
-                          ? "Depedent Beneficiary spouse"
-                          : !!data?.relationship && data?.relationship.id == 4
-                          ? "Depedent Beneficiary child"
-                          : "Main Beneficiary"
+                            ? "Depedent Beneficiary spouse"
+                            : !!data?.relationship && data?.relationship.id == 4
+                              ? "Depedent Beneficiary child"
+                              : "Main Beneficiary"
                         // ? edited?.family?.jsonExt?.civilQuality
                         // : null
                       }
