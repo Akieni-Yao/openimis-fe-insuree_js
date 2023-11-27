@@ -262,7 +262,7 @@ class InsureeForm extends Component {
     if (!doesInsureeChange) return false;
     // if (!this.props.isInsureeNumberValid) return false;
     // if (!this.state.insuree.chfId) return false;
-    if (!this.state.insuree?.jsonExt?.insureeEnrolmentType) return false;
+    // if (!this.state.insuree?.jsonExt?.insureeEnrolmentType) return false;
     // if (!this.state.insuree?.jsonExt?.createdAt) return false;
     if (!this.state.insuree?.jsonExt?.BirthPlace) return false;
     // if (!this.state.insuree?.jsonExt?.nationality) return false;
@@ -284,7 +284,38 @@ class InsureeForm extends Component {
   };
 
   _save = (insureeData) => {
+    console.log("insureeData", insureeData);
     const { insuree } = this.state;
+    const headInsureeJsonExt = insureeData?.jsonExt;
+    if (!headInsureeJsonExt.hasOwnProperty("civilQuality")) {
+      !!insureeData?.relationship && insureeData?.relationship.id == 8
+        ? (headInsureeJsonExt.civilQuality = "Depedent Beneficiary spouse")
+        : !!insureeData?.relationship && insureeData?.relationship.id == 4
+        ? (headInsureeJsonExt.civilQuality = "Depedent Beneficiary child")
+        : (headInsureeJsonExt.civilQuality = "Main Beneficiary");
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("nationality")) {
+      headInsureeJsonExt.nationality = "CG";
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("insureeEnrolmentType")) {
+      headInsureeJsonExt.insureeEnrolmentType = JSON.parse(insureeData.family.jsonExt).enrolmentType;
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("insureeaddress")) {
+      headInsureeJsonExt.insureeaddress = insureeData.family.address;
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("insureelocations")) {
+      headInsureeJsonExt.insureelocations = insureeData.family.location;
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("dateValidFrom")) {
+      headInsureeJsonExt.dateValidFrom = new Date().toISOString().slice(0, 10);
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("nbKids")) {
+      headInsureeJsonExt.nbKids = 0;
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("createdAt")) {
+      headInsureeJsonExt.createdAt = "";
+    }
+    console.log("familypayload", insureeData);
     const CheckHead =
       !!insuree && !!insuree.family && !!insuree.family.headInsuree && insuree.family.headInsuree.id !== insuree.id;
     this.setState(
@@ -292,12 +323,15 @@ class InsureeForm extends Component {
       (e) => this.props.save({ ...insureeData, checkHead: CheckHead, family_uuid: this.props.family_uuid }),
     );
   };
-  _approveorreject = (insuree) => {
+  _approveorreject = (insureeData) => {
+    const { insuree } = this.state;
     // if (insuree.status !== "APPROVED")
     //   this.props.updateExternalDocuments(this.props.modulesManager, this.props.documentsData, insuree.chfId);
+    const CheckHead =
+    !!insuree && !!insuree.family && !!insuree.family.headInsuree && insuree.family.headInsuree.id !== insuree.id;
     this.setState(
       { lockNew: true }, // avoid duplicates
-      (e) => this.props.save({ ...insuree, documentData: this.props.documentsData }),
+      (e) => this.props.save({ ...insureeData, documentData: this.props.documentsData ,checkHead: CheckHead, family_uuid: this.props.family_uuid }),
     );
     this.handleDialogClose();
   };
@@ -437,7 +471,6 @@ class InsureeForm extends Component {
     if (base64Data) {
       this.displayPrintWindow(base64Data, contentType);
     }
-
   };
   cancel = () => {
     this.setState({
@@ -478,7 +511,7 @@ class InsureeForm extends Component {
       approverData,
     } = this.props;
     const { insuree, clientMutationId, payload, statusCheck, email } = this.state;
-    
+
     if (!rights.includes(RIGHT_INSUREE)) return null;
     let runningMutation = !!insuree && !!clientMutationId;
     let actions = [

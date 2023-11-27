@@ -183,7 +183,7 @@ class FamilyForm extends Component {
     if (!this.state.family.headInsuree.otherNames) return false;
     if (!this.state.family.headInsuree.phone) return false;
     if (!this.state?.family?.headInsuree?.jsonExt?.BirthPlace) return false;
-    if (!this.state?.family?.headInsuree?.jsonExt?.nationality) return false;
+    // if (!this.state?.family?.headInsuree?.jsonExt?.nationality) return false;
     // if (!this.state?.family?.headInsuree?.jsonExt?.nbKids) return false;
     // if (!this.state?.family?.headInsuree?.jsonExt?.civilQuality) return false;
     // if (!this.state?.family?.headInsuree?.jsonExt?.createdAt) return false;
@@ -202,13 +202,40 @@ class FamilyForm extends Component {
   };
 
   updateCanSave = () => {
-      const { family } = this.props;
-      if (_.isEqual(family, this.state.family)) {
-        return false;
-      }
-      return true;
+    const { family } = this.props;
+    if (_.isEqual(family, this.state.family)) {
+      return false;
+    }
+    return true;
   };
   _save = (family) => {
+    const headInsureeJsonExt = family.headInsuree.jsonExt;
+    if (!headInsureeJsonExt.hasOwnProperty("civilQuality")) {
+      !!headInsureeJsonExt?.relationship && headInsureeJsonExt?.relationship.id == 8
+        ? (headInsureeJsonExt.civilQuality = "Depedent Beneficiary spouse")
+        : !!headInsureeJsonExt?.relationship && headInsureeJsonExt?.relationship.id == 4
+        ? (headInsureeJsonExt.civilQuality = "Depedent Beneficiary child")
+        : (headInsureeJsonExt.civilQuality = "Main Beneficiary");
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("nationality")) {
+      headInsureeJsonExt.nationality = "CG";
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("insureeEnrolmentType")) {
+      headInsureeJsonExt.insureeEnrolmentType = family.jsonExt.enrolmentType;
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("insureeaddress")) {
+      headInsureeJsonExt.insureeaddress = family.address;
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("insureelocations")) {
+      headInsureeJsonExt.insureelocations = family.location;
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("dateValidFrom")) {
+      headInsureeJsonExt.dateValidFrom = new Date().toISOString().slice(0, 10);
+    }
+    if (!headInsureeJsonExt.hasOwnProperty("nbKids")) {
+      headInsureeJsonExt.nbKids = 0;
+    }
+    headInsureeJsonExt.createdAt = "";
     this.setState(
       { lockNew: !family.uuid }, // avoid duplicates
       (e) => this.props.save(family),
@@ -230,7 +257,6 @@ class FamilyForm extends Component {
   };
 
   onEditedChanged = (family) => {
-    console.log('onEditedChanged',(family))
     this.setState({ family, newFamily: false });
   };
 
@@ -325,8 +351,6 @@ class FamilyForm extends Component {
       mutation,
     } = this.props;
     const { family, newFamily } = this.state;
-   
-
 
     if (!rights.includes(RIGHT_FAMILY)) return null;
     let runningMutation = !!family && !!family.clientMutationId;

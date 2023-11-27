@@ -3,7 +3,7 @@ import { injectIntl } from "react-intl";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { withTheme, withStyles } from "@material-ui/core/styles";
-import { formatMessageWithValues, withModulesManager, withHistory, historyPush } from "@openimis/fe-core";
+import { formatMessageWithValues, withModulesManager, withHistory, historyPush,formatMessage } from "@openimis/fe-core";
 import InsureeForm from "../components/InsureeForm";
 import { createInsuree, updateInsuree, updateExternalDocuments, updateFamily } from "../actions";
 import { RIGHT_INSUREE, RIGHT_INSUREE_ADD, RIGHT_INSUREE_EDIT } from "../constants";
@@ -37,7 +37,8 @@ class InsureePage extends Component {
       );
       if (!response.error) {
         this.setState({ isOpenSnackbar: true });
-        this.setState({ snackbarMsg: `Insuree Created with Temporary CAMU number` });
+        this.setState({ snackbarMsg: formatMessage(this.props.intl, "insuree", "CreateInsuree.snackbar") });
+        // this.setState({ snackbarMsg: `Insuree Created with Temporary CAMU number` });
         this.setState({ camuNumberRes: response?.insurees[0].insuree.chfId });
         setTimeout(() => {
           this.props.history.goBack();
