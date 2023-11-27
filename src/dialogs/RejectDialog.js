@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {useSelector} from  "react-redux";
+import { useSelector } from "react-redux";
 import {
-
   Dialog,
   DialogActions,
   DialogContent,
@@ -14,7 +13,7 @@ import {
   Grid,
   IconButton,
 } from "@material-ui/core";
-import { PublishedComponent, TextInput } from "@openimis/fe-core";
+import { PublishedComponent, TextInput, useTranslations, withModulesManager, combine } from "@openimis/fe-core";
 import { Close as CloseIcon } from "@material-ui/icons";
 
 const useStyles = makeStyles(() => ({
@@ -33,9 +32,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 const RejectDialog = (props) => {
-  const { classes, approveorreject, onClose, isOpen, payload, statusCheck,edited } = props;
-  const approverData=useSelector((store)=>store)
-  console.log('approverSata',approverData);
+  const { classes, approveorreject, onClose, isOpen, payload, statusCheck, edited, modulesManager } = props;
+  const approverData = useSelector((store) => store);
+  const { formatMessage } = useTranslations("insuree", modulesManager);
   const [comment, setComment] = useState({ statusComment: "", status: "", reviewer: null });
   const newClasses = useStyles();
   const handleChange = (name, value) => {
@@ -57,7 +56,7 @@ const RejectDialog = (props) => {
     <div>
       <Dialog open={isOpen} onClose={() => onClose()} maxWidth="xs" fullWidth>
         <DialogTitle style={{ fontWeight: 600 }}>
-          {statusCheck == "rework" ? "Rework" : "Reason for rejection"}
+          {statusCheck == "rework" ? formatMessage("dialog.reworkTitle") : formatMessage("dialog.rejectTitle")}
           <IconButton edge="end" className={newClasses.closeIcon} color="inherit" onClick={() => onClose()}>
             <CloseIcon />
           </IconButton>
@@ -67,7 +66,8 @@ const RejectDialog = (props) => {
             <Grid item xs={12} className={classes.item}>
               <PublishedComponent
                 pubRef="insuree.ReviewerPicker"
-                label="Reviewer"
+                module="insuree"
+                label="label.Reviewer"
                 withNull={true}
                 readOnly={false}
                 required
@@ -93,19 +93,19 @@ const RejectDialog = (props) => {
 
         <DialogActions>
           <Button onClick={() => onClose()} variant="outlined" className={classes.primaryButton}>
-            Cancel
+            {formatMessage("dialog.cancel")}
           </Button>
           <Button
             onClick={() => approveorreject(updatedPayload)}
             variant="contained"
             className={statusCheck == "rework" ? newClasses.reworkBtn : newClasses.rejectBtn}
           >
-            {statusCheck == "rework" ? "Send for rework" : "Reject"}
+            {statusCheck == "rework" ? formatMessage("button.sendRework") : formatMessage("button.reject")}
           </Button>
         </DialogActions>
       </Dialog>
     </div>
   );
 };
-
-export default RejectDialog;
+const enhance = combine(withModulesManager);
+export default enhance(RejectDialog);

@@ -277,6 +277,10 @@ class FamilyForm extends Component {
         selectedClass = this.props.classes.approvedBtn;
         docsStatus = "buttonStatus.approved";
         break;
+      case "ACTIVE":
+        selectedClass = this.props.classes.approvedBtn;
+        docsStatus = "buttonStatus.active";
+        break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
         docsStatus = "buttonStatus.rejected";

@@ -453,6 +453,7 @@
  "insuree.sendmail":"sentNotification",
  "insuree.buttonStatus.preRegistered": "Pre Registered",
  "insuree.buttonStatus.approved": "Approved",
+ "insuree.buttonStatus.active": "Active",
  "insuree.buttonStatus.rejected": "Rejected",
  "insuree.buttonStatus.rework": "Rework",
  "insuree.buttonStatus.waitingDocumentBiometric": "Waiting for document and biometric",
@@ -476,5 +477,11 @@
  "insuree.Insuree.status.WAITING_FOR_DOCUMENT_AND_BIOMETRIC": "Waiting for document and biometric",
  "insuree.Insuree.status.WAITING_FOR_APPROVAL": "Waiting For Approval",
  "insuree.Insuree.status.WAITING_FOR_QUEUE": "Waiting For Queue",
- "insuree.Insuree.status.ACTIVE": "Active"
+ "insuree.Insuree.status.ACTIVE": "Active",
+ "insuree.dialog.reworkTitle":"Rework",
+ "insuree.dialog.rejectTitle":"Reason for rejection",
+ "insuree.dialog.cancel":"Annuler",
+ "insuree.label.Reviewer":"Reviewer",
+ "insuree.button.sendRework":"Send for rework",
+ "insuree.button.reject":"Reject"
 }
