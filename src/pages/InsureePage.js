@@ -85,7 +85,7 @@ class InsureePage extends Component {
           jsonExt: jsonExt, // Assuming jsonExt is an object
           phone: phone,
           cardIssued: cardIssued,
-          status: status,
+          // status: status,
           gender: gender,
           marital: marital,
           passport: passport,
