@@ -247,7 +247,7 @@ class InsureeSearcher extends Component {
           return (
             <>
               <Typography variant="outlined">{formatMessage(this.props.intl, "insuree", docsStatus)}</Typography>
-              {insuree.status === "REWORK" || insuree.status === "REJECTED" ? (
+              {/* {insuree.status === "REWORK" || insuree.status === "REJECTED" ? (
                 <Tooltip
                   placement="right"
                   arrow
@@ -258,7 +258,7 @@ class InsureeSearcher extends Component {
                     <HelpIcon />
                   </IconButton>
                 </Tooltip>
-              ) : null}
+              ) : null} */}
             </>
           );
         } else {
