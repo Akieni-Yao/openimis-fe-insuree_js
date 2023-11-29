@@ -207,6 +207,10 @@ class InsureeSearcher extends Component {
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingApproval";
         break;
+      case "ACTIVE":
+        selectedClass = this.props.classes.approvedBtn;
+        docsStatus = "buttonStatus.active";
+        break;
       case "WAITING_FOR_QUEUE":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingQueue";
@@ -278,7 +282,7 @@ class InsureeSearcher extends Component {
     formatters.push(
       (insuree) => formatDateFromISO(this.props.modulesManager, this.props.intl, insuree.validityFrom),
       filters.showHistory &&
-        ((insuree) => formatDateFromISO(this.props.modulesManager, this.props.intl, insuree.validityTo)),
+      ((insuree) => formatDateFromISO(this.props.modulesManager, this.props.intl, insuree.validityTo)),
       (insuree) => (
         <Grid container wrap="nowrap" spacing="2">
           <Grid item>
