@@ -113,7 +113,10 @@ class InsureePage extends Component {
         this.setState({
           snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${insuree.status == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
             } `,
-
+            // snackbarMsg:  formatMessageWithValues(this.props.intl, "insuree", "UpdateInsuree.snackbar", {
+            //   status: familyLabel(this.props.family),
+            //   idLabel: insureeLabel(insuree),
+            // })
           // camuNumberRes: response?.insurees[0].insuree.camuNumber
           //   ? response?.insurees[0].insuree.camuNumber
           //   : response?.insurees[0].insuree.chfId,

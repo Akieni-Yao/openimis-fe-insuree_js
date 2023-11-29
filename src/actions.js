@@ -353,8 +353,9 @@ function formatPrint(edited) {
   } else {
     reportName = "enrollment_receipt_for_print";
   }
-
-  const formatPrint = `uuid: "${edited?.headInsuree?.uuid}",  isEmail: ${false},reportName: "${reportName}"`;
+  const formatPrint = `uuid: "${
+    edited?.headInsuree ? edited?.headInsuree?.uuid : edited?.uuid
+  }",  isEmail: ${false},reportName: "${reportName}"`;
   return formatPrint;
 }
 // function formatExternalDocument(docs, tempCamu) {

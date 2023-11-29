@@ -34,6 +34,7 @@ const FAMILY_STATUS_TYPE = [
   "WAITING_FOR_QUEUE",
   "ACTIVE",
   "REJECTED",
+  "REWORK"
 ];
 class InsureeFilter extends Component {
   state = {

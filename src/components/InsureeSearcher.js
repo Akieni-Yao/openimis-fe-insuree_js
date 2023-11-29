@@ -22,6 +22,7 @@ import { fetchInsureeSummaries, deleteInsuree } from "../actions";
 import { withTheme, withStyles } from "@material-ui/core/styles";
 import InsureeFilter from "./InsureeFilter";
 import { insureeLabel } from "../utils/utils";
+import HelpIcon from "@material-ui/icons/Help";
 
 const INSUREE_SEARCHER_CONTRIBUTION_KEY = "insuree.InsureeSearcher";
 const styles = (theme) => ({
@@ -67,7 +68,7 @@ class InsureeSearcher extends Component {
     this.rowsPerPageOptions = props.modulesManager.getConf(
       "fe-insuree",
       "insureeFilter.rowsPerPageOptions",
-      [10, 20, 50, 100],
+      [10, 20, 50, 3000],
     );
     this.defaultPageSize = props.modulesManager.getConf("fe-insuree", "insureeFilter.defaultPageSize", 10);
     this.locationLevels = this.props.modulesManager.getConf("fe-location", "location.Location.MaxLevels", 4);
@@ -247,18 +248,18 @@ class InsureeSearcher extends Component {
           return (
             <>
               <Typography variant="outlined">{formatMessage(this.props.intl, "insuree", docsStatus)}</Typography>
-              {insuree.status === "REWORK" || insuree.status === "REJECTED" ? (
-                <Tooltip
-                  placement="right"
-                  arrow
-                  classes={{ tooltip: this.props.classes.customWidth }}
-                  title={i.statusComment}
-                >
-                  <IconButton>
-                    <HelpIcon />
-                  </IconButton>
-                </Tooltip>
-              ) : null}
+              {/* {insuree.status === "REWORK" || insuree.status === "REJECTED" ? (
+                // <Tooltip
+                //   placement="right"
+                //   arrow
+                //   classes={{ tooltip: this.props.classes.customWidth }}
+                //   title={i.statusComment}
+                // >
+                //   <IconButton>
+                //     <HelpIcon />
+                //   </IconButton>
+                // </Tooltip>
+              ) : null} */}
             </>
           );
         } else {

@@ -473,7 +473,7 @@
  "insuree.Insuree.status.PRE_REGISTERED": "Pre Registered",
  "insuree.Insuree.status.APPROVED": "Approved",
  "insuree.Insuree.status.REJECTED": "Rejected",
- "insuree.Insuree.status.rework": "Rework",
+ "insuree.Insuree.status.REWORK": "Rework",
  "insuree.Insuree.status.WAITING_FOR_DOCUMENT_AND_BIOMETRIC": "Waiting for document and biometric",
  "insuree.Insuree.status.WAITING_FOR_APPROVAL": "Waiting For Approval",
  "insuree.Insuree.status.WAITING_FOR_QUEUE": "Waiting For Queue",
