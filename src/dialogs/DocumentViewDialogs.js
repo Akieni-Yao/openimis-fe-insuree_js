@@ -201,7 +201,8 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
             <iframe title="PDF Viewer" src={blobURL} width="100%" height="100%"></iframe>
           </DialogContent>
           <Divider />
-          {!showRejectComment && approverDetails == userId ? (
+          {/* {!showRejectComment && approverDetails == userId ? ( */}
+          {!showRejectComment ? (
             <DialogActions style={{ margin: "20px 20px" }}>
               <Button onClick={handleApprove} variant="contained" color="primary">
                 {/* Verify */}
