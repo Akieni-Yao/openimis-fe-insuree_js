@@ -43,7 +43,7 @@ const CAMU_ENROLMENT_TYPE = [
   "vulnerable_Persons",
 ];
 const capitalizeFirstLetter = (str) => {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  return str.split(' ').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 const CAMU_CIVIL_QUALITY = ["Main Beneficiary", "Depedent Beneficiary spouse", "Depedent Beneficiary child"];
 class InsureeMasterPanel extends FormPanel {
@@ -279,8 +279,8 @@ class InsureeMasterPanel extends FormPanel {
                     edited_id
                       ? edited?.jsonExt?.insureeEnrolmentType
                       : EditedEnrolmentType
-                      ? EditedEnrolmentType?.enrolmentType
-                      : this.props?.family?.jsonExt?.enrolmentType
+                        ? EditedEnrolmentType?.enrolmentType
+                        : this.props?.family?.jsonExt?.enrolmentType
                   }
                   // value={!!edited && !!edited.jsonExt ? edited.jsonExt.insureeEnrolmentType : null}
                   onChange={(value) => this.updateExts({ insureeEnrolmentType: value })}
@@ -631,7 +631,7 @@ class InsureeMasterPanel extends FormPanel {
                   onChange={(v) => this.updateAttribute("photo", !!v ? v : null)}
                 />
               </Grid>
-              <Grid item xs={3} className={classes.item}>
+              {/* <Grid item xs={3} className={classes.item}>
                 <TextInput
                   module="insuree"
                   label="Insuree.employee_number"
@@ -643,7 +643,7 @@ class InsureeMasterPanel extends FormPanel {
                   // }}
                   onChange={(v) => this.updateExts({ employeeNumber: v })}
                 />
-              </Grid>
+              </Grid> */}
               <Grid item xs={3} className={classes.item}>
                 <PublishedComponent
                   pubRef="insuree.EducationPicker"
