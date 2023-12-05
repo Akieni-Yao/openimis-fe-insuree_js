@@ -247,11 +247,14 @@ class FamilyForm extends Component {
   _save = (family) => {
     const EducationNameByVal = () => {
       const { education } = this.state;
-      for (let i = 0; i < education?.length; i++) {
-        if (education[i].value == family.headInsuree.education.id) {
-          return education[i].label.fr;
+      if (!!family?.headInsuree?.education?.id) {
+        for (let i = 0; i < education?.length; i++) {
+          if (education[i].value == family?.headInsuree?.education?.id) {
+            return education[i].label.fr;
+          }
         }
       }
+
       return undefined;
     };
     const educationName = EducationNameByVal();
@@ -283,7 +286,7 @@ class FamilyForm extends Component {
     }
     if (!!family.headInsuree.education) {
       headInsureeJsonExt.education = {
-        education: educationName,
+        education: !!educationName ? educationName : "",
       };
     }
     headInsureeJsonExt.createdAt = "";

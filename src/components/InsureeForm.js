@@ -323,9 +323,11 @@ class InsureeForm extends Component {
   _save = (insureeData) => {
     const EducationNameByVal = () => {
       const { education } = this.state;
-      for (let i = 0; i < education?.length; i++) {
-        if (education[i].value == insureeData?.education?.id) {
-          return education[i].label.fr;
+      if (!!insureeData?.education?.id) {
+        for (let i = 0; i < education?.length; i++) {
+          if (education[i].value == insureeData?.education?.id) {
+            return education[i].label.fr;
+          }
         }
       }
       return undefined;
@@ -363,7 +365,7 @@ class InsureeForm extends Component {
     }
     if (!!insureeData.education) {
       headInsureeJsonExt.education = {
-        education: educationName,
+        education: !!educationName ? educationName : "",
       };
     }
     console.log("familypayload", insureeData);
