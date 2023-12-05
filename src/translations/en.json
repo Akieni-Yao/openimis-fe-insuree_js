@@ -187,6 +187,7 @@
   "insuree.DeleteFamilies.mutationLabel": "Delete family - {label}",
   "insuree.CreateInsuree.mutationLabel": "Create insuree - {label}",
   "insuree.UpdateInsuree.mutationLabel": "Update insuree - {label}",
+  "insuree.CreateInsuree.snackbar":"Insuree Created with Temporary CAMU number",
   "insuree.RemoveInsuree.cancelPolicies.mutationLabel": "Remove insuree - {label} from family {family} and cancel policies",
   "insuree.RemoveInsuree.keepPolicies.mutationLabel": "Remove insuree - {label} from family {family}, but keep policies",
   "insuree.DeleteInsuree.mutationLabel": "Delete insuree - {label}",
