@@ -42,9 +42,22 @@ const CAMU_ENROLMENT_TYPE = [
   "students",
   "vulnerable_Persons",
 ];
-// const capitalizeFirstLetter = (str) => {
-//   return str.split(' ').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-// };
+const capitalizeWords = (inputString) => {
+  let result = "";
+
+  let capitalizeNext = true;
+
+  for (const char of inputString) {
+    if (char === ' ' || char === '\t') {
+      capitalizeNext = true;
+      result += char;
+    } else {
+      result += capitalizeNext ? char.toUpperCase() : char.toLowerCase();
+      capitalizeNext = false;
+    }
+  }    
+  return result;
+};
 const CAMU_CIVIL_QUALITY = ["Main Beneficiary", "Depedent Beneficiary spouse", "Depedent Beneficiary child"];
 class InsureeMasterPanel extends FormPanel {
   constructor(props) {
@@ -392,9 +405,9 @@ class InsureeMasterPanel extends FormPanel {
                   label="Insuree.otherNames"
                   required={true}
                   readOnly={readOnly}
-                  value={!!edited && !!edited?.otherNames ? edited?.otherNames : ""}
+                  value={!!edited && !!edited?.otherNames ? capitalizeWords(edited?.otherNames) : ""}
                   onChange={(v) => {
-                    this.updateAttribute("otherNames", v);
+                    this.updateAttribute("otherNames", capitalizeWords(v));
                   }}
                 />
               </Grid>
