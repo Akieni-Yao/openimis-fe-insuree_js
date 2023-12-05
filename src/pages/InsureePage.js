@@ -108,11 +108,56 @@ class InsureePage extends Component {
         }),
       );}
       this.setState({ statusInsuree: insuree.status });
+      const getStatusClass = (statusInsuree, camuStatus) => {
+        switch (statusInsuree) {
+          case "APPROVED":
+            return formatMessageWithValues(
+              this.props.intl,
+              "insuree",
+              "Insuree.snackbarMsg",
+              {
+                statusInsuree: formatMessage(this.props.intl, "insuree", "buttonStatus.approved"),
+                camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+              }
+            )
+          case "REJECTED":
+            return formatMessageWithValues(
+              this.props.intl,
+              "insuree",
+              "Insuree.snackbarMsg",
+              {
+                statusInsuree: formatMessage(this.props.intl, "insuree", "buttonStatus.Rejected"),
+                camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+              }
+            )
+          case "REWORK":
+            return formatMessageWithValues(
+              this.props.intl,
+              "insuree",
+              "Insuree.snackbarMsg",
+              {
+                statusInsuree: formatMessage(this.props.intl, "insuree", "buttonStatus.rework"),
+                camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+              }
+            )
+          default:
+            return formatMessageWithValues(
+              this.props.intl,
+              "insuree",
+              "Insuree.snackbarMsg",
+              {
+                statusInsuree: 'Updated',
+                camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+              }
+            )
+        }
+      }
       if (!response.error ) {
         this.setState({ isOpenSnackbar: true });
         this.setState({
-          snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${insuree.status == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
-            } `,
+          // snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${insuree.status == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+          //   } `,
+          snackbarMsg: `${getStatusClass(this.state.statusInsuree, insuree.status)}`,
             // snackbarMsg:  formatMessageWithValues(this.props.intl, "insuree", "UpdateInsuree.snackbar", {
             //   status: familyLabel(this.props.family),
             //   idLabel: insureeLabel(insuree),
