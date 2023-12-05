@@ -450,6 +450,8 @@
  "insuree.Insuree.verify":"Verify",
  "insuree.Insuree.reject":"Reject",
  "insuree.camunumber":"CAMU No",
+ "insuree.CAMUNo":"CAMU Number",
+ "insuree.TempCAMUNo":"Temporary CAMU Number",
  "insuree.sendmail":"sentNotification",
  "insuree.buttonStatus.preRegistered": "Pre Registered",
  "insuree.buttonStatus.approved": "Approved",

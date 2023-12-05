@@ -117,7 +117,10 @@ class InsureePage extends Component {
               "Insuree.snackbarMsg",
               {
                 statusInsuree: formatMessage(this.props.intl, "insuree", "buttonStatus.approved"),
-                camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+                // camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+                camuStatus: camuStatus == "APPROVED" ? 
+                formatMessage(this.props.intl, "insuree", "CAMUNo") : 
+                formatMessage(this.props.intl, "insuree", "TempCAMUNo")
               }
             )
           case "REJECTED":
@@ -127,7 +130,10 @@ class InsureePage extends Component {
               "Insuree.snackbarMsg",
               {
                 statusInsuree: formatMessage(this.props.intl, "insuree", "buttonStatus.Rejected"),
-                camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+                // camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+                camuStatus: camuStatus == "APPROVED" ? 
+                formatMessage(this.props.intl, "insuree", "CAMUNo") : 
+                formatMessage(this.props.intl, "insuree", "TempCAMUNo")
               }
             )
           case "REWORK":
@@ -137,7 +143,10 @@ class InsureePage extends Component {
               "Insuree.snackbarMsg",
               {
                 statusInsuree: formatMessage(this.props.intl, "insuree", "buttonStatus.rework"),
-                camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+                // camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+                camuStatus: camuStatus == "APPROVED" ? 
+                formatMessage(this.props.intl, "insuree", "CAMUNo") : 
+                formatMessage(this.props.intl, "insuree", "TempCAMUNo")
               }
             )
           default:
@@ -147,7 +156,10 @@ class InsureePage extends Component {
               "Insuree.snackbarMsg",
               {
                 statusInsuree: 'Updated',
-                camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+                // camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+                camuStatus: camuStatus == "APPROVED" ? 
+                formatMessage(this.props.intl, "insuree", "CAMUNo") : 
+                formatMessage(this.props.intl, "insuree", "TempCAMUNo")
               }
             )
         }
