@@ -2,7 +2,7 @@ import _ from "lodash";
 
 export function insureeLabel(insuree) {
   if (!insuree) return "";
-  return `${_.compact([insuree.lastName, insuree.otherNames]).join(" ")}${
+  return `${_.compact([insuree.lastName,  _.startCase(_.toLower(insuree.otherNames))]).join(" ")}${
     !!insuree.camuNumber ? ` (${insuree.camuNumber})` : !!insuree.chfId ? ` (${insuree.chfId})` : ""
   }`;
 }

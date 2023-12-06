@@ -315,7 +315,6 @@ class InsureeForm extends Component {
     if (!headInsureeJsonExt.hasOwnProperty("createdAt")) {
       headInsureeJsonExt.createdAt = "";
     }
-    console.log("familypayload", insureeData);
     const CheckHead =
       !!insuree && !!insuree.family && !!insuree.family.headInsuree && insuree.family.headInsuree.id !== insuree.id;
     this.setState(
@@ -382,6 +381,26 @@ class InsureeForm extends Component {
       case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingDocumentBiometric";
+       
+        break;
+      case "WAITING_FOR_DOCUMENT_REWORK":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingDocumentRework";
+       
+        break;
+      case "WAITING_FOR_BIOMETRIC_REWORK":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingBiometricRework";
+       
+        break;
+      case "WAITING_FOR_DOCUMENT":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingDocument";
+       
+        break;
+      case "WAITING_FOR_BIOMETRIC":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingBiometric";
        
         break;
       case "WAITING_FOR_APPROVAL":

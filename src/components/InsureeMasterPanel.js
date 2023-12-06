@@ -393,6 +393,7 @@ class InsureeMasterPanel extends FormPanel {
                   required={true}
                   readOnly={readOnly}
                   value={!!edited && !!edited?.otherNames ? edited?.otherNames : ""}
+                  capitalize
                   onChange={(v) => {
                     this.updateAttribute("otherNames", v);
                   }}

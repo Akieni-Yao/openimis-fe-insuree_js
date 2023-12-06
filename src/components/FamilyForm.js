@@ -301,6 +301,26 @@ class FamilyForm extends Component {
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingQueue";
         break;
+        case "WAITING_FOR_DOCUMENT_REWORK":
+          selectedClass = this.props.classes.commonBtn;
+          docsStatus = "buttonStatus.waitingDocumentRework";
+         
+          break;
+        case "WAITING_FOR_BIOMETRIC_REWORK":
+          selectedClass = this.props.classes.commonBtn;
+          docsStatus = "buttonStatus.waitingBiometricRework";
+         
+          break;
+        case "WAITING_FOR_DOCUMENT":
+          selectedClass = this.props.classes.commonBtn;
+          docsStatus = "buttonStatus.waitingDocument";
+         
+          break;
+        case "WAITING_FOR_BIOMETRIC":
+          selectedClass = this.props.classes.commonBtn;
+          docsStatus = "buttonStatus.waitingBiometric";
+         
+          break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
         break;
