@@ -437,16 +437,16 @@ class InsureeForm extends Component {
         docsStatus = "buttonStatus.waitingDocumentBiometric";
        
         break;
-      case "WAITING_FOR_DOCUMENT_REWORK":
-        selectedClass = this.props.classes.commonBtn;
-        docsStatus = "buttonStatus.waitingDocumentRework";
+      // case "WAITING_FOR_DOCUMENT_REWORK":
+      //   selectedClass = this.props.classes.commonBtn;
+      //   docsStatus = "buttonStatus.waitingDocumentRework";
        
-        break;
-      case "WAITING_FOR_BIOMETRIC_REWORK":
-        selectedClass = this.props.classes.commonBtn;
-        docsStatus = "buttonStatus.waitingBiometricRework";
+      //   break;
+      // case "WAITING_FOR_BIOMETRIC_REWORK":
+      //   selectedClass = this.props.classes.commonBtn;
+      //   docsStatus = "buttonStatus.waitingBiometricRework";
        
-        break;
+      //   break;
       case "WAITING_FOR_DOCUMENT":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingDocument";
