@@ -490,7 +490,7 @@ class InsureeForm extends Component {
   };
   statusButton = (data) => {
     const { selectedClass, docsStatus } = this.getStatusClass(data.status);
-    console.log("data.statusComment", data.statusComment)
+    // console.log("data.statusComment", data.statusComment)
     const shouldShowIconButton = INSUREE_REJECT_REASON?.some(reason =>
       data?.statusComment?.includes(reason)
     );
