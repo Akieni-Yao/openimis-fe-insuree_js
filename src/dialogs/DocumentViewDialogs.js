@@ -219,7 +219,8 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
               <PublishedComponent
                 pubRef="insuree.RejectCommentPicker"
                 withNull
-                label="Please Select the reason"
+                module="insuree"
+                label="pleaseSelectReason"
                 filterLabels={false}
                 value={rejectComment}
                 onChange={(v) => setRejectComment(v)}
