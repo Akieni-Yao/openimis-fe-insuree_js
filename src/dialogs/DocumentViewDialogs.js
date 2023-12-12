@@ -16,10 +16,18 @@ import {
   Backdrop,
   Paper,
 } from "@material-ui/core";
-import { PublishedComponent, FormattedMessage } from "@openimis/fe-core";
+import {
+  PublishedComponent,
+  FormattedMessage,
+  combine,
+  useTranslations,
+  withModulesManager,
+  ConstantBasedPicker,
+} from "@openimis/fe-core";
 import CloseIcon from "@material-ui/icons/Close";
 import Draggable from "react-draggable";
 import { useDispatch, useSelector } from "react-redux";
+import { injectIntl } from "react-intl";
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -60,12 +68,12 @@ const useStyles = makeStyles((theme) => ({
     pointerEvents: "none",
   },
 }));
-
+const DOCUMENT_REJECT_COMMENTS = ["1", "2"];
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
 
-function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc }) {
+function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc, modulesManager }) {
   // const [payload,setPayload]=useState({documentId: null,
   //   newStatus: null,
   //   comments: null})
@@ -164,7 +172,7 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
       // documentViewAPI();
     }
   }, [documentImage, open]);
-
+  const { formatMessage } = useTranslations("insuree", modulesManager);
   return (
     open && (
       <Draggable handle="#draggable-dialog-title">
@@ -216,14 +224,25 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
           ) : null}
           {showRejectComment && (
             <Grid style={{ margin: "10px 40px" }}>
-              <PublishedComponent
+              {/* <PublishedComponent
                 pubRef="insuree.RejectCommentPicker"
+                module="insuree"
                 withNull
+                nullLabel={formatMessage("emptyLabel")}
                 label="Please Select the reason"
                 filterLabels={false}
                 value={rejectComment}
                 onChange={(v) => setRejectComment(v)}
                 readOnly={false}
+              /> */}
+              <ConstantBasedPicker
+                module="insuree"
+                label="Insuree.rejectComments"
+                readOnly={false}
+                value={rejectComment}
+                onChange={(v) => setRejectComment(v)}
+                constants={DOCUMENT_REJECT_COMMENTS}
+                withNull
               />
               <DialogActions>
                 <Button onClick={() => setShowRejectComment(false)} variant="outlined" color="primary">
@@ -240,5 +259,5 @@ function DocumentViewDialog({ open, onClose, documentImage, approved, rejectDoc 
     )
   );
 }
-
-export default DocumentViewDialog;
+const enhance = combine(withModulesManager);
+export default enhance(DocumentViewDialog);

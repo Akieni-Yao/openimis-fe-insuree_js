@@ -21,6 +21,7 @@ import {
   PagedDataHandler,
   PublishedComponent,
   ProgressOrError,
+  ConstantBasedPicker,
 } from "@openimis/fe-core";
 import EnquiryDialog from "./EnquiryDialog";
 import {
@@ -75,7 +76,7 @@ const styles = (theme) => ({
     backgroundColor: "#eeeaea",
   },
 });
-
+const DOCUMENT_REJECT_COMMENTS = ["1", "2"];
 class InsureeDocuments extends PagedDataHandler {
   state = {
     documentViewOpen: false,
@@ -187,15 +188,25 @@ class InsureeDocuments extends PagedDataHandler {
   };
   rejectedCommentsTooltip = (rejectComment) => {
     return (
-      <PublishedComponent
-        pubRef="insuree.RejectCommentPicker"
-        withNull
-        filterLabels={false}
-        value={!!rejectComment.comments && Number(rejectComment.comments)}
+      // <PublishedComponent
+      //   pubRef="insuree.RejectCommentPicker"
+      //   withNull
+      //   filterLabels={false}
+      //   value={!!rejectComment.comments && Number(rejectComment.comments)}
+      //   readOnly={true}
+      // >
+      //   <div style={{ color: "white" }}>{rejectComment.comments}</div>
+      // </PublishedComponent>
+      <ConstantBasedPicker
+        module="insuree"
+        label="Insuree.rejectComments"
         readOnly={true}
-      >
-        <div style={{ color: "white" }}>{rejectComment.comments}</div>
-      </PublishedComponent>
+        value={!!rejectComment.comments && rejectComment.comments}
+        // onChange={(v) => setRejectComment(v)}
+        constants={DOCUMENT_REJECT_COMMENTS}
+        withNull
+        withLabel={false}
+      />
     );
   };
   viewDocumentAction = (uuid) => {
@@ -249,7 +260,7 @@ class InsureeDocuments extends PagedDataHandler {
   };
 
   formatters = [
-    (i) => formatMessage(this.props.intl, "insuree", i.documentName)|| "",
+    (i) => formatMessage(this.props.intl, "insuree", i.documentName) || "",
     (i) => !!i.documentId && this.viewDocumentAction(i.documentId),
 
     (i) => {

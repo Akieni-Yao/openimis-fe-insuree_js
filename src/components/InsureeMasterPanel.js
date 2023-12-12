@@ -48,14 +48,14 @@ const capitalizeWords = (inputString) => {
   let capitalizeNext = true;
 
   for (const char of inputString) {
-    if (char === ' ' || char === '\t') {
+    if (char === " " || char === "\t") {
       capitalizeNext = true;
       result += char;
     } else {
       result += capitalizeNext ? char.toUpperCase() : char.toLowerCase();
       capitalizeNext = false;
     }
-  }    
+  }
   return result;
 };
 const CAMU_CIVIL_QUALITY = ["Main Beneficiary", "Depedent Beneficiary spouse", "Depedent Beneficiary child"];
@@ -408,7 +408,7 @@ class InsureeMasterPanel extends FormPanel {
                   value={!!edited && !!edited?.otherNames ? edited?.otherNames : ""}
                   capitalize
                   onChange={(v) => {
-                    this.updateAttribute("otherNames", capitalizeWords(v));
+                    this.updateAttribute("otherNames", v);
                   }}
                 />
               </Grid>
