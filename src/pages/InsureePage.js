@@ -167,14 +167,13 @@ class InsureePage extends Component {
           );
         const hasReject =
           allApprovedOrRejected && insuree.documentData.some((document) => document.documentStatus === "REJECTED");
-
         if (!!allApprovedOrRejected) {
           // if (insuree.status !== "APPROVED" && (insuree.status == "REWORK" || insuree.status == "REJECTED")) {
           this.props.updateExternalDocuments(
             this.props.modulesManager,
             insuree?.documentData,
             insuree?.chfId,
-            hasReject ? false : true,
+            hasReject || !insuree.biometricsIsMaster ? false : true,
           );
         }
         this.setState({
