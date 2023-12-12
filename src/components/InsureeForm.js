@@ -5,7 +5,7 @@ import _ from "lodash";
 
 import { withTheme, withStyles } from "@material-ui/core/styles";
 import ReplayIcon from "@material-ui/icons/Replay";
-import { Typography, Button, Tooltip, IconButton, Grid } from "@material-ui/core";
+import { Typography, Button, Tooltip, IconButton, Grid, } from "@material-ui/core";
 import {
   formatMessageWithValues,
   withModulesManager,
@@ -18,6 +18,7 @@ import {
   Helmet,
   FormattedMessage,
   formatMessage,
+  PublishedComponent
 } from "@openimis/fe-core";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
@@ -32,7 +33,7 @@ import {
   printReport,
   approverInsureeComparison,
 } from "../actions";
-import { RIGHT_INSUREE } from "../constants";
+import { RIGHT_INSUREE, INSUREE_REJECT_REASON } from "../constants";
 import { insureeLabel } from "../utils/utils";
 import FamilyDisplayPanel from "./FamilyDisplayPanel";
 import InsureeMasterPanel from "../components/InsureeMasterPanel";
@@ -71,6 +72,10 @@ const styles = (theme) => ({
   },
   customWidth: {
     maxWidth: 500,
+  },
+  customReasonWidth: {
+    maxWidth: 500,
+    color: "#FFFFFFF"
   },
   margin2: {
     display: "flex",
@@ -120,6 +125,16 @@ const styles = (theme) => ({
       border: "1px solid #FF0000",
       color: "#FFFFFF",
     },
+  },
+  customArrow: {
+    color: "#eeeaea",
+  },
+  tooltip: {
+    maxWidth: 1000,
+    width: "fit-content",
+    // width: "auto",
+    color: "white",
+    backgroundColor: "#eeeaea",
   },
 });
 
@@ -476,6 +491,10 @@ class InsureeForm extends Component {
   };
   statusButton = (data) => {
     const { selectedClass, docsStatus } = this.getStatusClass(data.status);
+    // console.log("data.statusComment", data.statusComment)
+    const shouldShowIconButton = INSUREE_REJECT_REASON?.some(reason =>
+      data?.statusComment?.includes(reason)
+    );
     return (
       <Grid className={this.props.classes.margin2}>
         <Typography component="span" className={this.props.classes.spanPadding}>
@@ -484,12 +503,19 @@ class InsureeForm extends Component {
         <Button className={selectedClass} variant="outlined">
           {formatMessage(this.props.intl, "insuree", docsStatus)}
         </Button>
-        {data.status == "REWORK" || data.status == "REJECTED" ? (
+        {(data.status == "REWORK" || data.status == "REJECTED") && shouldShowIconButton ? (
           <Tooltip
             placement="bottom"
             arrow
-            classes={{ tooltip: this.props.classes.customWidth }}
-            title={data.statusComment}
+            classes={{ tooltip: this.props.classes.tooltip, arrow: this.props.classes.customArrow }}
+            // title={data.statusComment}
+            title={<> <PublishedComponent
+              pubRef="insuree.RejectReasonPicker"
+              withLabel={false}
+              value={!!data.statusComment ? data.statusComment : ""}
+              module="insuree"
+              readOnly={true}
+            /></>}
           // componentsProps={{
           //   tooltip: {
           //     sx: {
