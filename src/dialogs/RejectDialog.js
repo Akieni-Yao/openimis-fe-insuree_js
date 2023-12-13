@@ -20,10 +20,16 @@ const useStyles = makeStyles(() => ({
   rejectBtn: {
     backgroundColor: "#FF0000",
     color: "#fff",
+    "&:hover": {
+      backgroundColor: "#c13a3a",
+    },
   },
   reworkBtn: {
     backgroundColor: "#FF841C",
     color: "#fff",
+    "&:hover": {
+      backgroundColor: "#d47320",
+    },
   },
   closeIcon: {
     position: "absolute",

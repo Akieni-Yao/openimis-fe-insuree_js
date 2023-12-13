@@ -17,4 +17,3 @@ class RejectReasonPicker extends Component {
 }
 
 export default RejectReasonPicker;
-

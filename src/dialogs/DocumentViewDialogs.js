@@ -58,6 +58,9 @@ const useStyles = makeStyles((theme) => ({
   rejectBtn: {
     backgroundColor: "#FF0000",
     color: "#fff",
+    "&:hover": {
+      backgroundColor: "#c13a3a",
+    },
   },
   closeButton: {
     position: "absolute",
