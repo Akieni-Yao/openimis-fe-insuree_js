@@ -449,7 +449,7 @@ class FamilyForm extends Component {
             <Button variant="outlined" className={selectedClass}>
               {formatMessage(this.props.intl, "insuree", docsStatus)}
             </Button>
-            {family.status === "REWORK" || family.status === "REJECTED" ? (
+            {/* {family.status === "REWORK" || family.status === "REJECTED" ? (
               <Tooltip
                 placement="right"
                 arrow
@@ -460,7 +460,7 @@ class FamilyForm extends Component {
                   <HelpIcon />
                 </IconButton>
               </Tooltip>
-            ) : null}
+            ) : null} */}
           </Grid>
         );
       }
