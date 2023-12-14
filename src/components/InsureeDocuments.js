@@ -70,10 +70,10 @@ const styles = (theme) => ({
   },
   tooltip: {
     maxWidth: 1000,
-    width: "fit-content",
+    width: "fit-content"
     // width: "auto",
-    color: "white",
-    backgroundColor: "#eeeaea",
+    // color: "white",
+    // backgroundColor: "#eeeaea",
   },
 });
 const DOCUMENT_REJECT_COMMENTS = ["1", "2"];
@@ -197,16 +197,17 @@ class InsureeDocuments extends PagedDataHandler {
       // >
       //   <div style={{ color: "white" }}>{rejectComment.comments}</div>
       // </PublishedComponent>
-      <ConstantBasedPicker
-        module="insuree"
-        label="Insuree.rejectComments"
-        readOnly={true}
-        value={!!rejectComment.comments && rejectComment.comments}
-        // onChange={(v) => setRejectComment(v)}
-        constants={DOCUMENT_REJECT_COMMENTS}
-        withNull
-        withLabel={false}
-      />
+      // <ConstantBasedPicker
+      //   module="insuree"
+      //   label="Insuree.rejectComments"
+      //   readOnly={true}
+      //   value={!!rejectComment.comments && rejectComment.comments}
+      //   // onChange={(v) => setRejectComment(v)}P
+      //   constants={DOCUMENT_REJECT_COMMENTS}
+      //   // withNull
+      //   withLabel={false}
+      // />
+      formatMessage(this.props.intl, "insuree", `Insuree.rejectComments.${rejectComment.comments}`)
     );
   };
   viewDocumentAction = (uuid) => {
