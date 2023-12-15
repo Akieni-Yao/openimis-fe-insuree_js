@@ -3,7 +3,13 @@ import { injectIntl } from "react-intl";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { withTheme, withStyles } from "@material-ui/core/styles";
-import { formatMessageWithValues, withModulesManager, withHistory, historyPush,formatMessage } from "@openimis/fe-core";
+import {
+  formatMessageWithValues,
+  withModulesManager,
+  withHistory,
+  historyPush,
+  formatMessage,
+} from "@openimis/fe-core";
 import InsureeForm from "../components/InsureeForm";
 import { createInsuree, updateInsuree, updateExternalDocuments, updateFamily } from "../actions";
 import { RIGHT_INSUREE, RIGHT_INSUREE_ADD, RIGHT_INSUREE_EDIT } from "../constants";
@@ -42,7 +48,7 @@ class InsureePage extends Component {
         this.setState({ camuNumberRes: response?.insurees[0].insuree.chfId });
         setTimeout(() => {
           this.props.history.goBack();
-        }, 2000)
+        }, 2000);
       }
     } else {
       const response = await this.props.updateInsuree(
@@ -71,7 +77,7 @@ class InsureePage extends Component {
         typeOfId,
         email,
         education,
-        profession
+        profession,
       } = insuree;
       let payload = {};
       if (!checkHead) {
@@ -90,36 +96,69 @@ class InsureePage extends Component {
           marital: marital,
           passport: passport,
           typeOfId: typeOfId,
-          email:email,
-          education:education,
-          profession:profession
+          email: email,
+          education: education,
+          profession: profession,
         };
         payload.location = jsonExt.insureelocations;
         payload.address = jsonExt.insureeaddress;
         payload.uuid = family_uuid;
         payload.jsonExt = { enrolmentType: jsonExt.insureeEnrolmentType };
       }
-      if (!checkHead){
-      const updateFamilyResult = await this.props.updateFamily(
-        this.props.modulesManager,
-        payload,
-        formatMessageWithValues(this.props.intl, "insuree", "UpdateFamily.mutationLabel", {
-          label: familyLabel(payload),
-        }),
-      );}
+      if (!checkHead) {
+        const updateFamilyResult = await this.props.updateFamily(
+          this.props.modulesManager,
+          payload,
+          formatMessageWithValues(this.props.intl, "insuree", "UpdateFamily.mutationLabel", {
+            label: familyLabel(payload),
+          }),
+        );
+      }
       this.setState({ statusInsuree: insuree.status });
-      if (!response.error ) {
+      const getStatusClass = (statusInsuree, camuStatus) => {
+        switch (statusInsuree) {
+          case "APPROVED":
+            return formatMessageWithValues(this.props.intl, "insuree", "Insuree.snackbarMsg", {
+              statusInsuree: formatMessage(this.props.intl, "insuree", "buttonStatus.approved"),
+              // camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+              camuStatus:
+                camuStatus == "APPROVED"
+                  ? formatMessage(this.props.intl, "insuree", "CAMUNo")
+                  : formatMessage(this.props.intl, "insuree", "TempCAMUNo"),
+            });
+          case "REJECTED":
+            return formatMessageWithValues(this.props.intl, "insuree", "Insuree.snackbarMsg", {
+              statusInsuree: formatMessage(this.props.intl, "insuree", "buttonStatus.Rejected"),
+              // camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+              camuStatus:
+                camuStatus == "APPROVED"
+                  ? formatMessage(this.props.intl, "insuree", "CAMUNo")
+                  : formatMessage(this.props.intl, "insuree", "TempCAMUNo"),
+            });
+          case "REWORK":
+            return formatMessageWithValues(this.props.intl, "insuree", "Insuree.snackbarMsg", {
+              statusInsuree: formatMessage(this.props.intl, "insuree", "buttonStatus.rework"),
+              // camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+              camuStatus:
+                camuStatus == "APPROVED"
+                  ? formatMessage(this.props.intl, "insuree", "CAMUNo")
+                  : formatMessage(this.props.intl, "insuree", "TempCAMUNo"),
+            });
+          default:
+            return formatMessageWithValues(this.props.intl, "insuree", "Insuree.snackbarMsg", {
+              statusInsuree: "Updated",
+              // camuStatus: camuStatus == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
+              camuStatus:
+                camuStatus == "APPROVED"
+                  ? formatMessage(this.props.intl, "insuree", "CAMUNo")
+                  : formatMessage(this.props.intl, "insuree", "TempCAMUNo"),
+            });
+        }
+      };
+      if (!response.error) {
         this.setState({ isOpenSnackbar: true });
         this.setState({
-          snackbarMsg: `Insuree ${!!this.state.statusInsuree ? this.state.statusInsuree : "Updated"} with ${insuree.status == "APPROVED" ? "CAMU Number" : "Temporary CAMU Number"
-            } `,
-            // snackbarMsg:  formatMessageWithValues(this.props.intl, "insuree", "UpdateInsuree.snackbar", {
-            //   status: familyLabel(this.props.family),
-            //   idLabel: insureeLabel(insuree),
-            // })
-          // camuNumberRes: response?.insurees[0].insuree.camuNumber
-          //   ? response?.insurees[0].insuree.camuNumber
-          //   : response?.insurees[0].insuree.chfId,
+          snackbarMsg: `${getStatusClass(this.state.statusInsuree, insuree.status)}`,
         });
         const allApprovedOrRejected =
           insuree.documentData &&
@@ -128,10 +167,14 @@ class InsureePage extends Component {
           );
         const hasReject =
           allApprovedOrRejected && insuree.documentData.some((document) => document.documentStatus === "REJECTED");
-
-        if (!!hasReject) {
+        if (!!allApprovedOrRejected) {
           // if (insuree.status !== "APPROVED" && (insuree.status == "REWORK" || insuree.status == "REJECTED")) {
-          this.props.updateExternalDocuments(this.props.modulesManager, insuree?.documentData, insuree?.chfId);
+          this.props.updateExternalDocuments(
+            this.props.modulesManager,
+            insuree?.documentData,
+            insuree?.chfId,
+            hasReject || !insuree.biometricsIsMaster ? false : true,
+          );
         }
         this.setState({
           camuNumberRes: response?.insurees[0].insuree.camuNumber
@@ -140,7 +183,7 @@ class InsureePage extends Component {
         });
         setTimeout(() => {
           this.props.history.goBack();
-        }, 2000)
+        }, 2000);
       }
     }
   };

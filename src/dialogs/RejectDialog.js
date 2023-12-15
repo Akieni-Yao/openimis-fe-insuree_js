@@ -20,10 +20,16 @@ const useStyles = makeStyles(() => ({
   rejectBtn: {
     backgroundColor: "#FF0000",
     color: "#fff",
+    "&:hover": {
+      backgroundColor: "#c13a3a",
+    },
   },
   reworkBtn: {
     backgroundColor: "#FF841C",
     color: "#fff",
+    "&:hover": {
+      backgroundColor: "#d47320",
+    },
   },
   closeIcon: {
     position: "absolute",
@@ -32,10 +38,10 @@ const useStyles = makeStyles(() => ({
   },
 }));
 const RejectDialog = (props) => {
-  const { classes, approveorreject, onClose, isOpen, payload, statusCheck, edited, modulesManager } = props;
+  const { classes, approveorreject, onClose, isOpen, payload, statusCheck, edited, modulesManager, intl } = props;
   const approverData = useSelector((store) => store);
   const { formatMessage } = useTranslations("insuree", modulesManager);
-  const [comment, setComment] = useState({ statusComment: "", status: "", reviewer: null });
+  const [comment, setComment] = useState({ statusComment: null, status: "", reviewer: null, reason: null });
   const newClasses = useStyles();
   const handleChange = (name, value) => {
     setComment((prevComment) => ({
@@ -78,7 +84,7 @@ const RejectDialog = (props) => {
               />
             </Grid>
           )}
-          <Grid item xs={12} className={classes.item}>
+          {/* <Grid item xs={12} className={classes.item}>
             <TextInput
               // pubRef="insuree"
               module="insuree"
@@ -87,6 +93,15 @@ const RejectDialog = (props) => {
               placeholder="Please write your comments here"
               value={!!comment && !!comment?.statusComment ? comment?.statusComment : comment.statusComment}
               onChange={(e) => handleChange("statusComment", e)}
+            />
+          </Grid> */}
+          <Grid item xs={12} className={classes.item}>
+            <PublishedComponent
+              pubRef="insuree.RejectReasonPicker"
+              // value={!!comment && !!comment?.reason ? comment?.reason : ""}
+              value={!!comment && !!comment?.statusComment ? comment?.statusComment : comment.statusComment}
+              module="insuree"
+              onChange={(v) => handleChange("statusComment", v)}
             />
           </Grid>
         </DialogContent>

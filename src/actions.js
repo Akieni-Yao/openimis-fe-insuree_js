@@ -310,7 +310,8 @@ function formatInsureeDocument(docs) {
     ${!!docs.documentId ? `documentId: "${docs.documentId}"` : ""}
   `;
 }
-function formatExternalDocument(docs, tempCamu) {
+function formatExternalDocument(docs, tempCamu, isApprove) {
+  console.log("isApprove", isApprove);
   const newarray = docs.map((doc) => ({
     documentId: doc.documentId,
     status: doc.documentStatus,
@@ -320,10 +321,12 @@ function formatExternalDocument(docs, tempCamu) {
   const result = {
     tempCamuNumber: tempCamu || "",
     documentUpdates: newarray,
+    isApproved: isApprove,
   };
 
   const formattedResult = `
     tempCamuNumber: "${result.tempCamuNumber}",
+    isApproved:${result.isApproved},
     documentUpdates: [
     ${result.documentUpdates
       .map(
@@ -666,9 +669,9 @@ export function updateInsureeDocument(mm, insuree) {
   );
 }
 
-export function updateExternalDocuments(mm, docs, tempCamu) {
+export function updateExternalDocuments(mm, docs, tempCamu, isApprove) {
   let mutation = `mutation UpdateStatusInExternalEndpoint {
-  updateStatusInExternalEndpoint(${formatExternalDocument(docs, tempCamu)}) {
+  updateStatusInExternalEndpoint(${formatExternalDocument(docs, tempCamu, isApprove)}) {
     success
     message
     responses

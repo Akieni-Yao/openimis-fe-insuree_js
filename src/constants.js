@@ -1,4 +1,5 @@
 export const INSUREE_MARITAL_STATUS = ["W", "S", "D", "M"];
+export const INSUREE_REJECT_REASON=["DNC","WDC","RAD","MD"]
 export const FAMILY_POVERTY_STATUS = [true, false];
 export const PHOTO_STATUS = ["with", "without"];
 

@@ -45,6 +45,7 @@ import RejectCommentPicker from "./pickers/RejectCommentPicker";
 import ReviewerPicker from "./pickers/ReviwerPicker";
 import PendingApproval from "./components/PendingApproval";
 import PolicySummary from "./components/PolicySummary";
+import RejectReasonPicker from "./pickers/RejectReasonPicker";
 
 const ROUTE_INSUREE_FAMILIES = "insuree/families";
 const ROUTE_INSUREE_FAMILY_OVERVIEW = "insuree/families/familyOverview";
@@ -124,6 +125,7 @@ const DEFAULT_CONFIG = {
     { key: "insuree.ConfirmationTypePicker", ref: ConfirmationTypePicker },
     { key: "insuree.FamilyTypePicker", ref: FamilyTypePicker },
     { key: "insuree.PhotoStatusPicker", ref: PhotoStatusPicker },
+    { key: "insuree.RejectReasonPicker", ref: RejectReasonPicker },
     { key: "insuree.RelationPicker", ref: RelationPicker },
     { key: "insuree.RejectCommentPicker", ref: RejectCommentPicker },
     { key: "insuree.ReviewerPicker", ref: ReviewerPicker },

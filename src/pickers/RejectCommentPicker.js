@@ -6,10 +6,9 @@ import ConfigBasedPicker from "./ConfigBasedPicker";
 class RejectCommentPicker extends Component {
   constructor(props) {
     super(props);
-    this.rejectCommentOptions = props.modulesManager.getConf("insuree", "insuree.rejectCommentOptions", [
+    this.rejectCommentOptions = props.modulesManager.getConf("insuree", "insureeFilter.rejectCommentOptions", [
       {
         "value": "1",
-
         "label": {
           "en": "Doc is rejected due to quality of the document is not that much good.",
           "fr": "Le document est rejeté parce qu'il n'est pas de bonne qualité.",

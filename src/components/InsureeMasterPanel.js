@@ -42,8 +42,21 @@ const CAMU_ENROLMENT_TYPE = [
   "students",
   "vulnerable_Persons",
 ];
-const capitalizeFirstLetter = (str) => {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+const capitalizeWords = (inputString) => {
+  let result = "";
+
+  let capitalizeNext = true;
+
+  for (const char of inputString) {
+    if (char === " " || char === "\t") {
+      capitalizeNext = true;
+      result += char;
+    } else {
+      result += capitalizeNext ? char.toUpperCase() : char.toLowerCase();
+      capitalizeNext = false;
+    }
+  }
+  return result;
 };
 const CAMU_CIVIL_QUALITY = ["Main Beneficiary", "Depedent Beneficiary spouse", "Depedent Beneficiary child"];
 class InsureeMasterPanel extends FormPanel {
@@ -168,9 +181,9 @@ class InsureeMasterPanel extends FormPanel {
                     module="insuree"
                     id={
                       !!edited &&
-                        !!edited.family &&
-                        !!edited.family.headInsuree &&
-                        edited.family.headInsuree.id !== edited.id
+                      !!edited.family &&
+                      !!edited.family.headInsuree &&
+                      edited.family.headInsuree.id !== edited.id
                         ? title
                         : "family.title"
                     }
@@ -242,7 +255,7 @@ class InsureeMasterPanel extends FormPanel {
                   inputProps={{ maxLength: MAX_MAIN_ACTIVITY_LENGTH }}
                   value={!!edited && !!edited.jsonExt ? edited.jsonExt?.insureeniu : ""}
                   onChange={(v) => this.updateExts({ insureeniu: v })}
-                // readOnly={isPolicyHolderPortalUser}
+                  // readOnly={isPolicyHolderPortalUser}
                 />
               </Grid>
               <Grid item xs={3} className={classes.item}>
@@ -266,10 +279,10 @@ class InsureeMasterPanel extends FormPanel {
                   label="Family.enrolmentType"
                   readOnly={
                     !!edited &&
-                      !!edited.family &&
-                      !!edited.family.headInsuree &&
-                      edited.family.headInsuree.id !== edited.id &&
-                      edited_id == null
+                    !!edited.family &&
+                    !!edited.family.headInsuree &&
+                    edited.family.headInsuree.id !== edited.id &&
+                    edited_id == null
                       ? readOnly
                       : true
                   }
@@ -335,8 +348,8 @@ class InsureeMasterPanel extends FormPanel {
                     edited_id
                       ? edited?.jsonExt?.insureelocations
                       : edited?.family?.location
-                        ? edited?.family?.location
-                        : this.props?.family?.location
+                      ? edited?.family?.location
+                      : this.props?.family?.location
                   }
                   // value={!edited?.jsonExt?.insureelocations ? "" : edited?.jsonExt?.insureelocations}
                   onChange={(v) => this.updateExts({ insureelocations: v })}
@@ -365,8 +378,8 @@ class InsureeMasterPanel extends FormPanel {
                     edited_id
                       ? edited?.jsonExt?.insureeaddress
                       : edited?.family?.address
-                        ? edited?.family?.address
-                        : this.props?.family?.address
+                      ? edited?.family?.address
+                      : this.props?.family?.address
                   }
                   // readOnly={readOnly}
                   // value={!edited && !edited?.jsonExt?.insureeaddress ? "" : edited?.jsonExt?.insureeaddress}
@@ -392,9 +405,10 @@ class InsureeMasterPanel extends FormPanel {
                   label="Insuree.otherNames"
                   required={true}
                   readOnly={readOnly}
-                  value={!!edited && !!edited?.otherNames ? capitalizeFirstLetter(edited?.otherNames) : ""}
+                  value={!!edited && !!edited?.otherNames ? edited?.otherNames : ""}
+                  capitalize
                   onChange={(v) => {
-                    this.updateAttribute("otherNames", capitalizeFirstLetter(v));
+                    this.updateAttribute("otherNames", v);
                   }}
                 />
               </Grid>
@@ -481,9 +495,9 @@ class InsureeMasterPanel extends FormPanel {
                       type="number"
                       required={
                         !!edited &&
-                          !!edited.family &&
-                          !!edited.family.headInsuree &&
-                          edited.family.headInsuree.id !== edited.id
+                        !!edited.family &&
+                        !!edited.family.headInsuree &&
+                        edited.family.headInsuree.id !== edited.id
                           ? false
                           : true
                       }
@@ -514,10 +528,10 @@ class InsureeMasterPanel extends FormPanel {
                         !!edited && !!edited.jsonExt && !!edited?.jsonExt?.civilQuality
                           ? edited?.jsonExt?.civilQuality
                           : !!data?.relationship && data?.relationship.id == 8
-                            ? "Depedent Beneficiary spouse"
-                            : !!data?.relationship && data?.relationship.id == 4
-                              ? "Depedent Beneficiary child"
-                              : "Main Beneficiary"
+                          ? "Depedent Beneficiary spouse"
+                          : !!data?.relationship && data?.relationship.id == 4
+                          ? "Depedent Beneficiary child"
+                          : "Main Beneficiary"
                         // ? edited?.family?.jsonExt?.civilQuality
                         // : null
                       }
@@ -631,7 +645,7 @@ class InsureeMasterPanel extends FormPanel {
                   onChange={(v) => this.updateAttribute("photo", !!v ? v : null)}
                 />
               </Grid>
-              <Grid item xs={3} className={classes.item}>
+              {/* <Grid item xs={3} className={classes.item}>
                 <TextInput
                   module="insuree"
                   label="Insuree.employee_number"
@@ -643,7 +657,7 @@ class InsureeMasterPanel extends FormPanel {
                   // }}
                   onChange={(v) => this.updateExts({ employeeNumber: v })}
                 />
-              </Grid>
+              </Grid> */}
               <Grid item xs={3} className={classes.item}>
                 <PublishedComponent
                   pubRef="insuree.EducationPicker"

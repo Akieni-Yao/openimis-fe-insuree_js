@@ -5,7 +5,7 @@ import _ from "lodash";
 
 import { withTheme, withStyles } from "@material-ui/core/styles";
 import ReplayIcon from "@material-ui/icons/Replay";
-import { Typography, Button, Tooltip, IconButton, Grid } from "@material-ui/core";
+import { Typography, Button, Tooltip, IconButton, Grid, } from "@material-ui/core";
 import {
   formatMessageWithValues,
   withModulesManager,
@@ -18,6 +18,7 @@ import {
   Helmet,
   FormattedMessage,
   formatMessage,
+  PublishedComponent
 } from "@openimis/fe-core";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
@@ -32,7 +33,7 @@ import {
   printReport,
   approverInsureeComparison,
 } from "../actions";
-import { RIGHT_INSUREE } from "../constants";
+import { RIGHT_INSUREE, INSUREE_REJECT_REASON } from "../constants";
 import { insureeLabel } from "../utils/utils";
 import FamilyDisplayPanel from "./FamilyDisplayPanel";
 import InsureeMasterPanel from "../components/InsureeMasterPanel";
@@ -71,6 +72,10 @@ const styles = (theme) => ({
   },
   customWidth: {
     maxWidth: 500,
+  },
+  customReasonWidth: {
+    maxWidth: 500,
+    color: "#FFFFFFF"
   },
   margin2: {
     display: "flex",
@@ -121,6 +126,16 @@ const styles = (theme) => ({
       color: "#FFFFFF",
     },
   },
+  customArrow: {
+    color: "#eeeaea",
+  },
+  tooltip: {
+    maxWidth: 1000,
+    width: "fit-content",
+    // width: "auto",
+    color: "white",
+    backgroundColor: "#eeeaea",
+  },
 });
 
 const INSUREE_INSUREE_FORM_CONTRIBUTION_KEY = "insuree.InsureeForm";
@@ -140,6 +155,43 @@ class InsureeForm extends Component {
     successMessage: "",
     copyText: null,
     isCopied: false,
+    education: [
+      {
+        value: "2",
+        label: {
+          en: "Primary School",
+          fr: "École primaire",
+        },
+      },
+      {
+        value: "3",
+        label: {
+          en: "Secondary School",
+          fr: "École secondaire",
+        },
+      },
+      {
+        value: "4",
+        label: {
+          en: "University",
+          fr: "Université",
+        },
+      },
+      {
+        value: "5",
+        label: {
+          en: "Postgraduate Studies",
+          fr: "Études supérieures",
+        },
+      },
+      {
+        value: "6",
+        label: {
+          en: "PHD",
+          fr: "Doctorat",
+        },
+      },
+    ],
   };
 
   _newInsuree() {
@@ -260,6 +312,7 @@ class InsureeForm extends Component {
   canSave = () => {
     const doesInsureeChange = this.doesInsureeChange();
     if (!doesInsureeChange) return false;
+
     // if (!this.props.isInsureeNumberValid) return false;
     // if (!this.state.insuree.chfId) return false;
     // if (!this.state.insuree?.jsonExt?.insureeEnrolmentType) return false;
@@ -284,15 +337,26 @@ class InsureeForm extends Component {
   };
 
   _save = (insureeData) => {
-    console.log("insureeData", insureeData);
+    const EducationNameByVal = () => {
+      const { education } = this.state;
+      if (!!insureeData?.education?.id) {
+        for (let i = 0; i < education?.length; i++) {
+          if (education[i].value == insureeData?.education?.id) {
+            return education[i].label.fr;
+          }
+        }
+      }
+      return undefined;
+    };
+    const educationName = EducationNameByVal();
     const { insuree } = this.state;
     const headInsureeJsonExt = insureeData?.jsonExt;
     if (!headInsureeJsonExt.hasOwnProperty("civilQuality")) {
       !!insureeData?.relationship && insureeData?.relationship.id == 8
         ? (headInsureeJsonExt.civilQuality = "Depedent Beneficiary spouse")
         : !!insureeData?.relationship && insureeData?.relationship.id == 4
-        ? (headInsureeJsonExt.civilQuality = "Depedent Beneficiary child")
-        : (headInsureeJsonExt.civilQuality = "Main Beneficiary");
+          ? (headInsureeJsonExt.civilQuality = "Depedent Beneficiary child")
+          : (headInsureeJsonExt.civilQuality = "Main Beneficiary");
     }
     if (!headInsureeJsonExt.hasOwnProperty("nationality")) {
       headInsureeJsonExt.nationality = "CG";
@@ -315,6 +379,11 @@ class InsureeForm extends Component {
     if (!headInsureeJsonExt.hasOwnProperty("createdAt")) {
       headInsureeJsonExt.createdAt = "";
     }
+    if (!!insureeData.education) {
+      headInsureeJsonExt.education = {
+        education: !!educationName ? educationName : "",
+      };
+    }
     console.log("familypayload", insureeData);
     const CheckHead =
       !!insuree && !!insuree.family && !!insuree.family.headInsuree && insuree.family.headInsuree.id !== insuree.id;
@@ -328,10 +397,10 @@ class InsureeForm extends Component {
     // if (insuree.status !== "APPROVED")
     //   this.props.updateExternalDocuments(this.props.modulesManager, this.props.documentsData, insuree.chfId);
     const CheckHead =
-    !!insuree && !!insuree.family && !!insuree.family.headInsuree && insuree.family.headInsuree.id !== insuree.id;
+      !!insuree && !!insuree.family && !!insuree.family.headInsuree && insuree.family.headInsuree.id !== insuree.id;
     this.setState(
       { lockNew: true }, // avoid duplicates
-      (e) => this.props.save({ ...insureeData, documentData: this.props.documentsData ,checkHead: CheckHead, family_uuid: this.props.family_uuid }),
+      (e) => this.props.save({ ...insureeData, documentData: this.props.documentsData, checkHead: CheckHead, family_uuid: this.props.family_uuid }),
     );
     this.handleDialogClose();
   };
@@ -357,42 +426,62 @@ class InsureeForm extends Component {
       case "PRE_REGISTERED":
         selectedClass = this.props.classes.approvedBtn;
         docsStatus = "buttonStatus.preRegistered";
-        
+
         break;
       case "APPROVED":
         selectedClass = this.props.classes.approvedBtn;
         docsStatus = "buttonStatus.approved";
-       
+
         break;
       case "ACTIVE":
         selectedClass = this.props.classes.approvedBtn;
         docsStatus = "buttonStatus.active";
-       
+
         break;
       case "REJECTED":
         selectedClass = this.props.classes.rejectBtn;
         docsStatus = "buttonStatus.rejected";
-      
+
         break;
       case "REWORK":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.rework";
-       
+
         break;
       case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingDocumentBiometric";
        
         break;
+      // case "WAITING_FOR_DOCUMENT_REWORK":
+      //   selectedClass = this.props.classes.commonBtn;
+      //   docsStatus = "buttonStatus.waitingDocumentRework";
+       
+      //   break;
+      // case "WAITING_FOR_BIOMETRIC_REWORK":
+      //   selectedClass = this.props.classes.commonBtn;
+      //   docsStatus = "buttonStatus.waitingBiometricRework";
+       
+      //   break;
+      case "WAITING_FOR_DOCUMENT":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingDocument";
+       
+        break;
+      case "WAITING_FOR_BIOMETRIC":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingBiometric";
+       
+        break;
       case "WAITING_FOR_APPROVAL":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingApproval";
-       
+
         break;
       case "WAITING_FOR_QUEUE":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingQueue";
-        
+
         break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
@@ -402,6 +491,10 @@ class InsureeForm extends Component {
   };
   statusButton = (data) => {
     const { selectedClass, docsStatus } = this.getStatusClass(data.status);
+    // console.log("data.statusComment", data.statusComment)
+    const shouldShowIconButton = INSUREE_REJECT_REASON?.some(reason =>
+      data?.statusComment?.includes(reason)
+    );
     return (
       <Grid className={this.props.classes.margin2}>
         <Typography component="span" className={this.props.classes.spanPadding}>
@@ -410,22 +503,29 @@ class InsureeForm extends Component {
         <Button className={selectedClass} variant="outlined">
           {formatMessage(this.props.intl, "insuree", docsStatus)}
         </Button>
-        {data.status == "REWORK" || data.status == "REJECTED" ? (
+        {(data.status == "REWORK" || data.status == "REJECTED") && shouldShowIconButton ? (
           <Tooltip
             placement="bottom"
             arrow
-            classes={{ tooltip: this.props.classes.customWidth }}
-            title={data.statusComment}
-            // componentsProps={{
-            //   tooltip: {
-            //     sx: {
-            //       bgcolor: "common.white",
-            //       "& .MuiTooltip-arrow": {
-            //         color: "common.white",
-            //       },
-            //     },
-            //   },
-            // }}
+            classes={{ tooltip: this.props.classes.tooltip, arrow: this.props.classes.customArrow }}
+            // title={data.statusComment}
+            title={<> <PublishedComponent
+              pubRef="insuree.RejectReasonPicker"
+              withLabel={false}
+              value={!!data.statusComment ? data.statusComment : ""}
+              module="insuree"
+              readOnly={true}
+            /></>}
+          // componentsProps={{
+          //   tooltip: {
+          //     sx: {
+          //       bgcolor: "common.white",
+          //       "& .MuiTooltip-arrow": {
+          //         color: "common.white",
+          //       },
+          //     },
+          //   },
+          // }}
           >
             <IconButton>
               <HelpIcon />
@@ -559,12 +659,12 @@ class InsureeForm extends Component {
     const hasReject =
       documentsData && documentsData.length > 0
         ? (allApprovedOrRejected && documentsData.some((document) => document.documentStatus === "REJECTED")) ||
-          (allApprovedOrRejected && !this.state.insuree.biometricsIsMaster)
+        (allApprovedOrRejected && !this.state.insuree.biometricsIsMaster)
         : false;
     const allApproved =
       documentsData && documentsData.length > 0
         ? documentsData.every((document) => document.documentStatus === "APPROVED") &&
-          this.state.insuree.biometricsIsMaster
+        this.state.insuree.biometricsIsMaster
         : false;
 
     return (
@@ -628,7 +728,7 @@ class InsureeForm extends Component {
                 <FormattedMessage
                   module="insuree"
                   id="success"
-                  // values={this.state.successMessage}
+                // values={this.state.successMessage}
                 />
               </DialogContentText>
             </DialogContent>

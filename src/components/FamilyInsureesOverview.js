@@ -76,6 +76,13 @@ const styles = (theme) => ({
   customWidth: {
     maxWidth: 500,
   },
+  tooltip: {
+    maxWidth: 1000,
+    width: "fit-content",
+    // width: "auto",
+    color: "white",
+    backgroundColor: "#eeeaea",
+  },
 });
 
 class FamilyInsureesOverview extends PagedDataHandler {
@@ -314,6 +321,26 @@ class FamilyInsureesOverview extends PagedDataHandler {
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingQueue";
         break;
+      // case "WAITING_FOR_DOCUMENT_REWORK":
+      //   selectedClass = this.props.classes.commonBtn;
+      //   docsStatus = "buttonStatus.waitingDocumentRework";
+
+      //   break;
+      // case "WAITING_FOR_BIOMETRIC_REWORK":
+      //   selectedClass = this.props.classes.commonBtn;
+      //   docsStatus = "buttonStatus.waitingBiometricRework";
+
+      //   break;
+      case "WAITING_FOR_DOCUMENT":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingDocument";
+
+        break;
+      case "WAITING_FOR_BIOMETRIC":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingBiometric";
+
+        break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
         break;
@@ -342,8 +369,15 @@ class FamilyInsureesOverview extends PagedDataHandler {
               <Tooltip
                 placement="right"
                 arrow
-                classes={{ tooltip: this.props.classes.customWidth }}
-                title={i.statusComment}
+                classes={{ tooltip: this.props.classes.tooltip }}
+                // title={i.statusComment}
+                title={<> <PublishedComponent
+                  pubRef="insuree.RejectReasonPicker"
+                  withLabel={false}
+                  value={!!i.statusComment ? i.statusComment : ""}
+                  module="insuree"
+                  readOnly={true}
+                /></>}
               >
                 <IconButton>
                   <HelpIcon />

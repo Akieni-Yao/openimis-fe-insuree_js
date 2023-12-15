@@ -78,7 +78,43 @@ class FamilyForm extends Component {
     confirmedAction: null,
     copyText: null,
     isCopied: false,
-
+    education: [
+      {
+        value: "2",
+        label: {
+          en: "Primary School",
+          fr: "École primaire",
+        },
+      },
+      {
+        value: "3",
+        label: {
+          en: "Secondary School",
+          fr: "École secondaire",
+        },
+      },
+      {
+        value: "4",
+        label: {
+          en: "University",
+          fr: "Université",
+        },
+      },
+      {
+        value: "5",
+        label: {
+          en: "Postgraduate Studies",
+          fr: "Études supérieures",
+        },
+      },
+      {
+        value: "6",
+        label: {
+          en: "PHD",
+          fr: "Doctorat",
+        },
+      },
+    ],
     // isFormValid: true,
   };
 
@@ -209,13 +245,26 @@ class FamilyForm extends Component {
     return true;
   };
   _save = (family) => {
+    const EducationNameByVal = () => {
+      const { education } = this.state;
+      if (!!family?.headInsuree?.education?.id) {
+        for (let i = 0; i < education?.length; i++) {
+          if (education[i].value == family?.headInsuree?.education?.id) {
+            return education[i].label.fr;
+          }
+        }
+      }
+
+      return undefined;
+    };
+    const educationName = EducationNameByVal();
     const headInsureeJsonExt = family.headInsuree.jsonExt;
     if (!headInsureeJsonExt.hasOwnProperty("civilQuality")) {
       !!headInsureeJsonExt?.relationship && headInsureeJsonExt?.relationship.id == 8
         ? (headInsureeJsonExt.civilQuality = "Depedent Beneficiary spouse")
         : !!headInsureeJsonExt?.relationship && headInsureeJsonExt?.relationship.id == 4
-        ? (headInsureeJsonExt.civilQuality = "Depedent Beneficiary child")
-        : (headInsureeJsonExt.civilQuality = "Main Beneficiary");
+          ? (headInsureeJsonExt.civilQuality = "Depedent Beneficiary child")
+          : (headInsureeJsonExt.civilQuality = "Main Beneficiary");
     }
     if (!headInsureeJsonExt.hasOwnProperty("nationality")) {
       headInsureeJsonExt.nationality = "CG";
@@ -234,6 +283,11 @@ class FamilyForm extends Component {
     }
     if (!headInsureeJsonExt.hasOwnProperty("nbKids")) {
       headInsureeJsonExt.nbKids = 0;
+    }
+    if (!!family.headInsuree.education) {
+      headInsureeJsonExt.education = {
+        education: !!educationName ? educationName : "",
+      };
     }
     headInsureeJsonExt.createdAt = "";
     this.setState(
@@ -301,6 +355,26 @@ class FamilyForm extends Component {
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingQueue";
         break;
+        // case "WAITING_FOR_DOCUMENT_REWORK":
+        //   selectedClass = this.props.classes.commonBtn;
+        //   docsStatus = "buttonStatus.waitingDocumentRework";
+         
+        //   break;
+        // case "WAITING_FOR_BIOMETRIC_REWORK":
+        //   selectedClass = this.props.classes.commonBtn;
+        //   docsStatus = "buttonStatus.waitingBiometricRework";
+         
+        //   break;
+        case "WAITING_FOR_DOCUMENT":
+          selectedClass = this.props.classes.commonBtn;
+          docsStatus = "buttonStatus.waitingDocument";
+         
+          break;
+        case "WAITING_FOR_BIOMETRIC":
+          selectedClass = this.props.classes.commonBtn;
+          docsStatus = "buttonStatus.waitingBiometric";
+         
+          break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
         break;
@@ -375,7 +449,7 @@ class FamilyForm extends Component {
             <Button variant="outlined" className={selectedClass}>
               {formatMessage(this.props.intl, "insuree", docsStatus)}
             </Button>
-            {family.status === "REWORK" || family.status === "REJECTED" ? (
+            {/* {family.status === "REWORK" || family.status === "REJECTED" ? (
               <Tooltip
                 placement="right"
                 arrow
@@ -386,7 +460,7 @@ class FamilyForm extends Component {
                   <HelpIcon />
                 </IconButton>
               </Tooltip>
-            ) : null}
+            ) : null} */}
           </Grid>
         );
       }
