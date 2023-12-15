@@ -133,8 +133,8 @@ const styles = (theme) => ({
     maxWidth: 1000,
     width: "fit-content",
     // width: "auto",
-    color: "white",
-    backgroundColor: "#eeeaea",
+    // color: "white",
+    // backgroundColor: "#eeeaea",
   },
 });
 
@@ -451,27 +451,27 @@ class InsureeForm extends Component {
       case "WAITING_FOR_DOCUMENT_AND_BIOMETRIC":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingDocumentBiometric";
-       
+
         break;
       // case "WAITING_FOR_DOCUMENT_REWORK":
       //   selectedClass = this.props.classes.commonBtn;
       //   docsStatus = "buttonStatus.waitingDocumentRework";
-       
+
       //   break;
       // case "WAITING_FOR_BIOMETRIC_REWORK":
       //   selectedClass = this.props.classes.commonBtn;
       //   docsStatus = "buttonStatus.waitingBiometricRework";
-       
+
       //   break;
       case "WAITING_FOR_DOCUMENT":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingDocument";
-       
+
         break;
       case "WAITING_FOR_BIOMETRIC":
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingBiometric";
-       
+
         break;
       case "WAITING_FOR_APPROVAL":
         selectedClass = this.props.classes.commonBtn;
@@ -509,13 +509,15 @@ class InsureeForm extends Component {
             arrow
             classes={{ tooltip: this.props.classes.tooltip, arrow: this.props.classes.customArrow }}
             // title={data.statusComment}
-            title={<> <PublishedComponent
-              pubRef="insuree.RejectReasonPicker"
-              withLabel={false}
-              value={!!data.statusComment ? data.statusComment : ""}
-              module="insuree"
-              readOnly={true}
-            /></>}
+            title={formatMessage(this.props.intl, "insuree", `InsureeRejectReason.${data.statusComment}`)
+              // <> <PublishedComponent
+              //   pubRef="insuree.RejectReasonPicker"
+              //   withLabel={false}
+              //   value={!!data.statusComment ? data.statusComment : ""}
+              //   module="insuree"
+              //   readOnly={true}
+              // /></>
+            }
           // componentsProps={{
           //   tooltip: {
           //     sx: {

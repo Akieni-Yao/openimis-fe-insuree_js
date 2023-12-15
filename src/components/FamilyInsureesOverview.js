@@ -80,8 +80,8 @@ const styles = (theme) => ({
     maxWidth: 1000,
     width: "fit-content",
     // width: "auto",
-    color: "white",
-    backgroundColor: "#eeeaea",
+    // color: "white",
+    // backgroundColor: "#eeeaea",
   },
 });
 
@@ -371,13 +371,17 @@ class FamilyInsureesOverview extends PagedDataHandler {
                 arrow
                 classes={{ tooltip: this.props.classes.tooltip }}
                 // title={i.statusComment}
-                title={<> <PublishedComponent
-                  pubRef="insuree.RejectReasonPicker"
-                  withLabel={false}
-                  value={!!i.statusComment ? i.statusComment : ""}
-                  module="insuree"
-                  readOnly={true}
-                /></>}
+                title={
+                  formatMessage(this.props.intl, "insuree", `InsureeRejectReason.${i.statusComment}`)
+
+                  // <> <PublishedComponent
+                  //   pubRef="insuree.RejectReasonPicker"
+                  //   withLabel={false}
+                  //   value={!!i.statusComment ? i.statusComment : ""}
+                  //   module="insuree"
+                  //   readOnly={true}
+                  // /></>
+                }
               >
                 <IconButton>
                   <HelpIcon />
