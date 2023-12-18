@@ -66,6 +66,7 @@
   "insuree.Family.povertyStatus.false": "No",
   "insuree.familySummaries": "{count} Families/Groups Found",
   "insuree.familySummaries.openNewTabButton.tooltip": "Open in new tab",
+  "insuree.familySummaries.camuNumber": "CAMU No.",
   "insuree.familySummaries.insuranceNo": "Temporary Camu. No.",
   "insuree.familySummaries.lastName": "Last Name",
   "insuree.familySummaries.otherNames": "Given Name",
