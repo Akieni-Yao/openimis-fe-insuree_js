@@ -76,6 +76,7 @@ class FamilySearcher extends Component {
   headers = (filters) => {
     var h = [
       "insuree.familySummaries.insuranceNo",
+      "insuree.familySummaries.camuNumber",
       "insuree.familySummaries.lastName",
       "insuree.familySummaries.otherNames",
       "insuree.familySummaries.email",
@@ -101,6 +102,7 @@ class FamilySearcher extends Component {
   sorts = (filters) => {
     var results = [
       ["headInsuree__chfId", true],
+      ["headInsuree__camuNumber", true],
       ["headInsuree__lastName", true],
       ["headInsuree__otherNames", true],
       ["headInsuree__email", true],
@@ -148,6 +150,7 @@ class FamilySearcher extends Component {
   itemFormatters = (filters) => {
     var formatters = [
       (family) => (!!family.headInsuree ? family.headInsuree.chfId : ""),
+      (family) => (!!family.headInsuree ? family.headInsuree.camuNumber : ""),
       (family) => (!!family.headInsuree ? family.headInsuree.lastName : ""),
       (family) => (!!family.headInsuree ? family.headInsuree.otherNames : ""),
       (family) => (!!family.headInsuree ? family.headInsuree.email : ""),

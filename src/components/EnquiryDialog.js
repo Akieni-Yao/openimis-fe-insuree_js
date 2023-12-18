@@ -26,13 +26,12 @@ const useStyles = makeStyles(() => ({
 const EnquiryDialog = (props) => {
   const { intl, modulesManager, fetchInsuree, fetching, fetched, insuree, error, onClose, open, chfid, match, family } =
     props;
-  console.log("overview", family);
   const classes = useStyles();
   const prevMatchUrl = useRef(null);
 
   useEffect(() => {
     if (open && insuree?.id !== chfid) {
-      fetchInsuree(modulesManager, chfid);
+      // fetchInsuree(modulesManager, chfid);
     }
 
     if (!!match?.url && match.url !== prevMatchUrl.current) {

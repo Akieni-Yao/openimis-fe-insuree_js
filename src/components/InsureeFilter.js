@@ -113,7 +113,7 @@ class InsureeFilter extends Component {
                     {
                       id: "chfId",
                       value: v,
-                      filter: `chfId_Istartswith: "${v}"`,
+                      filter: `chfId_Icontains: "${v}"`,
                     },
                   ])
                 }
