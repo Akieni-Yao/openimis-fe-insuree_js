@@ -31,7 +31,7 @@ const EnquiryDialog = (props) => {
 
   useEffect(() => {
     if (open && insuree?.id !== chfid) {
-      // fetchInsuree(modulesManager, chfid);
+      fetchInsuree(modulesManager, chfid);
     }
 
     if (!!match?.url && match.url !== prevMatchUrl.current) {
