@@ -23,6 +23,7 @@ const useStyles = makeStyles(() => ({
 
 const InsureeSummary = (props) => {
   const { insuree, intl, modulesManager, className } = props;
+  console.log("insuree", insuree);
   const classes = useStyles();
   const hasAvatarContribution = modulesManager.getContribs(INSUREE_SUMMARY_AVATAR_CONTRIBUTION_KEY).length > 0;
   const hasExtContributions = modulesManager.getContribs(INSUREE_SUMMARY_EXT_CONTRIBUTION_KEY).length > 0;
@@ -39,7 +40,7 @@ const InsureeSummary = (props) => {
           id="InsureeSummary.chfId"
           field={
             <Typography className={classes.rawValue} variant="h4">
-              {insuree.chfId}
+              {insuree.camuNumber ? insuree.camuNumber : insuree.chfId}
             </Typography>
           }
         />

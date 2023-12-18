@@ -26,7 +26,6 @@ const useStyles = makeStyles(() => ({
 const EnquiryDialog = (props) => {
   const { intl, modulesManager, fetchInsuree, fetching, fetched, insuree, error, onClose, open, chfid, match, family } =
     props;
-  console.log("overview", family);
   const classes = useStyles();
   const prevMatchUrl = useRef(null);
 

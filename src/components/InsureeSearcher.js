@@ -113,6 +113,7 @@ class InsureeSearcher extends Component {
   headers = (filters) => {
     var h = [
       "insuree.insureeSummaries.insuranceNo",
+      "insuree.insureeSummaries.camuNumber",
       "insuree.insureeSummaries.lastName",
       "insuree.insureeSummaries.otherNames",
       "insuree.insureeSummaries.maritalStatus",
@@ -134,6 +135,7 @@ class InsureeSearcher extends Component {
   sorts = (filters) => {
     var results = [
       ["chfId", true],
+      ["camuNumber", true],
       ["lastName", true],
       ["otherNames", true],
       ["marital", true],
@@ -217,25 +219,25 @@ class InsureeSearcher extends Component {
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingQueue";
         break;
-        // case "WAITING_FOR_DOCUMENT_REWORK":
-        //   selectedClass = this.props.classes.commonBtn;
-        //   docsStatus = "buttonStatus.waitingDocumentRework";
-         
-        //   break;
-        // case "WAITING_FOR_BIOMETRIC_REWORK":
-        //   selectedClass = this.props.classes.commonBtn;
-        //   docsStatus = "buttonStatus.waitingBiometricRework";
-         
-        //   break;
-        case "WAITING_FOR_DOCUMENT":
-          selectedClass = this.props.classes.commonBtn;
-          docsStatus = "buttonStatus.waitingDocument";
-         
-          break;
-        case "WAITING_FOR_BIOMETRIC":
-          selectedClass = this.props.classes.commonBtn;
-          docsStatus = "buttonStatus.waitingBiometric";         
-          break;
+      // case "WAITING_FOR_DOCUMENT_REWORK":
+      //   selectedClass = this.props.classes.commonBtn;
+      //   docsStatus = "buttonStatus.waitingDocumentRework";
+
+      //   break;
+      // case "WAITING_FOR_BIOMETRIC_REWORK":
+      //   selectedClass = this.props.classes.commonBtn;
+      //   docsStatus = "buttonStatus.waitingBiometricRework";
+
+      //   break;
+      case "WAITING_FOR_DOCUMENT":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingDocument";
+
+        break;
+      case "WAITING_FOR_BIOMETRIC":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingBiometric";
+        break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
         break;
@@ -246,6 +248,7 @@ class InsureeSearcher extends Component {
   itemFormatters = (filters) => {
     var formatters = [
       (insuree) => insuree.chfId,
+      (insuree) => insuree.camuNumber,
       (insuree) => insuree.lastName,
       (insuree) => insuree.otherNames,
       (insuree) => (
@@ -303,7 +306,7 @@ class InsureeSearcher extends Component {
     formatters.push(
       (insuree) => formatDateFromISO(this.props.modulesManager, this.props.intl, insuree.validityFrom),
       filters.showHistory &&
-        ((insuree) => formatDateFromISO(this.props.modulesManager, this.props.intl, insuree.validityTo)),
+      ((insuree) => formatDateFromISO(this.props.modulesManager, this.props.intl, insuree.validityTo)),
       (insuree) => (
         <Grid container wrap="nowrap" spacing="2">
           <Grid item>

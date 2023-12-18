@@ -96,7 +96,7 @@ export function fetchInsureeGenders() {
 export function fetchInsuree(mm, chfid) {
   let payload = formatPageQuery(
     "insurees",
-    [`chfId:"${chfid}", ignoreLocation:true`],
+    [`chfId_Icontains:"${chfid}", ignoreLocation:true`],
     [
       "id",
       "uuid",

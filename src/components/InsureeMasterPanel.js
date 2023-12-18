@@ -225,7 +225,7 @@ class InsureeMasterPanel extends FormPanel {
                 <PublishedComponent
                   pubRef="insuree.InsureeNumberInput"
                   module="insuree"
-                  label="Insuree.chfId"
+                  label="Insuree.MasterPanel.chfId"
                   required={false}
                   readOnly={true}
                   value={edited?.chfId}

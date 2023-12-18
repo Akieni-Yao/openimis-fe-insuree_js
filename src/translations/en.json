@@ -23,7 +23,8 @@
   "insuree.FSP.title": "First Service Point",
   "insuree.Insuree.label": "Insuree",
   "insuree.Insuree.picker.dialog.title": "Search Insuree",
-  "insuree.Insuree.chfId": "Temporary Camu No.",
+  "insuree.Insuree.chfId": "Temporary Camu No./CAMU No.",
+  "insuree.Insuree.MasterPanel.chfId": "Temporary Camu No.",
   "insuree.Insuree.lastName": "Last/Post Names",
   "insuree.Insuree.otherNames": "First Names",
   "insuree.Insuree.names": "Name",
@@ -65,6 +66,7 @@
   "insuree.Family.povertyStatus.false": "No",
   "insuree.familySummaries": "{count} Families/Groups Found",
   "insuree.familySummaries.openNewTabButton.tooltip": "Open in new tab",
+  "insuree.familySummaries.camuNumber": "CAMU No.",
   "insuree.familySummaries.insuranceNo": "Temporary Camu. No.",
   "insuree.familySummaries.lastName": "Last Name",
   "insuree.familySummaries.otherNames": "Given Name",
@@ -81,7 +83,7 @@
   "insuree.familySummaries.deleteFamily.tooltip": "Delete family",
   "insuree.Family.headInsuree.lastName": "Last Name",
   "insuree.Family.headInsuree.otherNames": "Given Name",
-  "insuree.Family.headInsuree.chfId": "Temporary Camu No.",
+  "insuree.Family.headInsuree.chfId": "Temporary Camu No./CAMU No.",
   "insuree.Family.headInsuree.email": "Email",
   "insuree.Family.headInsuree.phone": "Phone",
   "insuree.Family.headInsuree.dob": "Birth Date",
@@ -506,5 +508,6 @@
  "insuree.Insuree.rejectComments":"Please Select the reason",
  "insuree.Insuree.rejectComments.null":" ",
  "insuree.Insuree.rejectComments.1":"Doc is rejected due to quality of the document is not that much good.",
- "insuree.Insuree.rejectComments.2":"Document is rejected"
+ "insuree.Insuree.rejectComments.2":"Document is rejected",
+ "insuree.insureeSummaries.camuNumber": "CAMU No."
 }
