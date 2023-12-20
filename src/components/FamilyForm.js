@@ -15,14 +15,15 @@ import {
   coreConfirm,
   parseData,
   Helmet,
+  FormattedMessage
 } from "@openimis/fe-core";
 import { RIGHT_FAMILY, RIGHT_FAMILY_EDIT } from "../constants";
 import FamilyMasterPanel from "./FamilyMasterPanel";
 
-import { fetchFamily, newFamily, createFamily, fetchFamilyMutation, printReport } from "../actions";
+import { fetchFamily, newFamily, createFamily, fetchFamilyMutation, printReport, FamilysendEmail } from "../actions";
 import FamilyInsureesOverview from "./FamilyInsureesOverview";
 import HeadInsureeMasterPanel from "./HeadInsureeMasterPanel";
-import { Button, Tooltip, IconButton, Typography, Grid } from "@material-ui/core";
+import { Button, Tooltip, IconButton, Typography, Grid, Dialog, DialogActions, DialogContent, DialogContentText } from "@material-ui/core";
 import { insureeLabel } from "../utils/utils";
 import HelpIcon from "@material-ui/icons/Help";
 import { formatMessage } from "@openimis/fe-core";
@@ -63,6 +64,46 @@ const styles = (theme) => ({
     paddingTop: theme.spacing(1),
     marginRight: "5px",
   },
+  dialogBg: {
+    backgroundColor: "#FFFFFF",
+    width: 300,
+    paddingRight: 20,
+    paddingLeft: 20,
+    paddingTop: 10,
+    paddingBootom: 10,
+  },
+  dialogText: {
+    color: "#000000",
+    fontWeight: "Bold",
+  },
+  primaryHeading: {
+    font: "normal normal medium 20px/22px Roboto",
+    color: "#333333",
+  },
+  primaryButton: {
+    backgroundColor: "#FFFFFF 0% 0% no-repeat padding-box",
+    border: "1px solid #999999",
+    color: "#999999",
+    borderRadius: "4px",
+    // fontWeight: "bold",
+    "&:hover": {
+      backgroundColor: "#FF0000",
+      border: "1px solid #FF0000",
+      color: "#FFFFFF",
+    },
+  }, //theme.dialog.primaryButton,
+  secondaryButton: {
+    backgroundColor: "#FFFFFF 0% 0% no-repeat padding-box",
+    border: "1px solid #999999",
+    color: "#999999",
+    borderRadius: "4px",
+    // fontWeight: "bold",
+    "&:hover": {
+      backgroundColor: "#FF0000",
+      border: "1px solid #FF0000",
+      color: "#FFFFFF",
+    },
+  },
 });
 
 const INSUREE_FAMILY_PANELS_CONTRIBUTION_KEY = "insuree.Family.panels";
@@ -78,6 +119,9 @@ class FamilyForm extends Component {
     confirmedAction: null,
     copyText: null,
     isCopied: false,
+    email: true,
+    success: false,
+    notSucess:false,
     education: [
       {
         value: "2",
@@ -355,26 +399,26 @@ class FamilyForm extends Component {
         selectedClass = this.props.classes.commonBtn;
         docsStatus = "buttonStatus.waitingQueue";
         break;
-        // case "WAITING_FOR_DOCUMENT_REWORK":
-        //   selectedClass = this.props.classes.commonBtn;
-        //   docsStatus = "buttonStatus.waitingDocumentRework";
-         
-        //   break;
-        // case "WAITING_FOR_BIOMETRIC_REWORK":
-        //   selectedClass = this.props.classes.commonBtn;
-        //   docsStatus = "buttonStatus.waitingBiometricRework";
-         
-        //   break;
-        case "WAITING_FOR_DOCUMENT":
-          selectedClass = this.props.classes.commonBtn;
-          docsStatus = "buttonStatus.waitingDocument";
-         
-          break;
-        case "WAITING_FOR_BIOMETRIC":
-          selectedClass = this.props.classes.commonBtn;
-          docsStatus = "buttonStatus.waitingBiometric";
-         
-          break;
+      // case "WAITING_FOR_DOCUMENT_REWORK":
+      //   selectedClass = this.props.classes.commonBtn;
+      //   docsStatus = "buttonStatus.waitingDocumentRework";
+
+      //   break;
+      // case "WAITING_FOR_BIOMETRIC_REWORK":
+      //   selectedClass = this.props.classes.commonBtn;
+      //   docsStatus = "buttonStatus.waitingBiometricRework";
+
+      //   break;
+      case "WAITING_FOR_DOCUMENT":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingDocument";
+
+        break;
+      case "WAITING_FOR_BIOMETRIC":
+        selectedClass = this.props.classes.commonBtn;
+        docsStatus = "buttonStatus.waitingBiometric";
+
+        break;
       default:
         selectedClass = this.props.classes.noBtnClasses;
         break;
@@ -408,6 +452,30 @@ class FamilyForm extends Component {
       this.displayPrintWindow(base64Data, contentType);
     }
     console.log(decodeURI(data?.payload?.data?.sentNotification?.data), "decode data");
+  };
+  emailButton = async (edited) => {
+    const message = await this.props.FamilysendEmail(this.props.modulesManager, edited);
+    if (!!message?.payload?.data?.sentNotification?.data) {
+      // If the email was sent successfully, update the success state and message
+      this.setState({
+        success: true,
+        successMessage: `${message?.payload?.data?.sentNotification?.message}`//"Email Sent Scodeuccessfully",
+      });
+    } else {
+      // If the email send was not successful, you can also set success to false here
+      // and provide an appropriate error message.
+      this.setState({
+        success: false,
+        notSucess:true,
+        successMessage: `${message?.payload?.data?.sentNotification?.message}`//"Email sending failed",
+      });
+    }
+  };
+  cancel = () => {
+    this.setState({
+      success: false,
+      notSucess:false
+    });
   };
   render() {
     const {
@@ -566,9 +634,46 @@ class FamilyForm extends Component {
             user={this.props.state.core.user}
             // onValidation={this.onValidation}
             printButton={this.printReport}
+            emailButton={this.emailButton}
+            email={family_uuid}
             print={family_uuid}
           />
         )}
+        {!!this.state.success ?
+          <Dialog open={this.state.success} onClose={this.cancel} maxWidth="md">
+            <DialogContent className={classes.dialogBg}>
+              <DialogContentText className={classes.primaryHeading}>
+                {/* {this.state.successMessage} */}
+                {<FormattedMessage
+                  module="insuree"
+                  id="success"
+                  // values={this.state.successMessage}
+                />}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions className={classes.dialogBg}>
+              <Button onClick={this.cancel} className={classes.secondaryButton}>
+                <FormattedMessage module="core" id="ok" />
+              </Button>
+            </DialogActions>
+          </Dialog>
+          : <Dialog open={this.state.notSucess} onClose={this.cancel} maxWidth="md">
+            <DialogContent className={classes.dialogBg}>
+              <DialogContentText className={classes.primaryHeading}>
+                {/* {this.state.successMessage} */}
+                {<FormattedMessage
+                  module="insuree"
+                  id="notvalid"
+                  // values={this.state.successMessage}
+                />}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions className={classes.dialogBg}>
+              <Button onClick={this.cancel} className={classes.secondaryButton}>
+                <FormattedMessage module="core" id="ok" />
+              </Button>
+            </DialogActions>
+          </Dialog>}
       </div>
     );
   }
@@ -590,7 +695,7 @@ const mapStateToProps = (state, props) => ({
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(
-    { fetchFamilyMutation, fetchFamily, newFamily, createFamily, journalize, coreConfirm, printReport },
+    { fetchFamilyMutation, fetchFamily, newFamily, createFamily, journalize, coreConfirm, printReport, FamilysendEmail },
     dispatch,
   );
 };
