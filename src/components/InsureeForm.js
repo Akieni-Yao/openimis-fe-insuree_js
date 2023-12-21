@@ -32,6 +32,7 @@ import {
   sendEmail,
   printReport,
   approverInsureeComparison,
+  printInsureeReport
 } from "../actions";
 import { RIGHT_INSUREE, INSUREE_REJECT_REASON } from "../constants";
 import { insureeLabel } from "../utils/utils";
@@ -571,7 +572,8 @@ class InsureeForm extends Component {
     }
   };
   printReport = async (edited) => {
-    const data = await this.props.printReport(this.props.modulesManager, edited);
+    // const data = await this.props.printReport(this.props.modulesManager, edited);
+    const data = await this.props.printInsureeReport(this.props.modulesManager, edited);
     const base64Data = data?.payload?.data?.sentNotification?.data;
 
     const contentType = "pdf";
@@ -736,7 +738,7 @@ class InsureeForm extends Component {
             </DialogContent>
             <DialogActions className={classes.dialogBg}>
               <Button onClick={this.cancel} className={classes.secondaryButton}>
-                <FormattedMessage module="core" id="cancel" />
+                <FormattedMessage module="core" id="ok" />
               </Button>
             </DialogActions>
           </Dialog>
@@ -776,6 +778,7 @@ export default withHistory(
       sendEmail,
       printReport,
       approverInsureeComparison,
+      printInsureeReport
       // approverCountCheck,
     })(injectIntl(withTheme(withStyles(styles)(InsureeForm)))),
   ),

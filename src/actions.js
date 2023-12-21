@@ -86,7 +86,7 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   "createdBy",
 ];
 
-export const INSUREE_PICKER_PROJECTION = ["id", "uuid", "chfId", "lastName", "otherNames"];
+export const INSUREE_PICKER_PROJECTION = ["id", "uuid", "chfId", "lastName", "otherNames", "jsonExt", "status"];
 
 export function fetchInsureeGenders() {
   const payload = formatQuery("insureeGenders", null, ["code"]);
@@ -340,6 +340,7 @@ function formatExternalDocument(docs, tempCamu, isApprove) {
   return formattedResult;
 }
 function formatMail(edited) {
+  // console.log(edited, "editededited")
   let reportName = "";
   if (!!edited?.camuNumber) {
     reportName = "enrollment_receipt";
@@ -350,22 +351,41 @@ function formatMail(edited) {
   return formatMail;
 }
 function formatFamilyMail(edited) {
-  let reportName = "enrollment_receipt_for_print";
+  // console.log("edited", edited)
+  let reportName = "";
   // if (!!edited?.camuNumber) {
   //   reportName = "enrollment_receipt";
   // } else {
   //   reportName = "enrollment_receipt_for_print";
   // }
+  if (`${edited?.ext?.enrolmentType}` === "students" || `${edited?.ext?.enrolmentType}` === "vulnerable_Persons") {
+    reportName = "enrollment_receipt_for_email_excp";
+  } else {
+    reportName = "enrollment_receipt_for_email";
+  }
   const formatMail = `uuid: "${edited?.headInsuree ? edited?.headInsuree?.uuid : edited?.uuid
     }",  isEmail: ${true},reportName: "${reportName}"`;
   return formatMail;
 }
 function formatPrint(edited) {
+  // console.log("editeded", edited?.ext?.enrolmentType)
+  let reportName = "";
+  if (`${edited?.ext?.enrolmentType}` === "students" || `${edited?.ext?.enrolmentType}` === "vulnerable_Persons") {
+    reportName = "enrollment_receipt_for_print_excp";
+  } else {
+    reportName = "enrollment_receipt_for_print";
+  }
+  const formatPrint = `uuid: "${edited?.headInsuree ? edited?.headInsuree?.uuid : edited?.uuid
+    }",  isEmail: ${false},reportName: "${reportName}"`;
+  return formatPrint;
+}
+function formatInsureePrint(edited) {
+  // console.log("editeded", edited?.ext?.enrolmentType)
   let reportName = "";
   if (!!edited?.camuNumber) {
     reportName = "enrollment_receipt";
   } else {
-    reportName = "enrollment_receipt_for_print";
+    reportName = "pre_enrollment_receipt";
   }
   const formatPrint = `uuid: "${edited?.headInsuree ? edited?.headInsuree?.uuid : edited?.uuid
     }",  isEmail: ${false},reportName: "${reportName}"`;
@@ -736,6 +756,15 @@ export function taskGroupCreator(edited) {
 export function printReport(mm, edited) {
   let mutation = `mutation SendNotification{
     sentNotification(${formatPrint(edited)}) {
+    success
+    message
+    data
+  }}`;
+  return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_REPORT_RESP", "INSUREE_MUTATION_ERR"], "success message");
+}
+export function printInsureeReport(mm, edited) {
+  let mutation = `mutation SendNotification{
+    sentNotification(${formatInsureePrint(edited)}) {
     success
     message
     data
