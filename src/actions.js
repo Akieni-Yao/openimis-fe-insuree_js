@@ -340,6 +340,7 @@ function formatExternalDocument(docs, tempCamu, isApprove) {
   return formattedResult;
 }
 function formatMail(edited) {
+  // console.log(edited, "editededited")
   let reportName = "";
   if (!!edited?.camuNumber) {
     reportName = "enrollment_receipt";
@@ -350,20 +351,27 @@ function formatMail(edited) {
   return formatMail;
 }
 function formatFamilyMail(edited) {
-  let reportName = "enrollment_receipt_for_print";
+  // console.log("edited", edited)
+  let reportName = "";
   // if (!!edited?.camuNumber) {
   //   reportName = "enrollment_receipt";
   // } else {
   //   reportName = "enrollment_receipt_for_print";
   // }
+  if (`${edited?.ext?.enrolmentType}` === "students" || `${edited?.ext?.enrolmentType}` === "vulnerable_Persons") {
+    reportName = "enrollment_receipt_for_email_excp";
+  } else {
+    reportName = "enrollment_receipt_for_email";
+  }
   const formatMail = `uuid: "${edited?.headInsuree ? edited?.headInsuree?.uuid : edited?.uuid
     }",  isEmail: ${true},reportName: "${reportName}"`;
   return formatMail;
 }
 function formatPrint(edited) {
+  // console.log("editeded", edited?.ext?.enrolmentType)
   let reportName = "";
-  if (!!edited?.camuNumber) {
-    reportName = "enrollment_receipt";
+  if (`${edited?.ext?.enrolmentType}` === "students" || `${edited?.ext?.enrolmentType}` === "vulnerable_Persons") {
+    reportName = "enrollment_receipt_for_print_excp";
   } else {
     reportName = "enrollment_receipt_for_print";
   }
