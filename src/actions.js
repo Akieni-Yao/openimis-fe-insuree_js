@@ -86,7 +86,7 @@ const INSUREE_FULL_PROJECTION = (mm) => [
   "createdBy",
 ];
 
-export const INSUREE_PICKER_PROJECTION = ["id", "uuid", "chfId", "lastName", "otherNames"];
+export const INSUREE_PICKER_PROJECTION = ["id", "uuid", "chfId", "lastName", "otherNames", "jsonExt", "status"];
 
 export function fetchInsureeGenders() {
   const payload = formatQuery("insureeGenders", null, ["code"]);
