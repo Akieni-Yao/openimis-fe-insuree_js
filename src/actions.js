@@ -379,6 +379,18 @@ function formatPrint(edited) {
     }",  isEmail: ${false},reportName: "${reportName}"`;
   return formatPrint;
 }
+function formatInsureePrint(edited) {
+  // console.log("editeded", edited?.ext?.enrolmentType)
+  let reportName = "";
+  if (!!edited?.camuNumber) {
+    reportName = "enrollment_receipt";
+  } else {
+    reportName = "pre_enrollment_receipt";
+  }
+  const formatPrint = `uuid: "${edited?.headInsuree ? edited?.headInsuree?.uuid : edited?.uuid
+    }",  isEmail: ${false},reportName: "${reportName}"`;
+  return formatPrint;
+}
 // function formatExternalDocument(docs, tempCamu) {
 //   const newarray = docs.map((doc) => ({
 //     documentId: doc.documentId,
@@ -744,6 +756,15 @@ export function taskGroupCreator(edited) {
 export function printReport(mm, edited) {
   let mutation = `mutation SendNotification{
     sentNotification(${formatPrint(edited)}) {
+    success
+    message
+    data
+  }}`;
+  return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_REPORT_RESP", "INSUREE_MUTATION_ERR"], "success message");
+}
+export function printInsureeReport(mm, edited) {
+  let mutation = `mutation SendNotification{
+    sentNotification(${formatInsureePrint(edited)}) {
     success
     message
     data
