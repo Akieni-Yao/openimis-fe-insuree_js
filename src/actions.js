@@ -342,10 +342,15 @@ function formatExternalDocument(docs, tempCamu, isApprove) {
 function formatMail(edited) {
   // console.log(edited, "editededited")
   let reportName = "";
-  if (!!edited?.camuNumber) {
-    reportName = "enrollment_receipt";
+  // if (!!edited?.camuNumber) {
+  //   reportName = "enrollment_receipt";
+  // } else {
+  //   reportName = "pre_enrollment_receipt";
+  // }
+  if (!!edited?.camuNumber && `${edited?.jsonExt?.insureeEnrolmentType}` === "students" || `${edited?.jsonExt?.insureeEnrolmentType}` === "vulnerable_Persons") {
+    reportName = "enrollment_receipt_excpt";
   } else {
-    reportName = "pre_enrollment_receipt";
+    reportName = "enrollment_receipt";
   }
   const formatMail = `uuid: "${edited?.uuid}",  isEmail: ${true},reportName: "${reportName}"`;
   return formatMail;
@@ -380,12 +385,17 @@ function formatPrint(edited) {
   return formatPrint;
 }
 function formatInsureePrint(edited) {
-  // console.log("editeded", edited?.ext?.enrolmentType)
+  // console.log("edited", edited)
+  // console.log("editeded", edited?.jsonExt?.insureeEnrolmentType)
+  // const jsonData = JSON.parse(edited?.family?.headInsuree?.jsonExt);
+  // const enrolementType=jsonData?.insureeEnrolmentType
+  // // console.log("ee",jsonData?.insureeEnrolmentType)
+  // console.log("jsonData",jsonData)
   let reportName = "";
-  if (!!edited?.camuNumber) {
-    reportName = "enrollment_receipt";
+  if (!!edited?.camuNumber && `${edited?.jsonExt?.insureeEnrolmentType}` === "students" || `${edited?.jsonExt?.insureeEnrolmentType}` === "vulnerable_Persons") {
+    reportName = "enrollment_receipt_excpt";
   } else {
-    reportName = "pre_enrollment_receipt";
+    reportName = "enrollment_receipt";
   }
   const formatPrint = `uuid: "${edited?.headInsuree ? edited?.headInsuree?.uuid : edited?.uuid
     }",  isEmail: ${false},reportName: "${reportName}"`;
