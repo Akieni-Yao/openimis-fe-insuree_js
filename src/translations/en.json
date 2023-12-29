@@ -5,6 +5,7 @@
   "insuree.menu.familiesOrGroups": "Families/Groups",
   "insuree.menu.insurees": "Insurees",
   "insuree.menu.pendingApproval": "Pending Approval",
+  "insuree.menu.pendingApprovalAssign": "User Assignment",
   "insuree.ageUnit": "Years",
   "insuree.label.regionFSP": "Region of FSP",
   "insuree.label.districtFSP": "District of FSP",
@@ -510,5 +511,8 @@
   "insuree.Insuree.rejectComments.null": " ",
   "insuree.Insuree.rejectComments.1": "Doc is rejected due to quality of the document is not that much good.",
   "insuree.Insuree.rejectComments.2": "Document is rejected",
-  "insuree.insureeSummaries.camuNumber": "CAMU No."
+  "insuree.insureeSummaries.camuNumber": "CAMU No.",
+  "insuree.UnAssignUser.mutationLabel":"Un-assign User",
+  "insuree.UnAssignUser.message":"Do you want un-assign Temp CAMU No. from {label}?",
+  "insuree.user.unAssign":"un-assign"
 }

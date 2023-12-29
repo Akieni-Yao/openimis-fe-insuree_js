@@ -162,7 +162,41 @@ export function fetchPendingForApproval(mm, familyUuid, headInsureeChfId) {
   const payload = formatPageQuery("approverFamilies", filters, PENDING_FULL_PROJECTION(mm));
   return graphql(payload, "INSUREE_PENDINGAPPROVAL");
 }
-
+export function fetchPendingApprvalQueue(mm, filters) {
+  return graphql(
+    `
+    query InsureeQueue {
+      insureeQueue {
+          totalCount
+          edgeCount
+          edges {
+              node {
+                  id
+                  uuid
+                  family {
+                      uuid
+                      id
+                      headInsuree {
+                          chfId
+                          lastName
+                          otherNames
+                      }
+                  }
+                  userId {
+                      id
+                      iUser {
+                          lastName
+                          otherNames
+                      }
+                  }
+              }
+          }
+      }
+  }
+`,
+    "INSUREE_PENDINGAPPROVALS",
+  );
+}
 export function fetchFamilyMembers(mm, filters) {
   let projections = [
     "uuid",
@@ -813,3 +847,29 @@ export function fetchPolicyHolderInsuree(modulesManager, insureeUuid) {
   const payload = formatPageQuery("policyHolderByInsuree", [filter], POLICYHOLDER_FULL_PROJECTION(modulesManager));
   return graphql(payload, "POLICYHOLDER_INSUREE");
 }
+ export function UnAssignUser(user){
+  console.log(user?.uuid,"user")
+  let mutation = `mutation UnassignUsertoProfile {
+    UnassignUsertoProfile(input: { uuid: "${user?.uuid}" }) {
+        success
+        message
+    }
+}`;
+  return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_UNASSIGN_RESP", "INSUREE_MUTATION_ERR"], "success message");
+ }
+ export function AssignUser(user,selectedValue){
+  console.log(user,"actions")
+  console.log(selectedValue,"selected")
+  let mutation= `mutation AssignUsertoProfile {
+    AssignUsertoProfile(
+        input: {
+            uuid:"${user?.uuid}"
+            userId: "${decodeId(selectedValue)}"
+        }
+    ) {
+        success
+        message
+    }
+}`;
+return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_UNASSIGN_RESP", "INSUREE_MUTATION_ERR"], "success message");
+ }

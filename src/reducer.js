@@ -74,6 +74,10 @@ function reducer(
     fetchedPendingApproval: false,
     PendingApproval: null,
     errorPendingApproval: null,
+    fetchingPendingApprovals: false,
+    fetchedPendingApprovals: false,
+    PendingApprovals: null,
+    errorPendingApprovals: null,
     fetchingApprover: false,
     fetchedApprover: false,
     approverData: null,
@@ -514,6 +518,29 @@ function reducer(
         fetchingPendingApproval: false,
         errorPendingApproval: formatServerError(action.payload),
       };
+      case "INSUREE_PENDINGAPPROVALS_REQ":
+        return {
+          ...state,
+          fetchingPendingApprovals: true,
+          fetchedPendingApprovals: false,
+          PendingApprovals: null,
+          errorPendingApprovals: null,
+        };
+      case "INSUREE_PENDINGAPPROVALS_RESP":
+        var families = parseData(action.payload.data.insureeQueue);
+        return {
+          ...state,
+          fetchingPendingApprovals: false,
+          fetchedPendingApprovals: true,
+          PendingApprovals: !!families && families.length > 0 ? families : null,
+          errorPendingApprovals: formatGraphQLError(action.payload),
+        };
+      case "INSUREE_PENDINGAPPROVALS_ERR":
+        return {
+          ...state,
+          fetchingPendingApprovals: false,
+          errorPendingApprovals: formatServerError(action.payload),
+        };
     case "INSUREE_CREATEDBY_REQ":
       return {
         ...state,
@@ -553,6 +580,14 @@ function reducer(
         reportData: action.payload.data.sentNotification?.data,
         errorreport: formatGraphQLError(action.payload),
       };
+      case "INSUREE_UNASSIGN_RESP":
+        return{
+          ...state,
+          fetchingunasign: false,
+          fetchedunasign: true,
+          unasignData: action.payload.data.sentNotification?.data,
+          errorunasign: formatGraphQLError(action.payload),
+        }
     case "INSUREE_SEND_EMAIL_RESP":
       return {
         ...state,

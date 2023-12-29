@@ -46,14 +46,15 @@ import ReviewerPicker from "./pickers/ReviwerPicker";
 import PendingApproval from "./components/PendingApproval";
 import PolicySummary from "./components/PolicySummary";
 import RejectReasonPicker from "./pickers/RejectReasonPicker";
-
+import UserPicker from "./pickers/UserPicker";
+import PendingApprovalAssignemnt from "./components/PendingApprovalAssignemnt";
 const ROUTE_INSUREE_FAMILIES = "insuree/families";
 const ROUTE_INSUREE_FAMILY_OVERVIEW = "insuree/families/familyOverview";
 const ROUTE_INSUREE_FAMILY = "insuree/family";
 const ROUTE_INSUREE_INSUREES = "insuree/insurees";
 const ROUTE_INSUREE_INSUREE = "insuree/insurees/insuree";
 const ROUTE_INSUREE_PENDINGAPPROVAL = "insuree/insurees/pendingapproval";
-
+const ROUTE_INSUREE_PENDINGAPPROVALASSIGNMENT = "insuree/insurees/PendingApprovalAssignemnt";
 const DEFAULT_CONFIG = {
   "translations": [{ key: "en", messages: messages_en }],
   "reducers": [{ key: "insuree", reducer }],
@@ -126,6 +127,7 @@ const DEFAULT_CONFIG = {
     { key: "insuree.FamilyTypePicker", ref: FamilyTypePicker },
     { key: "insuree.PhotoStatusPicker", ref: PhotoStatusPicker },
     { key: "insuree.RejectReasonPicker", ref: RejectReasonPicker },
+    { key: "insuree.UserPicker", ref: UserPicker },
     { key: "insuree.RelationPicker", ref: RelationPicker },
     { key: "insuree.RejectCommentPicker", ref: RejectCommentPicker },
     { key: "insuree.ReviewerPicker", ref: ReviewerPicker },
@@ -139,7 +141,7 @@ const DEFAULT_CONFIG = {
     { key: "insuree.route.insurees", ref: ROUTE_INSUREE_INSUREES },
     { key: "insuree.route.insuree", ref: ROUTE_INSUREE_INSUREE },
     { key: "insuree.route.pendingApproval", ref: ROUTE_INSUREE_PENDINGAPPROVAL },
-
+    { key: "insuree.route.pendingApprovalAssign", ref: ROUTE_INSUREE_PENDINGAPPROVALASSIGNMENT },
     { key: "insuree.Avatar", ref: InsureeAvatar },
     { key: "insuree.Summary", ref: InsureeSummary },
     { key: "policyHolder.Summary", ref: PolicySummary },
@@ -158,6 +160,7 @@ const DEFAULT_CONFIG = {
     { path: "insuree/cappedItemService", component: CappedItemServicePage },
     { path: "insuree/profile", component: ProfilePage },
     { path: "insuree/insurees/pendingapproval", component: PendingApproval },
+    { path: "insuree/insurees/PendingApprovalAssignemnt", component: PendingApprovalAssignemnt },
   ],
   "core.AppBar": [Enquiry],
   "core.MainMenu": [InsureeMainMenu],

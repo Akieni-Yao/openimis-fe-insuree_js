@@ -52,6 +52,13 @@ class InsureeMainMenu extends Component {
         route: "/" + ROUTE_POLICY_POLICIES,
       });
     }
+    if (rights.includes(RIGHT_INSUREE)) {
+      entries.push({
+        text: formatMessage(this.props.intl, "insuree", "menu.pendingApprovalAssign"),
+        icon: <HistoryIcon />,
+        route: "/" + modulesManager.getRef("insuree.route.pendingApprovalAssign")
+      });
+    }
     // entries.push(
     //   ...this.props.modulesManager
     //     .getContribs(INSUREE_MAIN_MENU_CONTRIBUTION_KEY)
