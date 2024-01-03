@@ -31,7 +31,7 @@ const UsersPicker = (props) => {
         onChange,
         createdAtCode,
     } = props;
-    console.log("value", value)
+    // console.log("value", value)
     const [searchString, setSearchString] = useState(null);
     // const [data, setData] = useState();
     const { isLoading, data, error } = useGraphqlQuery(
@@ -54,7 +54,7 @@ const UsersPicker = (props) => {
     }`,
         { str: searchString },
     );
-    console.log("data", data)
+    // console.log("data", data)
     // useEffect(async () => {
     //   const response = await taskGroupCreator(createdAtCode?.createdBy);
     //   setData(response.data);

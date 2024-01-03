@@ -29,6 +29,8 @@ import {
   Searcher
 } from "@openimis/fe-core";
 // import EnquiryDialog from "./EnquiryDialog";
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
 import {
   fetchFamilyMembers,
   selectFamilyMember,
@@ -108,7 +110,11 @@ class PendingApprovalAssignemnt extends Component {
     unAssignUser: null,
     userAssign: null,
     selectedDropdownValue: null,
-    toggleButtonClickedRow: null
+    toggleButtonClickedRow: null,
+    sucess: false,
+    sucessMessage: null,
+    Unassignsucess: false,
+    UnassignsucessMessage: null
   };
 
   constructor(props) {
@@ -195,11 +201,16 @@ class PendingApprovalAssignemnt extends Component {
     } else {
       const user = this.state.unAssignUser;
       this.setState({ unAssignUser: null }, async () => {
-        await this.props.UnAssignUser(
+      const response= await this.props.UnAssignUser(
           user,
         );
         // this.props.fetchPendingApprvalQueue(this.props.modulesManager);
-        this.fetch(['first: 10']);
+        this.fetch(['first: 5']);
+        // console.log("response",response);
+        if (response?.payload?.data?.UnassignUsertoProfile?.message) {
+          this.setState({ UnassignsucessMessage: response?.payload?.data?.UnassignUsertoProfile?.message })
+          this.setState({ Unassignsucess: true })
+        }
       });
     }
   };
@@ -210,12 +221,19 @@ class PendingApprovalAssignemnt extends Component {
     } else {
       const user = this.state.userAssign;
       this.setState({ AssignUser: null }, async () => {
-        await this.props.AssignUser(
+        const response = await this.props.AssignUser(
           user, this.state.selectedDropdownValue
         );
+        // console.log("response", response?.payload?.data?.AssignUsertoProfile?.message);
         // this.props.fetchPendingApprvalQueue(this.props.modulesManager);
         this.setState({ userAssign: null });
+        this.setState({ selectedDropdownValue: null });
         this.fetch(['first: 5']);
+        if (response?.payload?.data?.AssignUsertoProfile?.message) {
+          this.setState({ sucessMessage: response?.payload?.data?.AssignUsertoProfile?.message })
+          this.setState({ sucess: true })
+        }
+        // if(response)
       });
     }
     // console.log("this.state.selectedDropdownValue",this.state.selectedDropdownValue)
@@ -223,18 +241,21 @@ class PendingApprovalAssignemnt extends Component {
     // console.log("usersa", family)
   }
   handleDropdownChange = (selectedValue) => {
-    console.log(selectedValue.id,"selectedValue")
     this.setState({ selectedDropdownValue: selectedValue });
   };
-
+  onHandlerClose=()=>
+  {
+    this.setState({sucess:false});
+    this.setState({Unassignsucess:false});
+  }
   headers = (filter) => {
     var h = [
       "PedingApproval.tempCamuNo",
       "PedingApproval.lastName",
       "PedingApproval.firstName",
-      "Assigned User",
-      "",
-      ""
+      "Assign.User",
+      " ",
+      " "
     ];
     // return h;
     return h.filter(Boolean);
@@ -303,7 +324,8 @@ class PendingApprovalAssignemnt extends Component {
         const hasUserId = !!family?.userId; // Check if family has userId
         const isSelectedForAssign = this.state.selectedRowsForAssign.has(family);
         const buttonStyle = {
-          backgroundColor: 'green',
+          // backgroundColor: 'green',
+          backgroundColor: !!this.state.selectedDropdownValue ? 'green' : 'gray',
           border: '1px solid grey',
           borderRadius: '5px',
           padding: '10px',
@@ -312,15 +334,15 @@ class PendingApprovalAssignemnt extends Component {
         };
         return (
           <Grid item>
-            <Tooltip title={formatMessage(this.props.intl, "insuree", "insureeSummaries.openFamilyButton.tooltip")}>
+            <Tooltip title={formatMessage(this.props.intl, "insuree", "reassign.tooltip")}>
               <IconButton
                 size="small"
                 onClick={() => (hasUserId ? this.toggleAssign(family) : null)}
               >
-                {hasUserId ? (isSelectedForAssign ? <button style={buttonStyle} onClick={() => {
+                {hasUserId ? (isSelectedForAssign ? <button style={buttonStyle} disabled={!this.state.selectedDropdownValue} onClick={() => {
                   this.setState({ userAssign: family })
                 }}>
-                  <FormattedMessage module="core" id="Assign" />
+                  <FormattedMessage module="core" id="Re-assign" />
                 </button> : <SwapHorizIcon />) : " "}
               </IconButton>
             </Tooltip>
@@ -328,7 +350,7 @@ class PendingApprovalAssignemnt extends Component {
         );
       },
       (family) => family?.userId ? <Grid item>
-        <Tooltip title={formatMessage(this.props.intl, "insuree", "insureeSummaries.openFamilyButton.tooltip")}>
+        <Tooltip title={formatMessage(this.props.intl, "insuree", "Unassign.tooltip")}>
           <IconButton
             size="small"
             onClick={() => this.setState({ unAssignUser: family })}
@@ -338,7 +360,7 @@ class PendingApprovalAssignemnt extends Component {
         </Tooltip>
       </Grid> : (
         <Grid item>
-          <Tooltip title={formatMessage(this.props.intl, "insuree", "insureeSummaries.openFamilyButton.tooltip")}>
+          <Tooltip title={formatMessage(this.props.intl, "insuree", "assign.tooltip")}>
 
             {this.state.toggleButtonClickedRow === family ? (
               <button
@@ -346,14 +368,16 @@ class PendingApprovalAssignemnt extends Component {
                 color="primary"
                 style={
                   {
-                    "backgroundColor": 'green',
+                    "backgroundColor": !!this.state.selectedDropdownValue ? 'green' : "grey",
                     "border": '1px solid grey',
                     "borderRadius": '5px',
                     "padding": '10px',
                     "cursor": 'pointer',
                     "color": "white"
-                  } // Optional: Add pointer cursor for better UX
+                  }
+                  // Optional: Add pointer cursor for better UX
                 }
+                disabled={!this.state.selectedDropdownValue}
                 onClick={() => {
                   this.setState({ userAssign: family })
                 }}
@@ -426,6 +450,22 @@ class PendingApprovalAssignemnt extends Component {
 
           />
         )}
+        {this.state.sucess &&
+          <Snackbar open={this.state.sucess} anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }} onClose={this.onHandlerClose}>
+
+            < Alert variant="filled" severity="success" >
+              {this.state.sucessMessage}
+            </Alert >
+          </Snackbar>
+        }
+          {this.state.Unassignsucess &&
+          <Snackbar open={this.state.Unassignsucess} anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }} onClose={this.onHandlerClose}>
+
+            < Alert variant="filled" severity="success" >
+              {this.state.UnassignsucessMessage}
+            </Alert >
+          </Snackbar>
+        }
         <Grid container>
           <Grid item xs={12}>
             <Paper className={classes.paper}>

@@ -885,8 +885,8 @@ export function UnAssignUser(user) {
   return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_UNASSIGN_RESP", "INSUREE_MUTATION_ERR"], "success message");
 }
 export function AssignUser(user, selectedValue) {
-  console.log(user, "actions")
-  console.log(selectedValue, "selected")
+  // console.log(user, "actions")
+  // console.log(selectedValue, "selected")
   let mutation = `mutation AssignUsertoProfile {
     AssignUsertoProfile(
         input: {

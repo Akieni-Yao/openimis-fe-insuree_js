@@ -64,9 +64,7 @@ const AssignUserDialog = (props) => {
     }`,
         { str: searchString },
     );
-    console.log("datadata", data?.getFreeApprovers?.edges)
-    console.log("name", props.name);
-    console.log(props.task?.family?.headInsuree?.chfId, "task")
+
     const findUserById = (userId) => {
         const user = data?.getFreeApprovers?.edges.find(item => item.node.id === userId);
 

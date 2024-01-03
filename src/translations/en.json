@@ -518,6 +518,9 @@
   "insuree.UnAssignUser.message":"Do you want un-assign Temp CAMU No. from {label}?",
   "insuree.AssignUser.message":"Do you want assign {label}?",
   "insuree.user.Assign":"Assign",
-  "insuree.user.unAssign":"un-assign"
-
+  "insuree.user.unAssign":"un-assign",
+  "insuree.reassign.tooltip": "Re-assign User",
+  "insuree.assign.tooltip": "Assign User",
+  "insuree.Unassign.tooltip": "Un-Assign User",
+  "insuree.Assign.User": "Assigned User"
 }
