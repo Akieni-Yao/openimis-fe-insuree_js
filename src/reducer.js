@@ -77,6 +77,7 @@ function reducer(
     fetchingPendingApprovals: false,
     fetchedPendingApprovals: false,
     PendingApprovals: null,
+    PendingApprovalInfo: { totalCount: 0 },
     errorPendingApprovals: null,
     fetchingApprover: false,
     fetchedApprover: false,
@@ -119,7 +120,7 @@ function reducer(
         errorInsuree: null,
       };
     case "INSUREE_INSUREE_RESP":
-      console.log('reducer',parseData(action.payload.data.insurees));
+      console.log('reducer', parseData(action.payload.data.insurees));
       return {
         ...state,
         fetchingInsuree: false,
@@ -371,7 +372,7 @@ function reducer(
       };
     case "INSUREE_FAMILY_OVERVIEW_RESP":
       var families = parseData(action.payload.data.families);
-      console.log('reducerfamil',parseData(action.payload.data.families));
+      console.log('reducerfamil', parseData(action.payload.data.families));
       return {
         ...state,
         fetchingFamily: false,
@@ -518,29 +519,31 @@ function reducer(
         fetchingPendingApproval: false,
         errorPendingApproval: formatServerError(action.payload),
       };
-      case "INSUREE_PENDINGAPPROVALS_REQ":
-        return {
-          ...state,
-          fetchingPendingApprovals: true,
-          fetchedPendingApprovals: false,
-          PendingApprovals: null,
-          errorPendingApprovals: null,
-        };
-      case "INSUREE_PENDINGAPPROVALS_RESP":
-        var families = parseData(action.payload.data.insureeQueue);
-        return {
-          ...state,
-          fetchingPendingApprovals: false,
-          fetchedPendingApprovals: true,
-          PendingApprovals: !!families && families.length > 0 ? families : null,
-          errorPendingApprovals: formatGraphQLError(action.payload),
-        };
-      case "INSUREE_PENDINGAPPROVALS_ERR":
-        return {
-          ...state,
-          fetchingPendingApprovals: false,
-          errorPendingApprovals: formatServerError(action.payload),
-        };
+    case "INSUREE_PENDINGAPPROVALS_REQ":
+      return {
+        ...state,
+        fetchingPendingApprovals: true,
+        fetchedPendingApprovals: false,
+        PendingApprovals: null,
+        errorPendingApprovals: null,
+      };
+    case "INSUREE_PENDINGAPPROVALS_RESP":
+      var families = parseData(action.payload.data.insureeQueue);
+      return {
+        ...state,
+        fetchingPendingApprovals: false,
+        fetchedPendingApprovals: true,
+        PendingApprovals: !!families && families.length > 0 ? families : null,
+        errorPendingApprovals: formatGraphQLError(action.payload),
+        PendingApprovalInfo: pageInfo(action.payload.data.insureeQueue),
+      };
+      
+    case "INSUREE_PENDINGAPPROVALS_ERR":
+      return {
+        ...state,
+        fetchingPendingApprovals: false,
+        errorPendingApprovals: formatServerError(action.payload),
+      };
     case "INSUREE_CREATEDBY_REQ":
       return {
         ...state,
@@ -580,12 +583,20 @@ function reducer(
         reportData: action.payload.data.sentNotification?.data,
         errorreport: formatGraphQLError(action.payload),
       };
-      case "INSUREE_UNASSIGN_RESP":
-        return{
+    case "INSUREE_UNASSIGN_RESP":
+      return {
+        ...state,
+        fetchingunasign: false,
+        fetchedunasign: true,
+        unasignData: action.payload.data.sentNotification?.data,
+        errorunasign: formatGraphQLError(action.payload),
+      }
+      case "INSUREE_UNASSIGNUSERLIST_RESP":
+        return {
           ...state,
-          fetchingunasign: false,
-          fetchedunasign: true,
-          unasignData: action.payload.data.sentNotification?.data,
+          fetchingunasignUser: false,
+          fetchedunasignUser: true,
+          unasignDataUser: action.payload.data,
           errorunasign: formatGraphQLError(action.payload),
         }
     case "INSUREE_SEND_EMAIL_RESP":
@@ -737,7 +748,7 @@ function reducer(
         errorPolicyHolderInsuree: null,
       };
     case "POLICYHOLDER_INSUREE_RESP":
-     
+
       return {
         ...state,
         fetchingPolicyHolder: false,

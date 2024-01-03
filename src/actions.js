@@ -166,9 +166,15 @@ export function fetchPendingApprvalQueue(mm, filters) {
   return graphql(
     `
     query InsureeQueue {
-      insureeQueue {
+      insureeQueue(${filters.join(" ")}) {
           totalCount
           edgeCount
+          pageInfo {
+            hasNextPage
+            hasPreviousPage
+            startCursor
+            endCursor
+        }
           edges {
               node {
                   id
@@ -847,8 +853,29 @@ export function fetchPolicyHolderInsuree(modulesManager, insureeUuid) {
   const payload = formatPageQuery("policyHolderByInsuree", [filter], POLICYHOLDER_FULL_PROJECTION(modulesManager));
   return graphql(payload, "POLICYHOLDER_INSUREE");
 }
- export function UnAssignUser(user){
-  console.log(user?.uuid,"user")
+export function UnAssignUserList(user) {
+  // console.log(user?.uuid, "user")
+  let mutation = `query GetFreeApprovers {
+    getFreeApprovers {
+        totalCount
+        edgeCount
+        edges {
+            node {
+                id
+                username
+                iUser {
+                    lastName
+                    otherNames
+                    email
+                }
+            }
+        }
+    }
+}`;
+  return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_UNASSIGNUSERLIST_RESP", "INSUREE_MUTATION_ERR"], "success message");
+}
+export function UnAssignUser(user) {
+  // console.log(user?.uuid, "user")
   let mutation = `mutation UnassignUsertoProfile {
     UnassignUsertoProfile(input: { uuid: "${user?.uuid}" }) {
         success
@@ -856,11 +883,11 @@ export function fetchPolicyHolderInsuree(modulesManager, insureeUuid) {
     }
 }`;
   return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_UNASSIGN_RESP", "INSUREE_MUTATION_ERR"], "success message");
- }
- export function AssignUser(user,selectedValue){
-  console.log(user,"actions")
-  console.log(selectedValue,"selected")
-  let mutation= `mutation AssignUsertoProfile {
+}
+export function AssignUser(user, selectedValue) {
+  console.log(user, "actions")
+  console.log(selectedValue, "selected")
+  let mutation = `mutation AssignUsertoProfile {
     AssignUsertoProfile(
         input: {
             uuid:"${user?.uuid}"
@@ -871,5 +898,5 @@ export function fetchPolicyHolderInsuree(modulesManager, insureeUuid) {
         message
     }
 }`;
-return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_UNASSIGN_RESP", "INSUREE_MUTATION_ERR"], "success message");
- }
+  return graphql(mutation, ["INSUREE_MUTATION_REQ", "INSUREE_UNASSIGN_RESP", "INSUREE_MUTATION_ERR"], "success message");
+}

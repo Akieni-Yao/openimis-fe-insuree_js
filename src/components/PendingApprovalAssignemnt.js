@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, Component } from "react";
 import { withTheme, withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -26,6 +26,7 @@ import {
   PublishedComponent,
   ProgressOrError,
   clearCurrentPaginationPage,
+  Searcher
 } from "@openimis/fe-core";
 // import EnquiryDialog from "./EnquiryDialog";
 import {
@@ -48,6 +49,7 @@ import {
 // import DocumentViewDialog from "../dialogs/DocumentViewDialogs";
 import HelpIcon from "@material-ui/icons/Help";
 import UnAssignUserDialog from "../dialogs/UnAssignUserDialog";
+import AssignUserDialog from "../dialogs/AssignUserDialog";
 
 const styles = (theme) => ({
   paper: theme.paper.paper,
@@ -88,7 +90,7 @@ const styles = (theme) => ({
   },
 });
 
-class PendingApprovalAssignemnt extends PagedDataHandler {
+class PendingApprovalAssignemnt extends Component {
   state = {
     documentViewOpen: false,
     chfid: null,
@@ -104,7 +106,9 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
     selectedRowsForAssign: new Set(),
     toggleButtonClicked: false,
     unAssignUser: null,
-    selectedDropdownValue: null
+    userAssign: null,
+    selectedDropdownValue: null,
+    toggleButtonClickedRow: null
   };
 
   constructor(props) {
@@ -119,60 +123,72 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
   }
 
   componentDidMount() {
-    this.setState({ orderBy: null }, (e) => this.onChangeRowsPerPage(this.defaultPageSize));
+    // this.setState({ orderBy: null }, (e) => this.onChangeRowsPerPage(this.defaultPageSize));
     // this.props.fetchPendingForApproval(this.props.modulesManager);
-    this.props.fetchPendingApprvalQueue(this.props.modulesManager);
+    // this.props.fetchPendingApprvalQueue(this.props.modulesManager);
 
     const moduleName = "insuree";
     const { module } = this.props;
-    if (module !== moduleName) this.props.clearCurrentPaginationPage();
+    // if (module !== moduleName) this.props.clearCurrentPaginationPage();
   }
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.documentViewOpen !== this.state.documentViewOpen) {
-      this.adjustButtonZIndex();
-    }
-  }
-
-  componentWillUnmount = () => {
-    const { location, history } = this.props;
-    const {
-      location: { pathname },
-    } = history;
-    const urlPath = location.pathname;
-    if (!pathname.includes(urlPath)) this.props.clearCurrentPaginationPage();
+  fetch = (prms) => {
+    this.props.fetchPendingApprvalQueue(this.props.modulesManager, prms);
   };
-
-  queryPrms = () => {
-    let prms = [];
-    if (!!this.state.orderBy) {
-      prms.push(`orderBy: "${this.state.orderBy}"`);
+  filtersToQueryParams = (state) => {
+    let prms = Object.keys(state.filters)
+      .filter((f) => !!state.filters[f]["filter"])
+      .map((f) => state.filters[f]["filter"]);
+    if (!state.beforeCursor && !state.afterCursor) {
+      prms.push(`first: ${state.pageSize}`);
     }
-    // if (!!this.props.family && !!this.props.family.uuid) {
-    //   prms.push(`familyUuid:"${this.props.family.uuid}"`);
-    //   return prms;
-    // }
-    return null;
+    if (!!state.afterCursor) {
+      prms.push(`after: "${state.afterCursor}"`);
+      prms.push(`first: ${state.pageSize}`);
+    }
+    if (!!state.beforeCursor) {
+      prms.push(`before: "${state.beforeCursor}"`);
+      prms.push(`last: ${state.pageSize}`);
+    }
+    if (!!state.orderBy) {
+      prms.push(`orderBy: ["${state.orderBy}"]`);
+    }
+    return prms;
   };
-
 
   addUser = (e) => {
     this.setState({ readOnly: false, isAddUserClicked: true });
   }
+  // toggleAssign = (family) => {
+  //   // console.log("family", family)
+  //   const selectedRowsForAssign = new Set(this.state.selectedRowsForAssign);
+  //   const toggleButtonClickedRow = this.state.toggleButtonClickedRow === family ? null : family;
+  //   if (selectedRowsForAssign.has(family)) {
+  //     selectedRowsForAssign.delete(family);
+  //   } else {
+  //     selectedRowsForAssign.add(family);
+  //   }
+  //   // this.setState({ selectedRowsForAssign });
+  //   this.setState({ selectedRowsForAssign, toggleButtonClicked: true, readOnly: false, toggleButtonClickedRow });
+  // }
   toggleAssign = (family) => {
-    // console.log("family", family)
     const selectedRowsForAssign = new Set(this.state.selectedRowsForAssign);
     const toggleButtonClickedRow = this.state.toggleButtonClickedRow === family ? null : family;
-    if (selectedRowsForAssign.has(family)) {
-      selectedRowsForAssign.delete(family);
-    } else {
+
+    // Clear the selection of the previously selected row
+    if (selectedRowsForAssign.size > 0) {
+      selectedRowsForAssign.clear();
+    }
+
+    if (!selectedRowsForAssign.has(family)) {
       selectedRowsForAssign.add(family);
     }
-    // this.setState({ selectedRowsForAssign });
+
     this.setState({ selectedRowsForAssign, toggleButtonClicked: true, readOnly: false, toggleButtonClickedRow });
   }
-  onChangeSelection = (i) => {
-    this.props.selectFamilyMember(i[0] || null);
-  };
+
+  // onChangeSelection = (i) => {
+  //   this.props.selectFamilyMember(i[0] || null);
+  // };
   deleteUser = (isConfirmed) => {
     if (!!isConfirmed) {
       this.setState({ deleteUser: null });
@@ -182,22 +198,36 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
         await this.props.UnAssignUser(
           user,
         );
-        this.props.fetchPendingApprvalQueue(this.props.modulesManager);
-        // this.fetch(['first: 10', 'orderBy: ["name"]']);
+        // this.props.fetchPendingApprvalQueue(this.props.modulesManager);
+        this.fetch(['first: 10']);
       });
     }
   };
   userAssign = (family) => {
-    this.props.AssignUser(family, this.state.selectedDropdownValue)
-    console.log("usersa", family)
+    // console.log("family",family)
+    if (!!family) {
+      this.setState({ userAssign: null });
+    } else {
+      const user = this.state.userAssign;
+      this.setState({ AssignUser: null }, async () => {
+        await this.props.AssignUser(
+          user, this.state.selectedDropdownValue
+        );
+        // this.props.fetchPendingApprvalQueue(this.props.modulesManager);
+        this.setState({ userAssign: null });
+        this.fetch(['first: 5']);
+      });
+    }
+    // console.log("this.state.selectedDropdownValue",this.state.selectedDropdownValue)
+    // this.props.AssignUser(family, this.state.selectedDropdownValue)
+    // console.log("usersa", family)
   }
   handleDropdownChange = (selectedValue) => {
-    console.log("selected", selectedValue);
-    // Step 2: Update state with the selected value
+    console.log(selectedValue.id,"selectedValue")
     this.setState({ selectedDropdownValue: selectedValue });
   };
 
-  headers = () => {
+  headers = (filter) => {
     var h = [
       "PedingApproval.tempCamuNo",
       "PedingApproval.lastName",
@@ -206,28 +236,25 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
       "",
       ""
     ];
-    return h;
+    // return h;
+    return h.filter(Boolean);
   };
 
-  sorter = (attr, asc = true) => [
-    () =>
-      this.setState(
-        (state, props) => ({ orderBy: sort(state.orderBy, attr, asc) }),
-        (e) => this.query(),
-      ),
-    () => formatSorter(this.state.orderBy, attr, asc),
-  ];
+  // sorter = (attr, asc = true) => [
+  //   () =>
+  //     this.setState(
+  //       (state, props) => ({ orderBy: sort(state.orderBy, attr, asc) }),
+  //       (e) => this.query(),
+  //     ),
+  //   () => formatSorter(this.state.orderBy, attr, asc),
+  // ];
 
-  headerActions = [
-    this.sorter("PedingApproval.tempCamuNo"),
-    this.sorter("PedingApproval.firstName"),
-    this.sorter("PedingApproval.lastName"),
-    this.sorter("PedingApproval.lastName"),
-  ];
-
-  onDocumentViewClose = () => {
-    this.setState({ documentViewOpen: false });
-  };
+  // headerActions = [
+  //   this.sorter("PedingApproval.tempCamuNo"),
+  //   this.sorter("PedingApproval.firstName"),
+  //   this.sorter("PedingApproval.lastName"),
+  //   this.sorter("PedingApproval.lastName"),
+  // ];
 
   formatters = () => {
     var row = [
@@ -291,10 +318,7 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
                 onClick={() => (hasUserId ? this.toggleAssign(family) : null)}
               >
                 {hasUserId ? (isSelectedForAssign ? <button style={buttonStyle} onClick={() => {
-                  this.userAssign(family)
-                  // Handle assign button click logic here
-                  // You may want to use the selectedRowsForAssign state
-                  // to perform the assignment.
+                  this.setState({ userAssign: family })
                 }}>
                   <FormattedMessage module="core" id="Assign" />
                 </button> : <SwapHorizIcon />) : " "}
@@ -303,20 +327,6 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
           </Grid>
         );
       },
-      // (family) => family?.userId && this.state.ischangeUser === family(
-      //   <Grid item>
-      //     <Tooltip title={formatMessage(this.props.intl, "insuree", "insureeSummaries.openFamilyButton.tooltip")}>
-      //       <IconButton
-      //         size="small"
-      //         onClick={(family) =>
-      //           this.unAssign(family)
-      //         }
-      //       >
-      //         <SwapHorizIcon />
-      //       </IconButton>
-      //     </Tooltip>
-      //   </Grid>
-      // ),
       (family) => family?.userId ? <Grid item>
         <Tooltip title={formatMessage(this.props.intl, "insuree", "insureeSummaries.openFamilyButton.tooltip")}>
           <IconButton
@@ -329,19 +339,27 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
       </Grid> : (
         <Grid item>
           <Tooltip title={formatMessage(this.props.intl, "insuree", "insureeSummaries.openFamilyButton.tooltip")}>
+
             {this.state.toggleButtonClickedRow === family ? (
-              <Button
+              <button
                 size="small"
                 color="primary"
+                style={
+                  {
+                    "backgroundColor": 'green',
+                    "border": '1px solid grey',
+                    "borderRadius": '5px',
+                    "padding": '10px',
+                    "cursor": 'pointer',
+                    "color": "white"
+                  } // Optional: Add pointer cursor for better UX
+                }
                 onClick={() => {
-                  this.userAssign(family)
-                  // Handle assign button click logic here
-                  // You may want to use the selectedRowsForAssign state
-                  // to perform the assignment.
+                  this.setState({ userAssign: family })
                 }}
               >
                 Assign
-              </Button>
+              </button>
             ) : (
               <IconButton
                 size="small"
@@ -352,28 +370,7 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
             )}
           </Tooltip>
         </Grid>
-        // <Grid item>
-        //   <Tooltip title={formatMessage(this.props.intl, "insuree", "insureeSummaries.openFamilyButton.tooltip")}>
-        //     <IconButton
-        //       size="small"
-        //       onClick={() => (this.toggleAssign(family))}
-        //     // onClick={(e) =>
-        //     //   this.addUser()
-        //     // }
-        //     >
-        //       <PersonAddIcon />
-        //     </IconButton>
-        //   </Tooltip>
-        // </Grid>
       )
-      // (family) => (
-      //   <PublishedComponent
-      //     pubRef="insuree.UserPicker"
-      //     withLabel={false}
-      //     readOnly={false}
-      //     value={!!family?.userId?.iUser ? `${family?.userId?.iUser?.otherNames} ${family?.userId?.iUser?.lastName}` : null}
-      //   />
-      // ),
     ];
     return row;
   };
@@ -396,14 +393,20 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
       PendingApprovals,
       insurees,
       fetchingInsurees,
+      fetchedInsurees,
       errorInsurees,
+      filterPaneContributionsKey,
+      cacheFiltersKey,
+      PendingApprovalInfo
     } = this.props;
-    console.log("PendingApprovals", PendingApprovals)
+    // console.log("pageInfo", PendingApprovalInfo)
     let actions =
       !!readOnly || !!checkingCanAddInsuree || !!errorCanAddInsuree
         ? []
         : [
         ];
+    let count = PendingApprovalInfo?.totalCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
     return (
       <>
         {this.state.unAssignUser && (
@@ -414,10 +417,19 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
 
           />
         )}
+        {this.state.userAssign && (
+          <AssignUserDialog
+            task={this.state.userAssign}
+            onConfirm={this.userAssign}
+            name={this.state.selectedDropdownValue}
+            onCancel={(e) => this.setState({ userAssign: null })}
+
+          />
+        )}
         <Grid container>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
-              <Grid container alignItems="center" direction="row" className={classes.paperHeader}>
+              {/* <Grid container alignItems="center" direction="row" className={classes.paperHeader}>
                 <Grid item xs={8}>
                   <Typography className={classes.tableTitle}>
                     <FormattedMessage module="insuree" id="Insuree.pendingApproval" />
@@ -437,28 +449,28 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
                 <Grid item xs={12}>
                   <Divider />
                 </Grid>
-              </Grid>
+              </Grid> */}
 
-              <Table
+              <Searcher
                 module="insuree"
-                headers={this.headers()}
-                headerActions={this.headerActions}
-                itemFormatters={this.formatters()}
+                cacheFiltersKey={cacheFiltersKey}
+                filterPaneContributionsKey={filterPaneContributionsKey}
+                headers={this.headers}
+                itemsPageInfo={PendingApprovalInfo}
+                itemFormatters={this.formatters}
                 items={PendingApprovals}
-                fetching={fetchingInsurees}
-                error={errorInsurees}
-                // onDoubleClick={this.onDoubleClick}
-                withSelection={"single"}
-                onChangeSelection={this.onChangeSelection}
-                withPagination={false}
+                fetchingItems={fetchingInsurees}
+                fetchedItems={fetchedInsurees}
+                errorItems={errorInsurees}
+                // onChangeSelection={this.onChangeSelection}
                 rowsPerPageOptions={this.rowsPerPageOptions}
                 defaultPageSize={this.defaultPageSize}
-                page={this.currentPage()}
-                pageSize={this.currentPageSize()}
-                count={pageInfo.totalCount}
-                onChangePage={this.onChangePage}
-                onChangeRowsPerPage={this.onChangeRowsPerPage}
+                fetch={this.fetch}
                 rowLocked={this.rowLocked}
+                withSelection={"single"}
+                rowIdentifier={this.rowIdentifier}
+                filtersToQueryParams={this.filtersToQueryParams}
+                tableTitle={formatMessageWithValues(intl, "insuree", "insureePendingApproval", { count })}
               />
             </Paper>
           </Grid>
@@ -469,8 +481,6 @@ class PendingApprovalAssignemnt extends PagedDataHandler {
 }
 
 const mapStateToProps = (state) => (
-  // console.log("list",state)
-  // ,
   {
     rights: !!state.core && !!state.core.user && !!state.core.user.i_user ? state.core.user.i_user.rights : [],
     alert: !!state.core ? state.core.alert : null,
@@ -490,7 +500,7 @@ const mapStateToProps = (state) => (
     family: state.insuree.family,
     PendingApprovals: state.insuree.PendingApprovals,
     insurees: state.insuree.insurees,
-    insureesPageInfo: state.insuree.insureesPageInfo,
+    PendingApprovalInfo: state.insuree.PendingApprovalInfo,
     fetchingInsurees: state.insuree.fetchingInsurees,
     fetchedInsurees: state.insuree.fetchedInsurees,
   });
