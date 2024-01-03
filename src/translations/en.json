@@ -5,6 +5,7 @@
   "insuree.menu.familiesOrGroups": "Families/Groups",
   "insuree.menu.insurees": "Insurees",
   "insuree.menu.pendingApproval": "Pending Approval",
+  "insuree.menu.pendingApprovalAssign": "User Assignment",
   "insuree.ageUnit": "Years",
   "insuree.label.regionFSP": "Region of FSP",
   "insuree.label.districtFSP": "District of FSP",
@@ -166,6 +167,7 @@
   "insuree.HeadInsureeMasterPanel.title": "Head Insuree Details",
   "insuree.InsureeFirstServicePointPanel.title": "First Service Point",
   "insuree.insureeSummaries": "{count} Insurees Found",
+  "insuree.insureePendingApproval": "{count} Pending for Approval",
   "insuree.insureeSummaries.openNewTabButton.tooltip": "Open in new tab",
   "insuree.insureeSummaries.openFamilyButton.tooltip": "Open insuree's family",
   "insuree.insureeSummaries.insuranceNo": "Temporary Camu No.",
@@ -510,5 +512,15 @@
   "insuree.Insuree.rejectComments.null": " ",
   "insuree.Insuree.rejectComments.1": "Doc is rejected due to quality of the document is not that much good.",
   "insuree.Insuree.rejectComments.2": "Document is rejected",
-  "insuree.insureeSummaries.camuNumber": "CAMU No."
+  "insuree.insureeSummaries.camuNumber": "CAMU No.",
+  "insuree.UnAssignUser.mutationLabel":"Un-assign User",
+  "insuree.AssignUser.mutationLabel":"Assign User",
+  "insuree.UnAssignUser.message":"Do you want un-assign Temp CAMU No. from {label}?",
+  "insuree.AssignUser.message":"Do you want assign {label}?",
+  "insuree.user.Assign":"Assign",
+  "insuree.user.unAssign":"un-assign",
+  "insuree.reassign.tooltip": "Re-assign User",
+  "insuree.assign.tooltip": "Assign User",
+  "insuree.Unassign.tooltip": "Un-Assign User",
+  "insuree.Assign.User": "Assigned User"
 }
